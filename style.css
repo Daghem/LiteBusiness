@@ -1,0 +1,155 @@
+/* style.css - VERSIONE "MODERN & SEXY" */
+
+/* 1. Sfondo e Font Moderno */
+body {
+  background: linear-gradient(
+    135deg,
+    #f5f7fa 0%,
+    #c3cfe2 100%
+  ); /* Sfumatura elegante */
+  font-family:
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* Font più pulito */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+/* 2. Header "Glassmorphism" (Effetto vetro) */
+.chat-header {
+  background: rgba(255, 255, 255, 0.9); /* Bianco semitrasparente */
+  backdrop-filter: blur(10px); /* Sfocatura sfondo */
+  color: #333;
+  padding: 20px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); /* Ombra morbida */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  z-index: 1000;
+}
+
+/* 3. Area Chat */
+.chat-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px;
+  padding-bottom: 100px;
+}
+
+/* Scrollbar personalizzata (più sottile) */
+.chat-container::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-container::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+
+/* 4. Messaggi (Bolle più rotonde e moderne) */
+.message-user {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 25px;
+  animation: fadeIn 0.3s ease; /* Animazione di entrata */
+}
+
+.bubble-user {
+  background: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 100%
+  ); /* Sfumatura Viola/Blu moderna */
+  color: white;
+  border-radius: 20px 20px 5px 20px; /* Forma più organica */
+  padding: 15px 25px;
+  max-width: 70%;
+  box-shadow: 0 10px 20px rgba(118, 75, 162, 0.2); /* Ombra colorata */
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.message-ai {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 25px;
+  animation: fadeIn 0.3s ease;
+}
+
+.bubble-ai {
+  background-color: white;
+  color: #2d3436;
+  border-radius: 20px 20px 20px 5px;
+  padding: 20px 30px; /* Più spazioso */
+  max-width: 80%;
+  border: none; /* Via i bordi vecchi */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* Ombra leggerissima */
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* 5. Stile per le Citazioni (RAG) più carino */
+.source-box {
+  font-size: 0.9rem;
+  margin-top: 15px;
+  background-color: #f0fdf4; /* Verde chiarissimo */
+  border-left: 5px solid #2ecc71; /* Verde brillante */
+  padding: 12px 15px;
+  border-radius: 8px;
+  transition: transform 0.2s; /* Animazione al passaggio del mouse */
+}
+.source-box:hover {
+  transform: translateX(5px); /* Si sposta leggermente */
+}
+
+.source-link {
+  color: #27ae60;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* 6. Input Area "Galleggiante" */
+.input-area {
+  position: fixed;
+  bottom: 20px; /* Staccato dal fondo */
+  left: 50%;
+  transform: translateX(-50%); /* Centrato */
+  width: 90%; /* Non occupa tutto lo schermo */
+  max-width: 800px;
+  background-color: white;
+  padding: 15px;
+  border-radius: 50px; /* Completamente rotondo */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Ombra profonda */
+  z-index: 1000;
+}
+
+/* Togliamo i bordi brutti dall'input */
+.input-group {
+  background: white;
+}
+.form-control {
+  border: none; /* Niente bordi */
+  background: transparent;
+}
+.form-control:focus {
+  box-shadow: none; /* Via l'alone blu standard */
+}
+.btn-primary {
+  border-radius: 50px; /* Bottone rotondo */
+  padding: 10px 25px;
+  background: #667eea;
+  border: none;
+  transition: background 0.3s;
+}
+.btn-primary:hover {
+  background: #764ba2; /* Cambia colore al passaggio */
+}
+
+/* Animazione semplice */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -69,24 +69,22 @@
       const chatForm = document.getElementById("chatForm");
       const chatBox = document.getElementById("chatBox");
       const inputField = chatForm.querySelector("input");
+      const userText = inputField.value;
+      const contenuto = "content";
       // Funzione per inviare la domanda all'API (da implementare)
-      async function inviaDomanda() {
-        const userText = inputField.value;
-        try {
-          const response = await fetch("http://localhost:8000/", {
-            method: "POST",
-            headers: {
-              content: userText,
-            },
-            body: JSON.stringify({ content: userText }),
-          });
-        } catch (error) {
-          console.error("Errore durante la richiesta:", error);
-        }
-        return await response.json().message;
+      function inviaDomanda(userText) {
+        return fetch("http://localhost:8000/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", contenuto: userText },
+          body: JSON.stringify({ content: userText }),
+        })
+          .then((res) => res.json())
+          .then((data) => data.message)
+          .catch((err) => console.error("Errore:", err));
       }
 
-      chatForm.addEventListener("submit", function (e) {
+      chatForm.addEventListener("submit", async function (e) {
+        // Aggiunto async qui
         e.preventDefault();
 
         const userText = inputField.value;
@@ -96,14 +94,17 @@
         appendMessage("user", userText);
         inputField.value = "";
 
-        // Simula risposta IA
-        setTimeout(() => {
-          // Risposta "Scenica" per la presentazione
-          const fakeReply = inviaDomanda();
-          const fakeSource = "Circolare n. 32/E del 5 dicembre 2023";
+        // Invece di setTimeout, aspettiamo la risposta reale
+        // Se vuoi mantenere l'effetto "caricamento", puoi aggiungere un indicatore visivo
+        try {
+          const aiReply = await inviaDomanda(userText);
+          console.log(aiReply); // Aspetta la risposta reale
+          const aiSource = "Dati estratti dal Database Vettoriale RAG"; // Poi la renderai dinamica
 
-          appendMessage("ai", fakeReply, fakeSource);
-        }, 1500);
+          appendMessage("ai", aiReply, aiSource);
+        } catch (err) {
+          appendMessage("ai", "Spiacente, si è verificato un errore.");
+        }
       });
 
       function appendMessage(sender, text, source = null) {
@@ -123,7 +124,7 @@
                             ? `
                         <div class="source-box">
                             <i class="fas fa-book me-1"></i> <strong>Fonte verificata:</strong><br>
-                            <a href="#" class="source-link">${source}</a>
+                            <a href="#" class="source-link">www.google.com</a>
                         </div>`
                             : ""
                         }

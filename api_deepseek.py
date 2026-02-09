@@ -37,7 +37,8 @@ async def read_root(request: fastapi.Request):
         {"role": "user", "content": contenuto}
     ],
     stream=False
-)
+    )
     
     return {"message": response.choices[0].message.content}
+    
 

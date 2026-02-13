@@ -1,0 +1,79 @@
+Circolare n. 9/E del 10 aprile 2019 
+Oggetto: Regime forfetario per le persone fisiche esercenti attività d'impresa, arti o professioni 
+– Articolo 1, commi da 54 a 89, della legge 23 dicembre 2014, n. 190, come modificato dalla legge 
+30 dicembre 2018, n. 145 e dal decreto-legge 14 dicembre 2018, n. 135. 
+ 
+1. PREMESSA 
+La legge 23 dicembre 2014, n. 190 (legge di stabilità 2015), ha introdotto un regime fiscale 
+agevolato, c.d. regime forfetario, rivolto ai contribuenti persone fisiche esercenti attività 
+d'impresa, arti o professioni. Di recente, la legge 30 dicembre 2018, n. 145 (legge di bilancio 2019) 
+ha modificato l'ambito di applicazione del regime: 
+● Soglia unica: 65.000 euro di ricavi/compensi (indipendentemente dall'attività). 
+● Abrogazione limiti: Eliminati i limiti sul costo dei beni strumentali (20.000€) e sulle spese 
+per lavoro dipendente (5.000€). 
+● Nuove cause ostative: Riformulate le lettere d) e d-bis) del comma 57 per evitare 
+frazionamenti artificiosi delle attività. 
+2. INGRESSO E PERMANENZA NEL REGIME FORFETARIO 
+2.1. Premessa 
+Il regime forfetario rappresenta il regime naturale delle persone fisiche in forma individuale, 
+purché in possesso dei requisiti e in assenza di cause ostative. 
+2.2. Requisiti di applicazione 
+Il limite di 65.000 euro va verificato con riferimento ai ricavi conseguiti e ai compensi percepiti 
+nell'anno precedente. 
+● Criterio di cassa/competenza: Si tiene conto del regime contabile applicato nell'anno di 
+riferimento (cassa per i semplificati, competenza per gli ordinari). 
+● Ragguaglio ad anno: Il limite va riproporzionato se l'attività è iniziata in corso d'anno. 
+● Diritti d'autore: Concorrono alla soglia solo se correlati all'attività di lavoro autonomo 
+svolta. 
+2.3. Cause ostative 
+2.3.1. Regimi speciali e residenti all'estero 
+Non possono accedere i soggetti che si avvalgono di regimi speciali IVA (es. editoria, agricoltura, 
+tabacchi) o i non residenti (salvo residenti UE/SEE che producono in Italia almeno il 75% del 
+reddito). 
+2.3.2. Partecipazioni in società e controllo di SRL (Lettera d) 
+La causa ostativa scatta se il contribuente: 
+1. Partecipa contemporaneamente a società di persone, associazioni o imprese familiari. 
+2. Controlla (direttamente o indirettamente) società a responsabilità limitata o associazioni 
+in partecipazione che esercitano attività economiche riconducibili a quelle svolte dal 
+forfetario. 
+○ Controllo: Si rimanda all'art. 2359 c.c. (incluso il controllo tramite familiari). 
+○ Riconducibilità: Si verifica se le attività appartengono alla medesima Sezione 
+ATECO e se il forfetario fattura alla SRL controllata che deduce il costo. 
+2.3.3. Rapporti con ex datori di lavoro (Lettera d-bis) 
+Non può applicare il regime chi esercita l'attività prevalentemente (oltre il 50%) nei confronti di 
+datori di lavoro con i quali sono in corso rapporti di lavoro o erano intercorsi nei due precedenti 
+periodi d'imposta. 
+● Esclusione: Non si applica a chi inizia l'attività dopo il periodo di pratica obbligatoria per 
+professioni protette. 
+3. APPLICAZIONE E DISAPPLICAZIONE 
+● Passaggio da semplificato: È sempre possibile senza attendere il triennio, poiché entrambi 
+sono regimi naturali. 
+● Passaggio da ordinario: Possibile anche prima del triennio a seguito delle modifiche 
+normative della Legge di Bilancio 2019. 
+● Disapplicazione: Il regime cessa dall'anno successivo al superamento dei limiti o al 
+verificarsi di una causa ostativa (non c'è fuoriuscita in corso d'anno, salvo il caso limite 
+dei 100k introdotto successivamente). 
+4. CARATTERISTICHE DEL REGIME 
+4.1. Semplificazioni IVA 
+● Non si addebita l'IVA in fattura. 
+● Non si detrae l'IVA sugli acquisti. 
+● Esonero dalla dichiarazione annuale IVA e dai registri. 
+● Fatturazione elettronica: La circolare (all'epoca) indicava l'esonero, salvo che verso la PA. 
+4.2. Semplificazioni Imposte sui Redditi 
+● Esonero dagli ISA (Indici Sintetici di Aﬃdabilità). 
+● Non si operano ritenute d'acconto (ma bisogna indicare il CF del percettore in 
+dichiarazione). 
+● Non si subiscono ritenute d'acconto dai clienti (previa dichiarazione). 
+4.3. Determinazione del reddito imponibile 
+Il reddito si calcola applicando il coeﬃciente di redditività ai ricavi/compensi (criterio di cassa). 
+● Deducibilità: Sono deducibili solo i contributi previdenziali versati per legge. 
+● Perdite fiscali: Le perdite pregresse (regime ordinario) possono essere usate nel limite 
+dell'80%. 
+4.4. Imposta sostitutiva 
+● 15% (misura standard). 
+● 5% per i primi 5 anni (nuove attività/start-up) se rispettati i requisiti di novità. 
+5. SANZIONI 
+Si applicano le disposizioni vigenti in materia di imposte dirette e IVA. È previsto un aggravio 
+del 10% della sanzione se il maggior reddito accertato supera del 10% quello dichiarato in caso di 
+infedele indicazione dei requisiti di accesso. 
+ 

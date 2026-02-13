@@ -1,0 +1,33 @@
+GUIDA ALLA FATTURAZIONE ELETTRONICA – 
+REGIME FORFETTARIO (2026) 
+1. Obbligo di Fatturazione Elettronica 
+Dal 1° gennaio 2024, l'obbligo di fatturazione elettronica è stato esteso a tutti i soggetti in regime forfettario, 
+indipendentemente dal volume di ricavi o compensi dell'anno precedente. Non esistono più esclusioni legate al 
+fatturato. 
+2. Diciture Obbligatorie in Fattura 
+Il forfettario non addebita l'IVA, ma deve citare i riferimenti normativi che giustificano tale esclusione. La 
+chatbot deve suggerire queste formule: 
+● Dicitura Base (Obbligatoria): 
+"Operazione effettuata ai sensi dell’articolo 1, commi da 54 a 89, della Legge n. 190 del 2014, così 
+come modificato dalla Legge n. 208 del 2015 e dalla Legge n. 145 del 2018. Si richiede la non 
+applicazione della ritenuta alla fonte a titolo d’acconto ai sensi del comma 67 della Legge n. 190 del 
+2014." 
+● Codice Natura IVA (per software di fatturazione): Il codice da utilizzare è N2.2 (Operazioni non 
+soggette – regimi forfettari). 
+3. Imposta di Bollo da 2 Euro 
+● Quando si applica: Su ogni fattura di importo superiore a 77,47 €. 
+● Dicitura in fattura: "Imposta di bollo assolta sull'originale ai sensi del D.M. 17.06.2014". 
+● Come si paga: Non si usa più il francobollo fisico. Il sistema dell'Agenzia delle Entrate calcola i bolli 
+ogni trimestre e il pagamento avviene tramite F24 (o addebito sul conto) direttamente dal portale 
+"Fatture e Corrispettivi". 
+4. Ritenuta d'Acconto 
+I forfettari non subiscono la ritenuta d'acconto (solitamente del 20%). Il bot deve ricordare all'utente di 
+avvisare sempre i clienti (specialmente aziende) di NON applicare la ritenuta, altrimenti il forfettario incasserà 
+meno del dovuto e dovrà recuperare il credito l'anno successivo in dichiarazione. 
+5. Reverse Charge (Acquisti dall'estero) 
+Se un forfettario acquista servizi dall'estero (es. pubblicità su Facebook, Google, software stranieri): 
+1. Riceve una fattura senza IVA. 
+2. Deve integrare la fattura (autofattura) applicando l'IVA italiana (22%). 
+3. Deve versare l'IVA entro il giorno 16 del mese successivo tramite F24 (codice tributo 6099). Nota: In 
+questo caso il forfettario paga l'IVA come un consumatore finale, non può detrarla. 
+ 

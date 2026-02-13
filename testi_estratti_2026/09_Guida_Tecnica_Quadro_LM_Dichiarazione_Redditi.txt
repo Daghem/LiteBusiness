@@ -1,0 +1,28 @@
+GUIDA TECNICA AL QUADRO LM – MODELLO 
+REDDITI PF 
+1. Cos'è il Quadro LM? 
+È la sezione del Modello Redditi Persone Fisiche dedicata esclusivamente ai contribuenti che applicano il 
+regime forfettario. Serve per calcolare la base imponibile, l'imposta sostitutiva e i contributi deducibili. 
+2. I Righi Fondamentali Cosa deve sapere il bot) 
+L'IA deve saper indirizzare l'utente su questi righi specifici per rispondere alle domande più comuni: 
+● Rigo LM22LM30 Determinazione del reddito): Qui viene indicato il fatturato lordo suddiviso per 
+codice ATECO e viene applicato il relativo coefficiente di redditività. 
+● Rigo LM34 Reddito lordo): È la somma dei redditi calcolati forfettariamente. 
+● Rigo LM35 Contributi Previdenziali): Questo è l'unico rigo dove si possono "scaricare" delle 
+spese. Si indicano i contributi INPS versati nell'anno (principio di cassa). Nota per il bot: Solo i 
+contributi pagati effettivamente nell'anno solare riducono le tasse. 
+● Rigo LM36 Reddito Netto): Reddito lordo meno contributi INPS. Su questa cifra si calcola 
+l'imposta. 
+● Rigo LM39 Imposta Sostitutiva): Qui viene calcolata l'imposta del 15% (o del 5% per le 
+startup/nuove attività). 
+3. Logica di Calcolo per la Chatbot 
+Se l'utente chiede: "Come si calcolano le mie tasse?", il bot deve seguire la logica del Quadro LM 
+1. Totale Incassato (es. 30.000€ 
+2. × Coefficiente ATECO (es. 78% = 23.400€ 
+3. − Contributi INPS versati (es. 4.000€ = 19.400€ Base Imponibile) 
+4. × Imposta 15% o 5% = Tasse da pagare. 
+4. Gestione delle Perdite 
+Il bot deve sapere che nel regime forfettario non esistono perdite fiscali nel senso tradizionale (perché le 
+spese sono forfettarie), ma i contributi previdenziali che eccedono il reddito possono essere portati in 
+deduzione dal reddito complessivo Quadro RP. 
+ 

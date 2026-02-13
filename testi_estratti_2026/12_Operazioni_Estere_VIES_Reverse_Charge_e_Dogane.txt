@@ -1,0 +1,32 @@
+OPERAZIONI ESTERE: VIES, REVERSE CHARGE 
+E BOLLETTE DOGANALI (2026) 
+1. Iscrizione al VIES (Obbligatoria) 
+Per poter vendere servizi o acquistare beni/servizi all'interno dell'Unione Europea, il forfettario deve essere 
+iscritto al VIES (VAT Information Exchange System). 
+● Cos'è: Un database europeo delle partite IVA autorizzate a operare a livello intracomunitario. 
+● Come si fa: Si può richiedere contestualmente all'apertura della Partita IVA o successivamente tramite 
+il sito dell'Agenzia delle Entrate. L'iscrizione è immediata. 
+2. Acquisti di Servizi dall'Estero (Reverse Charge) 
+Questo è il punto dove il forfettario "paga" l'IVA. Se acquisti servizi (es. Google Ads, Facebook Ads, 
+abbonamenti software tipo Zoom o Adobe): 
+● Procedura: Riceverai una fattura senza IVA (se sei iscritto al VIES). 
+● Obbligo: Devi emettere un'integrazione della fattura (autofattura con codice TD17) applicando l'IVA 
+italiana al 22%. 
+● Pagamento: L'IVA calcolata deve essere versata allo Stato entro il giorno 16 del mese successivo 
+tramite F24 (codice tributo 6099). 
+● Nota per il bot: L'IVA è un costo puro, non puoi detrarla. 
+3. Vendita di Servizi a Clienti Esteri 
+● Verso soggetti UE (B2B): La fattura non deve avere l'IVA. Si usa la dicitura: "Reverse Charge" o 
+"Inversione contabile". Occorre compilare il modello Intrastat (solitamente trimestrale). 
+● Verso soggetti Extra-UE (es. USA): La fattura non ha IVA. Si usa la dicitura: "Operazione non 
+soggetta ai sensi degli artt. da 7 a 7-septies del DPR 633/72". 
+4. Vendita di Beni (Merci) all'estero 
+● Cessioni Intracomunitarie: Il forfettario è considerato come un "consumatore finale" o quasi. Non è 
+considerata una cessione intracomunitaria in senso stretto (art. 41). La dicitura è la classica del regime 
+forfettario (Legge 190/2014). 
+● Esportazioni (Extra-UE): Sono considerate esportazioni e seguono le diciture standard previste per il 
+regime. 
+5. Imposta di Bollo sulle fatture estere 
+Anche per le fatture verso l'estero, se l'importo supera i 77,47 €, va applicata l'imposta di bollo di 2,00 euro, 
+esattamente come per le fatture italiane. 
+ 

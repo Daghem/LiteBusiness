@@ -1,0 +1,514 @@
+ 
+ 
+1 
+L’IMPOSTA DI BOLLO 
+SULLE FATTURE ELETTRONICHE 
+ 
+1. 
+INTRODUZIONE AL NUOVO SISTEMA ..................................................... 2 
+2. 
+L’INTEGRAZIONE DEL BOLLO SULLE FATTURE ELETTRONICHE ................... 3 
+L’elenco A (non modificabile) ................................................................... 4 
+L’elenco B (modificabile) .......................................................................... 5 
+3. 
+CONSULTAZIONE E VARIAZIONE DELLE FATTURE SOGGETTE A BOLLO ............ 8 
+4. 
+VERSAMENTO DELL’IMPOSTA DI BOLLO E CONTROLLI ............................. 11 
+5. 
+PER SAPERNE DI PIÙ: NORMATIVA E PRASSI ......................................... 14 
+ 
+(GENNAIO 2024) 
+ 
+ 
+ 
+2 
+L’imposta di bollo sulle fatture elettroniche - GENNAIO 2024 
+1. INTRODUZIONE AL NUOVO SISTEMA 
+Con l’introduzione dell’obbligo di fatturazione elettronica, prima verso le Pubbliche 
+amministrazioni e poi verso i privati, l’articolo 6 del Dm 17 giugno 2014 ha disciplinato 
+l’assolvimento dell’imposta di bollo sulle fatture elettroniche, prevedendo l’obbligo di 
+riportare una specifica annotazione su quelle soggette a tale imposta e disponendo 
+modalità e termini di versamento. 
+L’annotazione di assolvimento dell’imposta di bollo sulla fattura elettronica avviene 
+valorizzando a “SI” il campo “Bollo virtuale” contenuto all’interno del tracciato record 
+della fattura elettronica. 
+Periodicamente, l’importo complessivo dell’imposta di bollo relativa alle fatture 
+elettroniche deve essere versato dal contribuente mediante presentazione di modello 
+F24. 
+Successivamente al periodo di avvio della fatturazione elettronica, nell’ottica di fornire 
+ai contribuenti una procedura utile per un corretto assolvimento dell’imposta di bollo, 
+l’articolo 12-novies del decreto legge n. 34/2019 (come modificato dal Dm del 4 
+dicembre 2020) ha previsto che l’Agenzia delle entrate metta a disposizione dei 
+contribuenti e dei loro intermediari delegati, all’interno del portale “Fatture e 
+corrispettivi”, i dati relativi all’imposta di bollo emergente dalle fatture elettroniche 
+emesse (Elenco A), integrati dall’Agenzia con i dati delle fatture elettroniche che non 
+recano l’indicazione dell’assolvimento dell’imposta di bollo, ma per le quali l’imposta 
+risulta dovuta (Elenco B).  
+I soggetti Iva possono dunque verificare di aver correttamente assoggettato le fatture 
+elettroniche all’imposta di bollo e, nel caso di omissione dell’indicazione del bollo sulle 
+fatture emesse, possono confermare l’integrazione elaborata dall’Agenzia ed effettuare 
+il versamento di tale imposta. 
+Se, invece, i soggetti Iva ritengono che una o più fatture elettroniche oggetto 
+dell’integrazione elaborata dall’Agenzia non debbano essere assoggettate a imposta di 
+bollo, possono eliminarle dall’integrazione e fornire le relative motivazioni in sede di 
+eventuale verifica da parte dell’Agenzia. 
+La guida tiene conto dell’aggiornamento del 29 marzo 2023 delle specifiche tecniche 
+allegate al provvedimento del Direttore dell’Agenzia delle entrate del 4 febbraio 2021 
+che ha dettato le regole di funzionamento del nuovo sistema. 
+ATTENZIONE 
+La modalità prevista per l’assolvimento dell’imposta di bollo dovuta per le fatture 
+elettroniche non deve essere confusa con il cosiddetto “bollo virtuale” (cioè con la modalità 
+di pagamento indicata nell’articolo 15 del Dpr n. 642/1972, che stabilisce che l’imposta di 
+bollo può essere assolta in modo virtuale, su richiesta degli interessati, per determinati atti 
+e documenti, definiti con appositi decreti ministeriali). 
+Tale procedura consiste nella richiesta di apposita autorizzazione all’Agenzia delle entrate, 
+nell’indicazione dell’assolvimento del bollo in modalità virtuale sui documenti cartacei, nella 
+presentazione di una dichiarazione annuale per la liquidazione dell’importo dovuto per 
+l’imposta di bollo e nel versamento tramite modello F24. 
+ 
+ 
+3 
+L’imposta di bollo sulle fatture elettroniche – GENNAIO 2024 
+2. L’INTEGRAZIONE DEL BOLLO SULLE FATTURE ELETTRONICHE 
+L’Agenzia delle entrate elabora per ogni trimestre solare le fatture elettroniche 
+trasmesse al Sistema di Interscambio (SdI) ed elaborate senza scarto, per 
+determinare se su tali fatture è stato indicato correttamente l’assoggettamento 
+all’imposta di bollo. 
+Se nei documenti elettronici emessi, utilizzando il tracciato della fattura elettronica 
+ordinaria, per la comunicazione dei dati delle operazioni transfrontaliere verso 
+operatori stranieri, è valorizzato a “SI” il campo “Bollo virtuale”, questi verranno 
+considerati per il calcolo dell’imposta di bollo da pagare. 
+Se sono state emesse fatture elettroniche che configurano i presupposti per 
+l’assoggettamento a bollo, ma non contengono la relativa indicazione, l’Agenzia le 
+evidenzia al soggetto che le ha emesse: il cedente/prestatore o, nel caso di 
+autofatture per regolarizzazione di operazioni, il cessionario/committente. 
+L’esito di tale elaborazione si concretizza nella messa a disposizione all’interno del 
+portale "Fatture e corrispettivi” di due elenchi contenenti gli estremi delle fatture 
+elettroniche emesse nel trimestre solare di riferimento: 
+ 
+l’elenco A (non modificabile), che contiene gli estremi delle fatture elettroniche e 
+dei documenti elettronici emessi, utilizzando il tracciato della fattura elettronica 
+ordinaria, per la comunicazione dei dati delle operazioni transfrontaliere verso 
+operatori stranieri, assoggettati all’imposta di bollo (campo <Bollo virtuale> 
+valorizzato a “SI” nel file con estensione .xml contenente la fattura elettronica) 
+ 
+l’elenco B (modificabile), che contiene gli estremi delle fatture che presentano i 
+requisiti per l’assoggettamento a bollo ma che non riportano l’indicazione prevista 
+(campo <Bollo virtuale> non presente nel file con estensione .xml contenente la 
+fattura elettronica). 
+Ai fini dell’individuazione del trimestre di riferimento, per le fatture elettroniche 
+emesse nei confronti di privati (operatori Iva e consumatori finali) vengono 
+considerate quelle in cui: 
+ 
+la data di consegna, contenuta nella “ricevuta di consegna” rilasciata al termine 
+dell’elaborazione, è precedente alla fine del trimestre 
+ 
+la data di messa a disposizione (contenuta nella “ricevuta di impossibilità di 
+recapito) è precedente alla fine del trimestre. 
+Per esempio, una fattura elettronica datata e trasmessa al Sistema di Interscambio il 
+30 marzo, la cui data di consegna attestata nella ricevuta è il 31 marzo, viene 
+considerata tra le fatture relative al primo trimestre. 
+Una fattura elettronica datata e trasmessa al Sistema di Interscambio il 30 marzo, la 
+cui data di consegna attestata nella ricevuta è il 1° aprile, viene considerata, ai fini del 
+bollo, tra le fatture relative al secondo trimestre. 
+ 
+ 
+4 
+L’imposta di bollo sulle fatture elettroniche - GENNAIO 2024 
+Per quanto riguarda l’individuazione del trimestre di riferimento delle fatture 
+elettroniche 
+emesse 
+nei 
+confronti 
+delle 
+Pubbliche 
+amministrazioni, 
+vengono 
+considerate le fatture: 
+ 
+consegnate e accettate dalla Pubblica amministrazione destinataria, per le quali la 
+data di consegna, contenuta nella “ricevuta di consegna”, è precedente alla fine del 
+trimestre (la data in cui è avvenuta l’accettazione non rileva) 
+ 
+consegnate e in decorrenza termini (la Pubblica amministrazione non ha notificato 
+né l’accettazione né il rifiuto), per le quali la data di consegna, contenuta nella 
+“ricevuta di consegna”, è precedente alla fine del trimestre (la data della notifica di 
+decorrenza termini non rileva) 
+ 
+non consegnate, per le quali la data di messa a disposizione, contenuta nella 
+“ricevuta di impossibilità di recapito”, è precedente alla fine del trimestre. 
+ATTENZIONE 
+Anche se il conteggio in un trimestre precedente - e quindi l’anticipazione - dell’imposta di 
+bollo relativa a fatture elettroniche da conteggiarsi nel trimestre successivo non configura 
+una violazione, si invita a conformarsi alle regole sopra indicate, in modo da evitare la 
+costante squadratura tra gli importi versati dal contribuente e quelli determinati 
+dall’Agenzia delle entrate, che dovrebbe poi successivamente essere chiarita con contatto 
+presso l’Agenzia. 
+L’elenco A (non modificabile) 
+L’elenco A contiene gli elementi identificativi delle fatture elettroniche ordinarie e 
+semplificate, emesse verso i privati (soggetti Iva e consumatori finali) e verso le 
+Pubbliche amministrazioni, nelle quali il cedente/prestatore ha indicato l’assolvimento 
+dell’imposta di bollo. 
+Tale indicazione viene rilevata dalla valorizzazione a “SI” del campo “Bollo virtuale” 
+(2.1.1.6.1 nel tracciato record della fattura ordinaria e 2.1.1.5 del tracciato record 
+della fattura semplificata) all’interno del file con estensione .xml contenente la fattura 
+elettronica emessa. 
+Nell’elenco vengono esposti anche gli elementi identificativi dei documenti elettronici 
+emessi, utilizzando il tracciato della fattura elettronica ordinaria, per la comunicazione 
+dei dati delle operazioni transfrontaliere verso operatori stranieri, sempre se nei 
+predetti documenti è valorizzato a “SI” il campo “Bollo virtuale”. 
+ATTENZIONE 
+Il contenuto del campo “Importo bollo” (2.1.1.6.2) del tracciato record della fattura 
+ordinaria non è rilevante. Indipendentemente dalla valorizzazione di tale campo, infatti, per 
+ogni fattura emessa con indicazione dell’assolvimento dell’imposta di bollo, viene 
+determinato un importo dovuto di 2 euro. 
+ 
+ 
+5 
+L’imposta di bollo sulle fatture elettroniche – GENNAIO 2024 
+Per quanto riguarda le autofatture (tipo documento “TD20”) contenenti assolvimento 
+del bollo ed emesse dal cessionario/committente per la regolarizzazione di operazioni 
+per le quali non ha ricevuto dal cedente/prestatore la relativa fattura (articolo 6, 
+commi 8 e 9-bis, del decreto legislativo n. 471/1997 e articolo 46, comma 5, del 
+decreto legislativo n. 331/1993), i dati vengono riportati nel solo elenco A del 
+cessionario/committente. 
+Anche i documenti elettronici con tipo documento uguale a TD16 (emessi per 
+l’integrazione di una fattura in reverse charge interno), che riportano l’assolvimento 
+dell’imposta di bollo (tag <BolloVirtuale> valorizzato con “SI”) vengono messi a 
+disposizione nell’elenco A del cessionario/committente. 
+L’elenco A viene messo a disposizione del contribuente e del suo intermediario 
+delegato all’interno del portale “Fatture e corrispettivi” e non può essere modificato. 
+ATTENZIONE 
+L’intermediario deve essere in possesso della delega al servizio di “Consultazione e 
+acquisizione delle fatture elettroniche o dei loro duplicati informatici” o della delega al 
+servizio di “Consultazione dei dati rilevanti ai fini Iva”. 
+Di seguito, un esempio di elenco A messo a disposizione: 
+ 
+L’elenco B (modificabile) 
+L’elenco B contiene gli elementi identificativi delle fatture elettroniche ordinarie e 
+semplificate, emesse verso i privati (soggetti Iva e consumatori finali) e verso le 
+Pubbliche amministrazioni, nelle quali il cedente/prestatore non ha indicato 
+l’assolvimento dell’imposta di bollo, ma per le quali viene rilevato l’obbligo di tale 
+assolvimento. 
+ 
+ 
+6 
+L’imposta di bollo sulle fatture elettroniche - GENNAIO 2024 
+Si tratta delle fatture che soddisfano tutte le seguenti condizioni: 
+ 
+la somma degli importi delle operazioni presenti risulta maggiore di 77,47 euro. A 
+questo fine, vengono considerati tutti gli importi presenti nei campi “Prezzo totale” 
+(2.2.1.11) del file .xml della fattura ordinaria e “Importo” (2.2.2) del file .xml della 
+fattura semplificata 
+ 
+è stato valorizzato il campo “Natura” con uno dei codici: 
+‒ N2.1 e N2.2 (operazioni non soggette a Iva) 
+‒ N3.5 e N3.6 (operazioni non imponibili Iva) 
+‒ N4 (operazioni esenti Iva) 
+ 
+non è presente l’indicazione della codifica prevista per i casi di non 
+assoggettamento all’imposta di bollo. Tale indicazione deve essere infatti riportata 
+per operazioni che, seppur formalmente rientranti nel campo applicativo 
+dell’imposta di bollo, non devono esservi assoggettate per specifica disposizione 
+normativa. Per segnalare la circostanza all’Agenzia delle entrate, l’operazione (riga 
+della fattura) deve riportare nel campo “Tipo dato” (2.2.1.16.1) presente nel 
+blocco “Altri dati gestionali” - uno dei seguenti valori: 
+‒ “NB1”, se si tratta di un documento assicurativo per il quale l’imposta di bollo è 
+assorbita nell’imposta sulle assicurazioni 
+‒ “NB2”, se si tratta di un documento emesso da un soggetto appartenente al 
+terzo settore 
+‒ “NB3”, se si tratta di un documento tra la banca e il cliente correntista per il 
+quale l’imposta di bollo è assorbita nell’imposta di bollo addebitata sull’estratto 
+conto. 
+ATTENZIONE 
+Il blocco “Altri dati gestionali” è presente nel tracciato record della sola fattura ordinaria. 
+Pertanto, i soggetti interessati a indicare il non assoggettamento al bollo di una o più 
+operazioni, devono obbligatoriamente – almeno limitatamente a tali operazioni – emettere 
+una fattura ordinaria. 
+Sono escluse le fatture elettroniche aventi tipo documento: 
+ 
+TD16 – integrazione fattura reverse charge interno 
+ 
+TD17 – integrazione/autofattura per acquisto di servizi dall’estero 
+ 
+TD18 – integrazione per acquisto di beni intracomunitari 
+ 
+TD19 – integrazione/autofattura per acquisto di beni ex art. 17, comma 2, del Dpr 
+n. 633/1972 
+ 
+TD28 - acquisti da San Marino con Iva (fattura cartacea). 
+ 
+ 
+7 
+L’imposta di bollo sulle fatture elettroniche – GENNAIO 2024 
+Vengono escluse, inoltre, le fatture elettroniche nelle quali il campo “Regime fiscale” 
+contiene uno dei seguenti valori: 
+ 
+RF05 – vendita sali e tabacchi (art. 74, comma 1, del Dpr n. 633/1972) 
+ 
+RF06 – commercio di fiammiferi (art. 74, comma 1, del Dpr n. 633/1972) 
+ 
+RF07 – editoria (art. 74, comma 1, del Dpr n. 633/1972) 
+ 
+RF08 – gestione servizi di telefonia pubblica (art. 74, comma 1, del Dpr n. 
+633/1972) 
+ 
+RF09 – rivendita di documenti di trasporto pubblico e di sosta (art. 74, comma 1, 
+del Dpr n. 633/1972) 
+ 
+RF10 – intrattenimenti, giochi e altre attività di cui alla tariffa allegata al Dpr n. 
+640/1972 (art. 74, comma 6, del Dpr n. 633/1972) 
+ 
+RF11 – agenzie viaggi e turismo (art. 74-ter del Dpr n. 633/1972). 
+Vengono esclusi anche i documenti elettronici emessi, utilizzando il tracciato della 
+fattura elettronica ordinaria, per la comunicazione dei dati delle operazioni 
+transfrontaliere verso operatori stranieri, che riportano nel tag <CodiceDestinatario> il 
+valore “XXXXXXX”. 
+Per quanto riguarda le autofatture (tipo documento “TD20”) contenenti l’assolvimento 
+del bollo ed emesse dal cessionario/committente per la regolarizzazione di operazioni 
+per le quali non ha ricevuto dal cedente/prestatore la relativa fattura (articolo 6, 
+commi 8 e 9-bis, del decreto legislativo n. 471/1997 e articolo 46, comma 5, del 
+decreto legislativo n. 331/1993), i dati vengono riportati nel solo elenco B del 
+cessionario/committente. 
+Anche l’elenco B viene messo a disposizione del contribuente e del suo intermediario 
+delegato, all’interno del portale “Fatture e corrispettivi” e può essere modificato 
+dall’utente. 
+Di seguito, un esempio di elenco B messo a disposizione: 
+ 
+ 
+8 
+L’imposta di bollo sulle fatture elettroniche - GENNAIO 2024 
+3. CONSULTAZIONE E VARIAZIONE DELLE FATTURE SOGGETTE A BOLLO 
+Gli elenchi A e B di ogni soggetto Iva che ha emesso fatture elettroniche sono messi a 
+disposizione dell’Agenzia delle entrate nell’area riservata del portale “Fatture e 
+corrispettivi” entro il giorno 15 del primo mese successivo ad ogni trimestre. 
+Il contribuente può modificare l’elenco B indicando quali fatture elettroniche, di quelle 
+selezionate, non realizzano i presupposti per l’applicazione dell’imposta di bollo e 
+aggiungendo gli estremi identificativi delle fatture elettroniche che, invece, devono 
+essere assoggettate ma non sono presenti in nessuno dei due elenchi. 
+Nel caso in cui il contribuente integri l’elenco B con gli estremi dei documenti 
+elettronici emessi, utilizzando il tracciato della fattura elettronica ordinaria, per la 
+comunicazione dei dati delle operazioni transfrontaliere verso operatori stranieri, 
+questi verranno considerati per il calcolo dell’imposta di bollo da pagare.  
+Per quanto riguarda le modifiche in aggiunta delle fatture elettroniche da assoggettare 
+all’imposta di bollo e non presenti nell’elenco B, si fa presente che: 
+ 
+deve trattarsi di fatture elettroniche trasmesse al Sistema di Interscambio ed 
+elaborate senza scarto (il sistema ha prodotto “ricevuta di consegna” o “ricevuta di 
+impossibilità di recapito”) 
+ 
+devono essere state emesse dal contribuente in qualità di cedente/prestatore o, se 
+autofatture 
+(tipo 
+documento 
+“TD20”), 
+dal 
+contribuente 
+in 
+qualità 
+di 
+cessionario/committente 
+ 
+devono riferirsi al trimestre in oggetto (e non al trimestre precedente o 
+successivo), come già chiarito nel capitolo 2. 
+La funzionalità di consultazione e modifica è utilizzabile anche dagli intermediari 
+(indicati all’articolo 3, comma 3, del Dpr n. 322/1998), ai quali il contribuente ha 
+conferito la delega “Consultazione e acquisizione delle fatture elettroniche o dei loro 
+duplicati informatici” o la delega “Consultazione dei dati rilevanti ai fini Iva”. 
+Le modifiche ai due elenchi devono essere effettuate entro l’ultimo giorno del mese 
+successivo al trimestre di riferimento. Per quanto riguarda il secondo trimestre, il 
+termine del 31 luglio slitta al 10 settembre. 
+ 
+ 
+9 
+L’imposta di bollo sulle fatture elettroniche – GENNAIO 2024 
+Nella tabella che segue sono evidenziate le date degli step del nuovo sistema. 
+ 
+MESSA A 
+DISPOSIZIONE 
+ELENCHI A E B 
+DATA LIMITE 
+MODIFICHE 
+ELENCO B 
+VISUALIZZAZIONE 
+IMPORTO DOVUTO 
+IMPOSTA DI BOLLO 
+SCADENZA 
+VERSAMENTO 
+IMPOSTA DI BOLLO 
+1° TRIMESTRE 
+15 aprile 
+30 aprile 
+15 maggio 
+31 maggio (*) (**) 
+2° TRIMESTRE 
+15 luglio 
+10 settembre 
+20 settembre 
+30 settembre (**) 
+3° TRIMESTRE 
+15 ottobre 
+31 ottobre 
+15 novembre 
+30 novembre 
+4° TRIMESTRE 
+15 gennaio 
+dell’anno 
+successivo 
+31 gennaio 
+dell’anno 
+successivo 
+15 febbraio 
+dell’anno 
+successivo 
+28 febbraio 
+dell’anno 
+successivo (***) 
+(*) Se l’importo dovuto per il primo trimestre non supera 5.000 euro, il versamento può essere 
+eseguito entro il 30 settembre. 
+(**) Se l’importo dovuto complessivamente per il primo e secondo trimestre non supera 5.000 euro, il 
+versamento può essere eseguito entro il 30 novembre. 
+(***) Se l’anno è bisestile il versamento può essere eseguito entro il 29 febbraio. 
+Se la scadenza per il pagamento dell’imposta di bollo è un giorno festivo, viene slittata 
+al primo giorno lavorativo successivo. 
+Il soggetto Iva o il suo intermediario delegato possono effettuare le modifiche 
+all’elenco B: 
+ 
+in modalità “puntuale”, attraverso la procedura web disponibile nell’area riservata 
+del portale “Fatture e corrispettivi”, che consente di operare direttamente sulla 
+tabella contenente gli estremi delle fatture presenti nell’elenco B 
+ 
+in modalità “massiva”, procedendo, nell’area riservata del portale “Fatture e 
+corrispettivi”, allo scarico (download) di un file con estensione .xml - o più file .xml 
+nel caso di un numero elevato di fatture - contenente gli estremi delle fatture 
+presenti nell’elenco B e al successivo caricamento (upload) del file .xml contenente 
+i dati e le modifiche e/o integrazioni apportate. In tal caso, l’Agenzia delle entrate 
+elabora il file .xml contenente i dati modificati e restituisce all’utente l’esito 
+dell’elaborazione, indicando le fatture eventualmente scartate ed i relativi motivi. 
+Si precisa che se il download dell’elenco B avviene in più file .xml e se ne modifica 
+uno solo, sarà sufficiente caricare solo il file .xml modificato o anche caricare con 
+un unico file .xml le sole modifiche e/o integrazioni da apportare all’elenco B. 
+L’elenco B può essere modificato più volte entro il termine previsto. L’Agenzia delle 
+entrate procede al calcolo dell’imposta di bollo dovuta per il trimestre sulla base 
+dell’ultima modifica trasmessa. 
+ 
+ 
+10 
+L’imposta di bollo sulle fatture elettroniche - GENNAIO 2024 
+Nel caso in cui il contribuente versi l’imposta di bollo per il trimestre entro la scadenza 
+per la modifica dell’elenco B, successivamente al versamento viene inibita la possibilità 
+di ulteriore modifica dell’elenco. 
+ATTENZIONE 
+In assenza di modifiche, si intende confermato l’elenco B proposto dall’Agenzia delle 
+entrate. 
+Al termine del periodo utile per effettuare le variazioni all’elenco B, le fatture 
+elettroniche che risultano ricomprese, riportano l’annotazione dell’assolvimento 
+dell’imposta di bollo e tale informazione viene messa a disposizione nella scheda di 
+dettaglio della fattura elettronica consultabile nell’area riservata del portale “Fatture e 
+Corrispettivi”. Tale annotazione può essere visualizzata dal contribuente, o da un suo 
+intermediario delegato, nel dettaglio della fattura nell’area riservata del portale 
+“Fatture e corrispettivi”. Se necessaria, il contribuente può richiedere l’attestazione, 
+prodotta in formato pdf/a, dell’assolvimento dell’imposta di bollo per una determinata 
+fattura. 
+ 
+ 
+11 
+L’imposta di bollo sulle fatture elettroniche – GENNAIO 2024 
+4. VERSAMENTO DELL’IMPOSTA DI BOLLO E CONTROLLI 
+Sulla base dei dati presenti negli elenchi A e B (quest’ultimo nella versione modificata 
+entro i termini dal contribuente), l’Agenzia delle entrate procede al calcolo dell’imposta 
+di bollo dovuta per il trimestre di riferimento e ne evidenzia l’importo nell’area 
+riservata del portale “Fatture e corrispettivi” entro il giorno 15 del secondo mese 
+successivo alla chiusura del trimestre.  
+Per il secondo trimestre, tale data slitta al 20 settembre. 
+ 
+Il versamento dell’imposta di bollo dovuta deve essere effettuato secondo le scadenze 
+stabilite all’articolo 6, comma 2, del Dm del 17 giugno 2014 ed evidenziate nella 
+tabella riportata nel paragrafo precedente. 
+Il pagamento viene eseguito semplicemente indicando sull’apposita funzionalità web 
+del portale “Fatture e corrispettivi” l’Iban corrispondente al conto corrente intestato al 
+contribuente, sul quale viene così addebitato l’importo dell’imposta di bollo dovuta. 
+10
+210
+420
+2023
+200
+ 
+ 
+12 
+L’imposta di bollo sulle fatture elettroniche - GENNAIO 2024 
+Nel caso di ritardo rispetto alla scadenza prevista, la procedura web calcola e consente 
+il pagamento della sanzione e degli interessi previsti per il ravvedimento operoso. 
+In alternativa, il contribuente può versare l’importo dovuto tramite modello F24, da 
+presentarsi in modalità telematica. I codici tributo da utilizzare sono i seguenti: 
+ 
+2521 - Imposta di bollo sulle fatture elettroniche - primo trimestre 
+ 
+2522 - Imposta di bollo sulle fatture elettroniche - secondo trimestre 
+ 
+2523 - Imposta di bollo sulle fatture elettroniche - terzo trimestre 
+ 
+2524 - Imposta di bollo sulle fatture elettroniche - quarto trimestre 
+ 
+2525 - Imposta di bollo sulle fatture elettroniche - sanzioni 
+ 
+2526 - Imposta di bollo sulle fatture elettroniche - interessi. 
+ATTENZIONE 
+I codici tributo da utilizzare per il versamento di quanto dovuto per i trimestri il cui 
+versamento è slittato al 30 settembre o al 30 novembre sono quelli relativi ai trimestri per i 
+quali l’imposta di bollo è dovuta (2521 e/o 2522). 
+ 
+ 
+ 
+13 
+L’imposta di bollo sulle fatture elettroniche – GENNAIO 2024 
+La funzionalità web dedicata al pagamento dell’imposta di bollo consente la 
+consultazione dei versamenti eseguiti per i trimestri e delle rispettive ricevute di 
+elaborazione.  
+ 
+Nel caso di versamento dell’imposta di bollo omesso o carente rispetto all’importo 
+dovuto o tardivo rispetto alla scadenza, l’Agenzia delle entrate trasmette al 
+contribuente una comunicazione telematica all’indirizzo di posta elettronica certificata 
+presente nell’elenco INI-PEC (Indice nazionale degli indirizzi di pec), nella quale indica 
+l’importo dovuto per: 
+ 
+l’imposta di bollo 
+ 
+la sanzione prevista dall’articolo 13, comma 1, del decreto legislativo n. 471/1997, 
+ridotta a un terzo 
+ 
+gli interessi. 
+Entro trenta giorni dal ricevimento della comunicazione, il contribuente o il suo 
+intermediario possono fornire chiarimenti in merito ai versamenti. 
+10
+5
+2
+ 
+ 
+14 
+L’imposta di bollo sulle fatture elettroniche - GENNAIO 2024 
+5. PER SAPERNE DI PIÙ: NORMATIVA E PRASSI 
+Decreto del Ministero dell’Economia e delle Finanze del 17 giugno 2014 – art. 6 
+(Modalità di assolvimento dell'imposta di bollo su libri, registri ed altri documenti 
+rilevanti ai fini tributari) 
+Decreto legge n. 34 del 30 aprile 2019 – art. 12-novies (Imposta di bollo virtuale sulle 
+fatture elettroniche) 
+Decreto del Ministero dell’Economia e delle Finanze del 4 dicembre 2020 (Modifiche 
+alle modalità di assolvimento dell’imposta di bollo sulle fatture elettroniche e 
+individuazione delle procedure di recupero dell’imposta di bollo non versata) 
+Decreto legge n. 124 del 26 ottobre 2019 – art 17 (Imposta di bollo sulle fatture 
+elettroniche), come modificato dall’articolo 3, comma 4, del decreto legge n. 73/2022 
+Provvedimento del Direttore dell’Agenzia delle entrate del 4 febbraio 2021 (Modalità 
+tecniche per l’effettuazione delle integrazioni da parte dell’Agenzia delle entrate delle 
+fatture inviate tramite il Sistema di Interscambio per le quali è dovuto l’assolvimento 
+dell’imposta di bollo. Modalità telematiche per la messa a disposizione, la 
+consultazione e la variazione dei dati relativi all’imposta di bollo da parte del cedente o 
+prestatore, o dell’intermediario delegato, e per l’invio delle comunicazioni, da parte 
+dell’Agenzia delle entrate, nei casi di ritardato, omesso o insufficiente versamento 
+dell’imposta) 
+Risoluzione dell’Agenzia delle entrate n. 42/E del 9 aprile 2019 (Istituzione dei codici 
+tributo per il versamento, tramite i modelli “F24” e “F24 Enti pubblici”, dell’imposta di 
+bollo sulle fatture elettroniche) 
+I documenti di normativa e di prassi indicati sono reperibili attraverso il servizio curato 
+dal CERDEF (Centro di Ricerche e Documentazione Economica e Finanziaria), presente 
+sul sito del Dipartimento delle Finanze 

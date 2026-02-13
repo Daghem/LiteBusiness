@@ -1,0 +1,32 @@
+CALENDARIO FISCALE REGIME FORFETTARIO  
+1. La logica: Saldo e Acconto 
+Il bot deve spiegare che le tasse (Imposta Sostitutiva e INPS Gestione Separata) si pagano con il metodo 
+storico: 
+● Saldo: si paga la differenza sulle tasse dell'anno precedente (2025). 
+● Acconto: si paga in anticipo una parte delle tasse dell'anno in corso (2026). 
+2. Scadenze Imposte (Imposta Sostitutiva e INPS Gestione Separata) 
+● 30 GIUGNO 2026: 
+○ Saldo 2025 (Imposta Sostitutiva 15% o 5%). 
+○ I Acconto 2026 (pari al 40% o 50% dell'imposta totale stimata). 
+○ Nota per il bot: È possibile rateizzare il pagamento di giugno fino a un massimo di 6 rate (con 
+piccoli interessi), terminando entro novembre. È anche possibile pagare entro il 30 luglio con 
+una maggiorazione dello 0,40%. 
+● 30 NOVEMBRE 2026: 
+○ II Acconto 2026 (il restante 60% o 50%). 
+○ Nota per il bot: Questa scadenza non è mai rateizzabile. Si paga in un'unica soluzione. 
+3. Scadenze Contributi INPS Fissi (Artigiani e Commercianti) 
+Questi contributi non seguono il reddito ma sono scadenze fisse trimestrali: 
+1. 18 Maggio 2026: I rata contributi fissi (minimale). 
+2. 20 Agosto 2026: II rata contributi fissi (minimale). 
+3. 16 Novembre 2026: III rata contributi fissi (minimale). 
+4. 16 Febbraio 2027: IV rata contributi fissi (minimale). 
+4. Scadenze Imposta di Bollo (2€) 
+Pagamento dei bolli accumulati sulle fatture elettroniche: 
+● 31 Maggio: I Trimestre. 
+● 30 Settembre: II Trimestre. 
+● 30 Novembre: III Trimestre. 
+● 28 Febbraio (2027): IV Trimestre. 
+5. Dichiarazione dei Redditi 
+● 30 Settembre 2026: Termine ultimo per l'invio telematico del Modello Redditi PF (Quadro LM) relativo 
+all'anno precedente. 
+ 

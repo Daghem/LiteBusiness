@@ -1,0 +1,1101 @@
+CIRCOLARE N. 32/E 
+ 
+ 
+ 
+ 
+Direzione Centrale Coordinamento Normativo 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Roma, 5 dicembre 2023  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+OGGETTO: Articolo 1, comma 54, della legge 29 dicembre 2022, n. 197 (legge di 
+bilancio 2023) – Modifiche al regime forfetario  
+ 
+ 
+2 
+INDICE 
+ 
+PREMESSA ...................................................................................................................... 4 
+1. 
+CARATTERISTICHE DEL REGIME FORFETARIO ..................................... 6 
+1.1. Requisiti di accesso e cause ostative ....................................................................... 6 
+1.2. Semplificazioni ai fini dell’IVA e delle imposte sui redditi .................................. 8 
+1.3. Determinazione della base imponibile e applicazione dell’imposta .................. 10 
+1.4. Passaggio dal regime ordinario al forfetario e viceversa ................................... 11 
+2. 
+MODIFICHE AL REGIME FORFETARIO: SUPERAMENTO DEL LIMITE 
+DI 85.000 EURO ............................................................................................................ 13 
+2.1. I nuovi limiti dei ricavi e dei compensi ................................................................ 13 
+2.2. Passaggio al regime ordinario – rettifica dell’IVA non detratta ....................... 15 
+3. 
+MODIFICHE AL REGIME FORFETARIO: SUPERAMENTO DEL LIMITE 
+DI 100.000 EURO .......................................................................................................... 18 
+3.1. Effetti ai fini IVA ................................................................................................... 18 
+3.1.1. 
+Rettifica dell’IVA non addebitata in rivalsa ...................................... 18 
+3.1.2. 
+Rettifica dell’IVA non detratta ........................................................... 20 
+3.1.3. 
+Rettifica dell’IVA non detratta – casi particolari ............................. 22 
+3.2. Effetti ai fini delle imposte dirette ........................................................................ 24 
+3.3. Effetti sulle ritenute d’acconto  ............................................................................ 27 
+4. 
+RISPOSTE A QUESITI ........................................................................................ 29 
+3 
+4.1. Superamento della soglia di 100.000 euro di ricavi o compensi percepiti – 
+Fatturazione dell’operazione che comporta il superamento  ..................................... 29 
+4.2. Superamento della soglia di 100.000 euro di ricavi o compensi percepiti – Effetti 
+sulle annualità successive .............................................................................................. 31 
+4.3. Superamento della soglia di 100.000 euro di ricavi o compensi percepiti – 
+Soggetti che iniziano l’attività in corso d’anno ........................................................... 32 
+4.4. Accesso al regime forfetario - Decadenza da precedenti opzioni  ...................... 34 
+4.5. Acquisti in reverse-charge in costanza di regime forfetario ................................ 35 
+5. 
+CLAUSOLA DI SALVAGUARDIA .................................................................... 37 
+ 
+ 
+4 
+PREMESSA 
+L’articolo 1, comma 54, della legge 29 dicembre 2022, n. 1971 (di seguito, 
+“legge di bilancio 2023”), modifica la disciplina del regime fiscale agevolato, c.d. 
+regime forfetario, recata dall’articolo 1, commi da 54 a 89, della legge 23 dicembre 
+2014, n. 190 (di seguito, “legge di stabilità 2015”). 
+Nei successivi paragrafi, dopo una sintesi delle caratteristiche relative alla 
+disciplina del regime forfetario, vengono forniti chiarimenti sulle modifiche apportate 
+dalla legge di bilancio 2023 concernenti le condizioni di accesso, permanenza e 
+cessazione dal regime in argomento. 
+Per effetto delle disposizioni contenute nell’articolo 1, comma 54, della legge 
+di bilancio 2023, in particolare: 
+- viene innalzata da 65.000 euro a 85.000 euro2 la soglia massima di ricavi 
+conseguiti o di compensi percepiti nell’anno precedente – di cui all’articolo 
+1, comma 543, della legge di stabilità 2015 – per poter applicare il regime 
+in argomento (lettera a); 
+ 
+1 La previsione in commento dispone che «all’articolo 1 della legge 23 dicembre 2014, n. 190, in materia di 
+regime forfetario per le persone fisiche esercenti attività d’impresa, arti o professioni, sono apportate le 
+seguenti modificazioni: 
+a) al comma 54, lettera a), le parole: “euro 65.000” sono sostituite dalle seguenti: “euro 85.000”; 
+b) al comma 71 sono aggiunti, in fine, i seguenti periodi: “Il regime forfetario cessa di avere applicazione 
+dall’anno stesso in cui i ricavi o i compensi percepiti sono superiori a 100.000 euro. In tale ultimo caso è 
+dovuta l’imposta sul valore aggiunto a partire dalle operazioni effettuate che comportano il superamento del 
+predetto limite”». 
+2 Con decisione di esecuzione (UE) 2020/647 dell’11 maggio 2020 adottata dal Consiglio, l’Italia era stata 
+autorizzata, fino al 31 dicembre 2024, ad applicare una misura speciale di deroga all’articolo 285 della direttiva 
+2006/112/CE, al fine di esentare dall’IVA i soggetti passivi il cui volume d’affari annuo non superasse 65.000 
+euro. Con successiva decisione di esecuzione (UE) 2023/664 del 21 marzo 2023 il Consiglio, abrogando la 
+predetta decisione 2020/647, ha autorizzato la Repubblica italiana a innalzare a 85.000 euro, dal 1° gennaio 
+2023 e fino al 31 dicembre 2024, la soglia di volume d’affari che consente ai soggetti passivi di beneficiare 
+dell’esenzione dall’IVA, così legittimando la nuova soglia per i contribuenti forfetari prevista dalla legge di 
+bilancio 2023. 
+3 L’articolo 1 della legge di stabilità 2015 prevede al comma 54, come da ultimo modificato dalla disposizione 
+in commento, che i «contribuenti persone fisiche esercenti attività d’impresa, arti o professioni applicano il 
+regime forfetario di cui al presente comma e ai commi da 55 a 89 del presente articolo se, al contempo, 
+nell’anno precedente: 
+a) hanno conseguito ricavi ovvero hanno percepito compensi, ragguagliati ad anno, non superiori a euro 
+85.000; 
+5 
+- le cause di cessazione del regime – di cui all’articolo 1, comma 714, della 
+legge di stabilità 2015 – vengono integrate di una fattispecie che, 
+diversamente dalle altre, comporta la fuoriuscita dal regime già a decorrere 
+dall’anno stesso in cui questa si manifesta; si tratta del superamento in 
+corso d’anno della soglia di 100.000 euro di ricavi o compensi percepiti 
+(lettera b). 
+Le disposizioni in commento si ispirano a quanto previso dalla direttiva (UE) 
+2020/285 del Consiglio dell’Unione europea del 18 febbraio 2020 – che ha modificato 
+la direttiva 2006/112/CE del Consiglio del 28 novembre 2006 (c.d. “direttiva IVA”) 
+con riferimento al regime speciale di esonero dall’imposta sul valore aggiunto per le 
+piccole imprese – sia per quanto riguarda l’individuazione della soglia massima di 
+85.000 euro come ammontare per l’ammissione al regime forfetario, sia per la 
+previsione di fuoriuscita da detto regime in corso d’anno, nel caso di sforamento della 
+soglia di 100.000 euro.  
+Nell’ultimo paragrafo, infine, viene fornita risposta ad alcuni quesiti posti dagli 
+operatori in relazione alle citate modifiche normative. 
+L’illustrazione di tali disposizioni tiene conto, fra l’altro, della documentazione 
+parlamentare, con particolare riguardo alle relazioni e ai dossier della Camera dei 
+Deputati e del Senato della Repubblica. 
+ 
+b) hanno sostenuto spese per un ammontare complessivamente non superiore ad euro 20.000 lordi per lavoro 
+accessorio di cui all’articolo 70 del decreto legislativo 10 settembre 2003, n. 276, per lavoratori dipendenti e 
+per collaboratori di cui all’articolo 50, comma 1, lettere c) e c-bis), del testo unico delle imposte sui redditi, di 
+cui al decreto del Presidente della Repubblica 22 dicembre 1986, n. 917 (…) comprese le somme erogate sotto 
+forma di utili da partecipazione agli associati di cui all’articolo 53, comma 2, lettera c), e le spese per 
+prestazioni di lavoro di cui all’articolo 60 del citato testo unico di cui al decreto del Presidente della 
+Repubblica n. 917 del 1986». 
+4 L’articolo 1, comma 71, della legge di stabilità 2015, come da ultimo modificato dalla disposizione in 
+commento, dispone che il «regime forfetario cessa di avere applicazione a partire dall’anno successivo a quello 
+in cui viene meno taluna delle condizioni di cui al comma 54 ovvero si verifica taluna delle fattispecie indicate 
+al comma 57. Il regime forfetario cessa di avere applicazione dall’anno stesso in cui i ricavi o i compensi 
+percepiti sono superiori a 100.000 euro. In tale ultimo caso è dovuta l’imposta sul valore aggiunto a partire 
+dalle operazioni effettuate che comportano il superamento del predetto limite». 
+6 
+Per le parti non oggetto di esame della presente circolare si rinvia ai chiarimenti 
+forniti con i precedenti documenti di prassi in materia, in quanto compatibili con il 
+vigente quadro normativo (si vedano, tra le altre, la circolare n. 9/E del 10 aprile 2019 
+e la circolare n. 10/E del 4 aprile 2016). 
+  
+1. 
+CARATTERISTICHE DEL REGIME FORFETARIO 
+ 
+1.1. 
+Requisiti di accesso e cause ostative 
+Il regime forfetario rappresenta il regime naturale per le persone fisiche che 
+esercitano un’attività di impresa, arte o professione in forma individuale, purché 
+nell’anno precedente abbiano congiuntamente5: 
+a) conseguito ricavi o percepito compensi, ragguagliati ad anno, non superiori 
+al limite normativamente previsto, da ultimo stabilito nella misura di 
+85.000 euro dalla disposizione in commento; 
+b) sostenuto spese per un importo complessivo non superiore a 20.000 euro 
+lordi per lavoro accessorio, lavoro dipendente e compensi a collaboratori, 
+anche a progetto. 
+L’applicazione del regime forfetario è rivolta sia ai soggetti che già svolgono 
+un’attività sia a coloro che ne intraprendono una nuova. La permanenza nel regime, 
+inoltre, non è soggetta ad alcun limite temporale ed è subordinata solo al verificarsi 
+delle condizioni normativamente prescritte. 
+Per i soggetti che, iniziando una nuova attività, sappiano già di percepire 
+nell’anno somme superiori alla soglia di cui alla precedente lettera a), tuttavia, 
+ 
+5 Ai sensi del comma 54 dell’articolo 1 della legge di stabilità 2015, riportato nella nota n. 3. 
+7 
+l’accesso al regime forfetario è precluso6, non potendo questi effettuare la 
+comunicazione di cui al comma 56 dell’articolo 1 della legge di stabilità 20157. 
+L’accesso al regime agevolato in esame è in ogni caso precluso8 ai soggetti 
+che: 
+- si avvalgono di regimi speciali ai fini IVA o di regimi forfetari di 
+determinazione del reddito; 
+- non sono residenti nel territorio dello Stato, ad eccezione di coloro che 
+risiedono in uno degli Stati membri della UE o in uno Stato aderente 
+all’Accordo sullo Spazio economico europeo che garantisca un adeguato 
+scambio di informazioni e che producono in Italia almeno il 75 per cento 
+del reddito complessivamente realizzato; 
+- effettuano, in via esclusiva o prevalente, operazioni di cessione di 
+fabbricati o porzioni di fabbricato, di terreni edificabili o di mezzi di 
+trasporto nuovi; 
+- contemporaneamente all’esercizio di attività d’impresa, arti o professioni, 
+partecipano a società di persone, associazioni professionali o imprese 
+familiari ovvero controllano direttamente o indirettamente società a 
+responsabilità limitata o associazioni in partecipazione, le quali esercitano 
+attività economiche direttamente o indirettamente riconducibili a quelle 
+svolte in via individuale; 
+- esercitano in prevalenza la loro attività nei confronti di datori di lavoro con 
+i quali sono in corso rapporti lavorativi o erano intercorsi rapporti 
+lavorativi nei due precedenti periodi d’imposta ovvero nei confronti di 
+ 
+6 Cfr. risposta a istanza di interpello n. 195 del 17 giugno 2019. 
+7 In base all’articolo 1, comma 56, della legge di stabilità 2015, le «persone fisiche che intraprendono l’esercizio 
+di imprese, arti o professioni possono avvalersi del regime forfetario comunicando, nella dichiarazione di inizio 
+di attività di cui all’articolo 35 del decreto del Presidente della Repubblica 26 ottobre 1972, n. 633, e successive 
+modificazioni, di presumere la sussistenza dei requisiti di cui al comma 54 del presente articolo». 
+8 Si veda il comma 57 dell’articolo 1 della legge di stabilità 2015. 
+8 
+soggetti direttamente o indirettamente riconducibili a tali datori di lavoro, 
+fatta eccezione per chi inizia una nuova attività dopo aver svolto il periodo 
+di pratica obbligatoria ai fini dell’esercizio di arti o professioni; 
+- nell’anno precedente, hanno percepito redditi di lavoro dipendente e/o 
+assimilati di importo superiore a 30.000 euro, tranne nel caso in cui il 
+rapporto di lavoro dipendente sia cessato nell’anno precedente. 
+Il sopraggiungere di una delle predette cause ostative in corso d’anno 
+determina la fuoriuscita dal regime a partire dall’anno successivo. 
+Anche il venir meno di uno dei requisiti richiesti per accedere al regime 
+forfetario, sopra richiamati, comporta la cessazione del regime medesimo, a decorrere 
+dall’anno successivo a quello in cui si è verificato l’evento, salvo quanto illustrato nei 
+successivi paragrafi.  
+ 
+1.2. 
+Semplificazioni ai fini dell’IVA e delle imposte sui redditi 
+Ai fini IVA, l’adozione del regime forfetario comporta l’esclusione sia 
+dell’applicazione dell’imposta in rivalsa all’atto della certificazione dei corrispettivi 
+oppure dei ricavi e dei compensi sia dell’esercizio del diritto alla detrazione 
+dell’imposta assolta, dovuta o addebitata sugli acquisti nazionali, comunitari e sulle 
+importazioni. 
+È, inoltre, previsto l’esonero dai seguenti adempimenti9: 
+- liquidazione e versamento dell’IVA, salva l’ipotesi di acquisti dall’estero o 
+di acquisti soggetti al reverse-charge; 
+- registrazione delle fatture emesse, dei corrispettivi e degli acquisti;  
+- tenuta e conservazione dei registri e dei documenti, fatta eccezione per le 
+fatture e i documenti di acquisto e le bollette doganali di importazione;  
+- presentazione della dichiarazione annuale IVA.  
+ 
+9 Si veda l’articolo 1, comma 59, della legge di stabilità 2015. 
+9 
+Agli effetti delle imposte sui redditi, i contribuenti in regime forfetario: 
+- non sono soggetti alla ritenuta d’acconto relativamente ai ricavi o 
+compensi percepiti; a tal fine, questi attestano ai propri committenti che il 
+reddito cui le somme afferiscono è soggetto a imposta sostitutiva ed 
+esplicitano in fattura l’applicazione del regime forfetario10; 
+- non sono tenuti a operare la ritenuta alla fonte con riferimento agli 
+emolumenti corrisposti e sono esonerati dagli obblighi di registrazione e 
+tenuta delle scritture contabili11, fermi restando gli obblighi di operare la 
+ritenuta sui redditi di lavoro dipendente e a essi assimilati di cui agli articoli 
+23 e 24 del decreto del Presidente della Repubblica 29 settembre 1973, n. 
+600, e di tenere e conservare i registri previsti da disposizioni diverse da 
+quelle tributarie; 
+- sono esonerati dall’applicazione degli indici sintetici di affidabilità 
+fiscale12. 
+Con riferimento alle modalità di fatturazione delle operazioni effettuate, si 
+ricorda che l’articolo 18, commi 2 e 3, del decreto-legge 30 aprile 2022, n. 36, 
+convertito, con modificazioni, dalla legge 29 giugno 2022, n. 79, ha abrogato la parte 
+dell’articolo 1, comma 3, del decreto legislativo 5 agosto 2015, n. 127, che esonerava 
+dalla fatturazione elettronica i soggetti che applicano il regime forfetario, ponendo 
+l’obbligo di emettere fattura elettronica: 
+- a partire dal 1° luglio 2022, in capo ai forfetari che, nell’anno precedente, 
+hanno conseguito ricavi o percepito compensi superiori a 25.000 euro, 
+ragguagliati ad anno; 
+ 
+10 Si veda l’articolo 1, comma 67, della legge di stabilità 2015. 
+11 Si veda l’articolo 1, comma 69, della legge di stabilità 2015. 
+12 Si vedano l’articolo 2, comma 1, lettera b), del decreto ministeriale 23 marzo 2018 e l’articolo 2, comma 1, 
+lettera b), del decreto ministeriale 28 dicembre 2018. 
+10 
+- a decorrere dal 1° gennaio 2024, per tutti i soggetti che adottano il 
+forfetario. 
+In proposito, si rammenta che con la risposta n. 150, pubblicata sul sito internet 
+dell’Agenzia delle entrate, alle FAQ del 22 dicembre 2022, nel confermare la risposta 
+resa al quesito n. 1.3 della circolare n. 26/E del 13 luglio 2022, è stato chiarito che 
+“solo per i contribuenti che nell’anno 2021 hanno conseguito ricavi o compensi, 
+ragguagliati ad anno, superiori a 25.000 [euro] è entrato in vigore dal 1° luglio 2022 
+l’obbligo di fatturazione elettronica. Per tutti gli altri soggetti forfettari l’obbligo 
+decorrerà dal 1° gennaio 2024, indipendentemente dai ricavi/compensi conseguiti nel 
+2022”. 
+I contribuenti che permangono nel regime forfetario, quindi, nel corso del 2023 
+e che per l’anno precedente erano già tenuti alla fatturazione elettronica continuano a 
+fatturare con tale modalità. 
+Viceversa, per i soggetti che restano nel regime forfetario nel 2023 e che per 
+l’anno 2022 non erano tenuti alla fatturazione elettronica, l’obbligo di emettere fatture 
+elettroniche decorrerà dal 1° gennaio 2024, a prescindere dall’entità dei ricavi 
+conseguiti o compensi percepiti. 
+Laddove, invece, la permanenza nel regime forfetario venga meno nel corso 
+del 2023 per il superamento del nuovo limite di 100.000 euro, l’obbligo in capo al 
+contribuente – ex forfetario divenuto istantaneamente ordinario – di emettere fattura 
+elettronica con indicazione dell’IVA opera già nel 2023. 
+ 
+1.3. 
+Determinazione della base imponibile e applicazione dell’imposta 
+In forza dell’articolo 1, comma 64, della legge di stabilità 2015, gli esercenti 
+attività di impresa, arte o professione che adottano il regime forfetario determinano il 
+reddito imponibile secondo il criterio di cassa, applicando all’ammontare dei ricavi o 
+compensi percepiti nel periodo d’imposta le percentuali di redditività indicate 
+11 
+nell’allegato n. 4 della medesima legge, che variano dal 40 per cento all’86 per cento, 
+in base al codice ATECO che contraddistingue l’attività esercitata. 
+Alla base imponibile così determinata si applica un’unica imposta sostitutiva 
+di quella sui redditi e delle addizionali regionali e comunali, in misura pari al 15 per 
+cento, salvo per i contribuenti che avviano una nuova attività, per i quali, al ricorrere 
+delle condizioni stabilite dal comma 65 del medesimo articolo, nei primi cinque anni 
+d’imposta trova applicazione l’aliquota del 5 per cento. 
+ 
+1.4. 
+Passaggio dal regime ordinario al forfetario e viceversa 
+Come già precisato, il regime forfetario rappresenta il regime naturale delle 
+persone fisiche che esercitano un’attività di impresa, arte o professione in forma 
+individuale, in possesso dei requisiti stabiliti dall’articolo 1, comma 54, lettere a) e b), 
+della legge di stabilità 2015 e in assenza delle cause ostative previste dal successivo 
+comma 57. 
+Il regime forfetario si applica sia ai soggetti già in attività – a decorrere 
+dall’anno successivo a quello nel quale risultano soddisfatti i predetti requisiti – sia a 
+coloro che intraprendono una nuova attività. 
+Nel primo caso – applicazione del regime a un’attività già avviata – nella 
+dichiarazione IVA relativa all’anno in cui i requisiti sono soddisfatti va comunicata 
+l’adozione del regime forfetario a partire dal periodo d’imposta successivo a quello 
+cui si riferisce la dichiarazione. Naturalmente, atteso che il regime forfetario è un 
+regime naturale, come precisato con la circolare n. 10/E del 2016, par. 2.4.1, “i 
+contribuenti che già svolgono un’attività di impresa, arte o professione vi accedono 
+senza dover fare alcuna comunicazione preventiva (con il modello AA9/12) o 
+successiva (con la dichiarazione annuale)”. 
+Nel secondo caso – applicazione del regime a una nuova attività – l’adozione 
+del regime forfetario va comunicata nel modello di dichiarazione di inizio dell’attività 
+12 
+di cui all’articolo 35 del decreto del Presidente della Repubblica 26 ottobre 1972, n. 
+633 (di seguito, decreto IVA)13. 
+I contribuenti rientranti naturalmente nel regime forfetario possono, tuttavia, 
+non applicarlo e optare per la determinazione delle imposte sul reddito e dell’IVA nei 
+modi ordinari. L’opzione per il regime ordinario si perfeziona col comportamento 
+concludente, ai sensi dell’articolo 1 del decreto del Presidente della Repubblica 10 
+novembre 1997, n. 44214, ma deve essere comunicata, in ogni caso, tramite la prima 
+dichiarazione IVA da presentare successivamente alla scelta operata, ai sensi del 
+successivo articolo 2, comma 115. L’omessa comunicazione in dichiarazione 
+dell’opzione – che resta valida per almeno un triennio – non pregiudica l’applicazione 
+del regime ordinario, ma comporta la sanzione amministrativa di cui all’articolo 8, 
+comma 1, del decreto legislativo 18 dicembre 1997, n. 471. 
+Trascorso il triennio minimo di permanenza nel regime ordinario, l’opzione 
+resta valida per ciascun anno successivo, fin quando persiste la concreta applicazione 
+della scelta operata. 
+Il contribuente in possesso dei requisiti per l’applicazione del regime forfetario, 
+tuttavia, qualora abbia optato per il regime di contabilità semplificata di cui 
+all’articolo 18 del decreto del Presidente della Repubblica 29 settembre 1973, n. 600, 
+ 
+13 Come chiarito con la circolare n. 10/E del 2016, par. 2.4.2, i contribuenti che iniziano un’attività d’impresa, 
+arte o professione e che presumono di rispettare i requisiti e le condizioni previste per l’applicazione del regime 
+in esame “hanno l’obbligo di darne comunicazione nella dichiarazione di inizio attività, da presentare ai sensi 
+dell’articolo 35 del D.P.R. 633 del 1972 (modello AA9/12); tale comunicazione non ha valore di opzione, 
+trattandosi di un regime naturale, ma è richiesta unicamente ai fini anagrafici”. Si vedano anche le istruzioni 
+al modello AA9/12, pagina 4, secondo cui l’intenzione di avvalersi del regime forfetario va indicata nel modello 
+AA9/12, quadro B, sezione “Regimi fiscali agevolati”, riportando il codice 2 qualora si ritenga di essere in 
+possesso dei requisiti che comportano l’applicazione del predetto regime. 
+14 L’articolo 1, comma 1, del DPR n. 442 del 1997 dispone che l’«opzione e la revoca di regimi di 
+determinazione dell’imposta o di regimi contabili si desumono da comportamenti concludenti del contribuente 
+o dalle modalità di tenuta delle scritture contabili. La validità dell’opzione e della relativa revoca è subordinata 
+unicamente alla sua concreta attuazione sin dall’inizio dell’anno o dell’attività. È comunque consentita la 
+variazione dell’opzione e della revoca nel caso di modifica del relativo sistema in conseguenza di nuove 
+disposizioni normative». 
+15 L’articolo 2, comma 1, del DPR n. 442 del 1997 dispone che il «contribuente è obbligato a comunicare 
+l’opzione di cui all’articolo 1 nella prima dichiarazione annuale IVA da presentare successivamente alla scelta 
+operata». 
+13 
+può passare al regime forfetario senza attendere il decorso di un triennio, in quanto 
+trattasi di due regimi naturali dei contribuenti minori16. 
+ 
+2. 
+MODIFICHE AL REGIME FORFETARIO: SUPERAMENTO DEL 
+LIMITE DI 85.000 EURO  
+ 
+2.1. 
+I nuovi limiti dei ricavi e dei compensi 
+A seguito delle modifiche al regime forfetario enunciate in premessa, dal 1° 
+gennaio 2023 l’aver percepito ricavi o compensi per un importo superiore al limite di 
+85.000 euro, ma comunque inferiore al limite di 100.000 euro, non pregiudica la 
+permanenza nel regime forfetario nell’anno in cui avviene il superamento (del limite 
+di 85.000 euro), ma comporta la fuoriuscita dal regime medesimo dall’anno 
+successivo, con conseguente applicazione del regime ordinario. Il superamento del 
+limite di 100.000 euro, invece, comporta l’immediata cessazione del regime forfetario 
+a partire dal momento stesso del superamento e, conseguentemente, la possibilità di 
+rettificare – nella dichiarazione IVA relativa all’anno del superamento – l’imposta 
+non detratta in costanza di regime forfetario, con le modalità di seguito descritte. 
+In linea con quanto già chiarito con la circolare n. 9/E del 2019, si precisa che 
+il superamento nel corso del 2022 del precedente limite di 65.000 euro, ma non anche 
+del nuovo limite di 85.000 euro consente l’ingresso nel regime già a partire dal 2023 
+ovvero la permanenza nel 2023 da parte di chi già lo applicava nel 202217. Resta 
+ 
+16 Si vedano, in senso conforme, la risoluzione n. 64/E del 14 settembre 2018 e il paragrafo 3.1 della circolare 
+n. 9/E del 10 aprile 2019. 
+17 In senso conforme la circolare n. 9/E del 2019, dove al paragrafo 2.2, a proposito del precedente innalzamento 
+del limite da 30.000 a 65.000 euro, è stato precisato che il “nuovo limite di ricavi/compensi di 65.000 euro va 
+verificato, come si evince dall’espressa previsione normativa, con riferimento al limite dei ricavi conseguiti e 
+dei compensi percepiti nell’anno precedente all’applicazione del regime forfetario. Da ciò consegue che, ad 
+esempio, nel caso in cui il contribuente abbia superato la soglia di 30.000 euro di ricavi/compensi al 31 
+dicembre 2018, ma abbia conseguito/percepito, nel medesimo periodo d’imposta, ricavi/compensi non 
+superiori alla soglia di 65.000 euro (quindi superiori ai limiti imposti dalla vecchia normativa ma inferiori a 
+quelli indicati dalla nuova previsione della legge di bilancio 2019), può rimanere nel regime forfetario, 
+applicando le disposizioni introdotte dalla legge di bilancio 2019”. 
+14 
+ferma, in entrambi i casi (nuovo ingresso o permanenza nel regime), l’applicazione 
+delle nuove regole – introdotte dalla legge di stabilità 2023 – relative al superamento 
+in corso d’anno del limite di 100.000 euro di ricavi o compensi percepiti, con 
+l’immediata fuoriuscita dal regime medesimo. 
+I nuovi limiti si riferiscono ai ricavi e ai compensi derivanti dallo svolgimento 
+delle attività d’impresa e delle attività artistiche e professionali; l’eventuale 
+superamento dei limiti stessi deve essere verificato in base al regime contabile 
+applicato nell’anno di riferimento. 
+Come precisato nel paragrafo 2.2 della citata circolare n. 9/E del 2019, gli 
+imprenditori “che hanno operato in contabilità ordinaria devono calcolare 
+l’ammontare dei ricavi conseguiti applicando il principio di competenza e coloro che 
+hanno applicato il regime semplificato di cui al comma 1 dell’articolo 18 del d.P.R. 
+n. 600 del 1973 devono calcolare l’ammontare dei ricavi conseguiti applicando il 
+regime di cassa. Il predetto limite deve essere ragguagliato all’anno nel caso di 
+attività iniziata in corso di anno”. Ne discende che: 
+• la permanenza nel regime forfetario nel 2023, per chi già lo applicava nel 
+2022, dipende dall’ammontare dei ricavi o compensi incassati nel 2022 – 
+anche laddove le operazioni sottostanti siano state effettuate in anni 
+precedenti – senza tener conto dei ricavi o compensi documentati nel 
+2022, ma non incassati in quell’anno; 
+• l’ingresso nel regime forfetario nel 2023, per chi non lo applicava nel 
+2022, dipende dall’ammontare – al netto dell’IVA addebitata in rivalsa – 
+dei ricavi conseguiti in base all’articolo 109 del TUIR, per coloro che 
+hanno operato in contabilità ordinaria, o dei ricavi e compensi incassati, 
+rispettivamente, per coloro che hanno adottato il regime contabile 
+semplificato e per i professionisti. Resta fermo che, una volta all’interno 
+del regime forfetario, il contribuente determina il reddito imponibile 
+15 
+applicando i coefficienti di redditività ai ricavi o compensi incassati 
+nell’anno. 
+ 
+2.2. 
+Passaggio al regime ordinario – rettifica dell’IVA non detratta 
+Dalla fuoriuscita dal regime forfetario, con decorrenza dall’anno successivo a 
+seguito del superamento dell’anzidetta soglia di ricavi e compensi (85.000 euro), 
+discende il diritto alla rettifica dell’imposta non detratta, secondo le condizioni 
+previste dall’articolo 19-bis2 del decreto IVA, per effetto dell’applicazione del regime 
+forfetario, da esporre nella dichiarazione IVA relativa al primo anno di applicazione 
+delle regole ordinarie. Il periodo d’imposta interessato dalla rettifica varia a seconda 
+del limite di ricavi o compensi che viene superato. 
+Così, il superamento del limite di 85.000 euro nell’anno x – nel quale viene 
+applicato il regime forfetario – implica che l’eventuale rettifica dell’imposta non 
+detratta sia esposta nella dichiarazione IVA relativa all’anno x+1 – primo anno di 
+applicazione delle regole ordinarie – da presentare nell’anno x+2. In senso conforme 
+la circolare n. 10/E del 2016, paragrafo 4.1.3, con la quale è stato chiarito che la 
+“rettifica va eseguita nella dichiarazione IVA dell’ultimo anno di applicazione delle 
+regole ordinarie e il versamento dell’eventuale importo a debito va operato in 
+un’unica soluzione. La rettifica della detrazione va effettuata anche in caso di 
+passaggio dal regime forfetario al regime ordinario nella dichiarazione del primo 
+anno di applicazione delle regole ordinarie”. 
+Il superamento del limite di 100.000 euro nell’anno x, invece, implica che la 
+rettifica dell’imposta non detratta sia esposta nella dichiarazione relativa allo stesso 
+anno, da presentare nell’anno x+1. 
+In entrambi i casi, la rettifica della detrazione è operata nel rispetto delle 
+condizioni previste dall’articolo 19-bis2 del decreto IVA, in base al quale: 
+- se «mutamenti nel regime fiscale delle operazioni attive, nel regime di 
+detrazione dell’imposta sugli acquisti o nell’attività comportano la 
+16 
+detrazione dell’imposta in misura diversa da quella già operata, la 
+rettifica è eseguita limitatamente ai beni ed ai servizi non ancora ceduti 
+o non ancora utilizzati e, per i beni ammortizzabili, è eseguita se non 
+sono trascorsi quattro anni da quello della loro entrata in funzione» 
+(comma 3); 
+- ai fini della rettifica, «i fabbricati o porzioni di fabbricati sono comunque 
+considerati beni ammortizzabili ed il periodo di rettifica è stabilito in 
+dieci anni, decorrenti da quello di acquisto o di ultimazione» (comma 8); 
+- le rettifiche delle detrazioni «sono effettuate nella dichiarazione relativa 
+all’anno in cui si verificano gli eventi che le determinano, sulla base delle 
+risultanze delle scritture contabili obbligatorie» (comma 9). 
+Si richiama, in proposito, la circolare n. 73/E del 21 dicembre 2007 – recante 
+chiarimenti sul regime fiscale semplificato per i contribuenti minimi di cui all’articolo 
+1, commi da 96 a 117, della legge 24 dicembre 2007, n. 244 (legge Finanziaria per il 
+2008) – dove, al paragrafo 3.1.4, è stato precisato che l’“applicazione del regime dei 
+contribuenti minimi comporta la rettifica dell’Iva già detratta negli anni in cui si è 
+applicato il regime ordinario, ai sensi dell’art. 19-bis2 del D.P.R. n. 633 del 1972. 
+(…) Analoga rettifica va effettuata quando il contribuente transita, per legge o 
+opzione, nel regime ordinario dell’Iva”. 
+Ai fini della rettifica in rassegna possono mutuarsi i chiarimenti della circolare 
+n. 10/E del 2016, paragrafo 4.1.3 – resi in relazione al passaggio inverso dal regime 
+ordinario a quello forfetario – in quanto resta fermo in entrambi i casi il presupposto 
+enunciato nell’articolo 19-bis2, vale a dire il «mutamento nel regime fiscale delle 
+operazioni attive» e, conseguentemente, il mutamento «nel regime di detrazione 
+dell’imposta sugli acquisti». Nel caso di fuoriuscita dal regime forfetario, quindi, 
+l’IVA relativa a beni e servizi non ancora ceduti o non ancora utilizzati è “rettificata 
+in un’unica soluzione, senza attendere il materiale impiego degli stessi, fatta 
+eccezione per i beni ammortizzabili, compresi i beni immateriali, la cui rettifica va 
+17 
+eseguita soltanto se non siano ancora trascorsi quattro anni da quello della loro 
+entrata in funzione, ovvero dieci anni dalla data di acquisto o di ultimazione se 
+trattasi di fabbricati o loro porzioni. Come già evidenziato con le circolari n. 73/E 
+del 2007 e 17/E del 2012 (per coloro che applicavano il regime dei minimi o di 
+vantaggio), ai fini della rettifica occorre predisporre un’apposita documentazione 
+nella quale indicare, per categorie omogenee, la quantità e i valori dei beni facenti 
+parte del patrimonio aziendale (secondo le modalità illustrate nella circolare n. 328/E 
+del 24 dicembre 1997)”. 
+Per effetto del superamento nel corso dell’anno x del limite di 85.000 euro, ma 
+entro il limite di 100.000 euro, quindi, nella dichiarazione IVA dell’anno successivo 
+x+1 – da presentare nell’anno x+2 – potrà essere computata a credito in un’unica 
+soluzione l’imposta relativa: 
+- ai beni e ai servizi non ancora ceduti o utilizzati al 31 dicembre dell’anno 
+x; 
+- ai beni ammortizzabili (compresi i beni immateriali, quali ad esempio 
+opere dell’ingegno, marchi, brevetti, know-how, diritti di concessione), 
+se non sono trascorsi quattro anni da quello della loro entrata in funzione 
+(dieci anni dalla data di acquisto o ultimazione per i fabbricati o porzioni 
+di essi), con riferimento alle quote residue.  
+In coerenza alle istruzioni di cui alla prassi citata, andrà dettagliata su apposita 
+documentazione, per categorie omogenee, la quantità, la natura e i valori dei predetti 
+beni e servizi. 
+Per semplificare il calcolo delle rettifiche da indicare nel quadro VF della 
+dichiarazione IVA, le istruzioni alla compilazione del modello riportano in appendice 
+l’apposito prospetto D18. 
+ 
+18 Cfr. istruzioni al modello di dichiarazione IVA 2023 – anno 2022 – pagine 81 e 82, secondo cui va compilato 
+il rigo 3 “Rettifica per mutamenti di regime fiscale”, indicando col segno (+) l’aumento della detrazione – 
+relativa ai beni e ai servizi non ancora ceduti o utilizzati al 31 dicembre dell’anno precedente – conseguente al 
+18 
+ 
+3. 
+MODIFICHE AL REGIME FORFETARIO: SUPERAMENTO DEL 
+LIMITE DI 100.000 EURO 
+Come anticipato in premessa, l’articolo 1, comma 54, lettera b), della legge di 
+bilancio 2023 dispone la fuoriuscita dal regime forfetario «dall’anno stesso in cui i 
+ricavi o i compensi percepiti sono superiori a 100.000 euro. In tale ultimo caso è 
+dovuta l’imposta sul valore aggiunto a partire dalle operazioni effettuate che 
+comportano il superamento del predetto limite»19. 
+ 
+3.1. 
+Effetti ai fini IVA 
+3.1.1. Rettifica dell’IVA non addebitata in rivalsa 
+In considerazione del richiamo normativo ai ricavi o compensi «percepiti», ciò 
+che rileva ai fini del superamento del limite di 100.000 euro è l’incasso20 dei medesimi 
+e non l’emissione della relativa fattura. Ne discende che la fattura che comporta il 
+superamento del limite di 100.000 euro in corso d’anno, se emessa contestualmente 
+all’incasso, deve esporre l’IVA a debito. Laddove, invece, l’incasso avvenga in un 
+momento successivo all’emissione della fattura, in linea generale, gli obblighi ai fini 
+IVA sono assolti a partire dal momento in cui è stato incassato il corrispettivo 
+dell’anzidetta operazione e dovrà essere, altresì, integrata la fattura alla quale l’incasso 
+si riferisce, ancorché emessa antecedentemente all’incasso medesimo. 
+ 
+“passaggio dal regime forfetario disciplinato dall’articolo 1, commi da 54 a 89, della legge 23 dicembre 2014, 
+n. 190, al regime ordinario”. 
+19 Tale disposizione si ispira all’articolo 288-bis, paragrafo 2, secondo periodo, della direttiva IVA, il quale 
+prevede che se nel corso di un anno civile si supera la soglia del volume d’affari annuo nell’Unione di cui 
+all’articolo 284, paragrafo 2, lettera a), il regime di esonero di cui all’articolo 284, paragrafo 1, concesso a un 
+soggetto passivo non stabilito in un altro Stato membro, che concede il regime, cessa di applicarsi a partire da 
+quel momento. L’articolo 284, paragrafo 2, lettera a), prevede che tale soglia sia pari a 100.000 euro di volume 
+d’affari annuo nell’Unione. 
+20 Come si dirà nel prosieguo, per la fuoriuscita dal regime forfetario si fa riferimento al momento dell’incasso 
+come criterio unico che rileva, quindi, ai fini sia dell’IVA sia dell’IRPEF, incluse le relative ritenute d’acconto. 
+19 
+In definitiva, l’incasso del corrispettivo che ha comportato il superamento dei 
+100.000 euro rappresenta per il contribuente la linea di demarcazione tra la fuoriuscita 
+dal regime forfetario e l’ingresso nel regime ordinario, con i conseguenti adempimenti 
+ai fini IVA (come, ad esempio, le liquidazioni periodiche e la dichiarazione annuale).  
+A partire dall’incasso (successivo all’emissione della fattura) che comporta lo 
+sforamento del limite di 100.000 euro, in particolare, rientrano nel regime ordinario e 
+devono essere fatturate con IVA: 
+- l’operazione che ha generato l’incasso; il contribuente deve assoggettare 
+a imposta il corrispettivo, integrando con l’IVA il documento 
+originariamente emesso in costanza di regime forfetario, ai sensi 
+dell’articolo 21, comma 1, decreto IVA (come verrà in seguito illustrato); 
+-  tutte le altre cessioni di beni e le prestazioni di servizi effettuate, ma non 
+ancora fatturate al momento del suddetto incasso; 
+-  tutte le altre cessioni di beni e le prestazioni di servizi effettuate 
+successivamente al medesimo incasso e non ancora fatturate. 
+La dichiarazione IVA relativa all’anno nel quale è stata superata l’anzidetta 
+soglia, pertanto, evidenzierà, oltre all’operazione il cui incasso ha comportato la 
+fuoriuscita dal regime forfetario, tutte le operazioni (attive e passive) fatturate (pur 
+essendo state effettuate in costanza di regime forfetario) successivamente all’incasso 
+citato e tutte le operazioni (attive e passive) effettuate (e fatturate) successivamente 
+all’incasso che ha comportato la fuoriuscita dal regime agevolato.  
+Rimangono, invece, nell’alveo della disciplina del regime forfetario le 
+operazioni fatturate anteriormente all’incasso che ha comportato il superamento dei 
+100.000 euro; tali operazioni non devono, quindi, essere evidenziate nella 
+dichiarazione annuale (relativa alla frazione di anno in cui il contribuente transita nel 
+regime ordinario), neppure nell’ipotesi in cui il corrispettivo di tali operazioni sia 
+incassato successivamente a quello che ha comportato il superamento del limite di 
+100.000 euro. 
+20 
+Si ipotizzi, a titolo esemplificativo, il caso di un professionista che nel mese di 
+settembre 2023 abbia già fatturato e incassato compensi per 80.000 euro e che nel 
+mese di ottobre emetta, nell’ordine, la fattura n. x di 4.000 euro, la fattura n. y di 
+30.000 euro e, infine, la fattura n. z di 5.000 euro. 
+Il 20 novembre è incassata la fattura n. y di 30.000 euro. Ciò determina il 
+superamento del limite di 100.000 euro di compensi «percepiti» nel corso del 2023 e 
+la fuoriuscita immediata dal regime forfetario. Di conseguenza, a partire da tale 
+momento il professionista ex forfetario deve applicare il regime IVA ordinario e deve 
+assoggettare a IVA, oltre alle fatture emesse successivamente all’incasso, anche la 
+fattura n. y che ha determinato lo sforamento.  
+Non devono, invece, essere rettificate le fatture n. x e n. z, emesse 
+legittimamente senza IVA, prima dell’incasso della fattura n. y che ha causato la 
+fuoriuscita dal regime forfetario, in ossequio a quanto disposto dalla relativa 
+disciplina.  
+La rettifica conseguente all’esempio di cui sopra va effettuata emettendo, ai 
+sensi dell’articolo 26, comma 1, del decreto IVA, apposita nota di variazione in 
+aumento (tramite SDI) a integrazione della fattura originaria, addebitando a titolo di 
+rivalsa l’IVA dovuta.  
+Dal momento dell’incasso della somma che ha comportato la fuoriuscita dal 
+regime forfetario, il contribuente è tenuto a istituire i registri di cui agli articoli 23, 24 
+e 25 del decreto IVA, annotando le operazioni rilevanti ai fini IVA.  
+ 
+3.1.2. Rettifica dell’IVA non detratta 
+In ipotesi di superamento del limite di 100.000 euro in corso d’anno, l’imposta 
+non detratta in costanza di regime forfetario, ai fini dell’eventuale rettifica, è indicata 
+21 
+nella dichiarazione IVA relativa all’anno del superamento, in applicazione del già 
+citato articolo 19-bis2, comma 3, del decreto IVA21. 
+In particolare, il passaggio dal regime forfetario a quello ordinario comporta la 
+possibilità di rettifica dell’imposta sugli acquisti di beni ammortizzabili (a determinate 
+condizioni)22 e di beni e servizi «non ancora ceduti o non ancora utilizzati» al 
+momento dell’incasso del corrispettivo dell’operazione che comporta il superamento 
+del predetto limite. Stante il cambiamento di regime in corso d’anno, la rettifica 
+dell’imposta non detratta va operata, quindi, tenendo conto della natura dei beni 
+acquistati (capitale circolante ovvero cespiti ammortizzabili) e, ove necessario, del 
+periodo compreso fra la data dell’acquisto e la data di fuoriuscita dal regime forfetario. 
+In tale ultimo caso, il calcolo della rettifica della detrazione va effettuato considerando 
+il numero dei mesi23 intercorrenti tra la data di acquisto del bene e quella di fuoriuscita 
+dal regime forfetario. 
+Si ipotizzi, a titolo esemplificativo, il caso di un operatore commerciale che al 
+1° ottobre 2023 (data in cui ha incassato un corrispettivo superando il limite di 
+100.000 euro di ricavi «percepiti»), abbia in magazzino beni invenduti per 12.200 
+euro (10.000 imponibile + 2.200 IVA). In questo caso, nella dichiarazione IVA 
+relativa all’anno in cui è avvenuto il mutamento di regime, l’operatore rettifica in 
+aumento l’imposta a credito per 2.200 euro. 
+Se, inoltre, l’operatore commerciale ha acquistato il 1° luglio 2022 un cespite 
+ammortizzabile (diverso dagli immobili) per 6.100 euro (5.000 imponibile + 1.100 
+ 
+21 Si veda, al riguardo, l’articolo 1, comma 61, della legge di stabilità 2015, in base al quale la rettifica della 
+detrazione viene operata «nella dichiarazione» IVA, in caso di passaggio dalle regole ordinarie al regime 
+forfetario e viceversa. È escluso che l’IVA a credito conseguente alle rettifiche in rassegna possa essere 
+scomputata nella prima liquidazione periodica utile. Tale facoltà è, infatti, circoscritta ai soli soggetti che 
+applicano comunque l’IVA, ancorché in base a regimi speciali, quali, ad esempio, il regime speciale agricolo e 
+dell’agriturismo (in senso conforme, si vedano le istruzioni al modello di Comunicazione delle liquidazioni 
+periodiche IVA 2023, pagina 10). 
+22 Si tratta delle condizioni di cui all’articolo 19-bis2 del DPR n. 633 del 1972. 
+23 In relazione alle modalità di rettifica della detrazione dell’IVA per periodi inferiori all’anno, si vedano la 
+risoluzione n. 178/E del 9 luglio 2009 e la circolare n. 50 del 29 febbraio 1996. 
+22 
+IVA), nella medesima dichiarazione IVA rettifica in aumento l’IVA a credito 
+corrispondente ai quinti residui (1.100/5 = 220 euro, da rapportare ai mesi nel 2023), 
+vale a dire il quinto del 2023 rapportato ai mesi residui dell’anno24 (55 euro) più i 
+quinti pieni del triennio 2024-202625 (660 euro), per un totale di 715 euro.  
+Se, infine, al 1° ottobre 2023 risultano servizi non ancora fruiti, consistenti ad 
+esempio in un leasing stipulato il 1° marzo 2023, regolato con pagamenti semestrali 
+anticipati (1° marzo - 1° settembre) per 3.660 euro (3.000 imponibile + 660 IVA), 
+nella stessa dichiarazione IVA l’operatore commerciale rettifica in aumento l’IVA a 
+credito per l’importo corrispondente ai mesi residui del 2023 (ottobre, novembre e 
+dicembre = 3 mesi) più i mesi del 2024 (gennaio e febbraio = 2 mesi), vale a dire 550 
+euro26. 
+ 
+3.1.3. Rettifica dell’IVA non detratta – casi particolari 
+L’acquisto dei cespiti ammortizzabili può comportare diversi interventi in 
+contabilità IVA in dipendenza di altrettanti passaggi fra il regime ordinario e 
+forfetario, stante l’ampio periodo di osservazione (cinque o dieci anni) entro cui 
+operare le eventuali rettifiche in aumento o in diminuzione. È opportuno, a tal fine, 
+analizzare le seguenti due ipotesi: 
+Ipotesi 1 
+Il 1° marzo 2021 il contribuente trimestrale in regime ordinario acquista un 
+cespite ammortizzabile (diverso dagli immobili) per 6.100 euro (5.000 imponibile + 
+1.100 IVA). Detrae integralmente 1.100 euro nella liquidazione IVA relativa al primo 
+trimestre 2021. 
+Nel 2022 lo stesso contribuente accede al regime forfetario, in quanto ne 
+soddisfa i requisiti di legge. L’imposta di 1.100 euro già detratta integralmente, 
+ 
+24 220 x 3/12 = 55 euro 
+25 220 x 3 = 660 euro 
+26 660 x 5/6 = 550 euro 
+23 
+quindi, è rettificata di 4/5 nella dichiarazione IVA 2022 – relativa all’anno 2021 – per 
+un importo a debito in aumento di 880 euro27. 
+Il 30 giugno 2023 il contribuente fuoriesce istantaneamente dal regime 
+forfetario per superamento del limite di 100.000 euro di ricavi percepiti. Nella 
+dichiarazione IVA 2024 – relativa all’anno 2023 – detrae, pertanto, i 3/5 dell’imposta 
+originaria di 1.100 euro – rapportando il quinto relativo al 2023 al numero di mesi 
+residui alla fine dell’anno (6 mesi) – per un importo a credito di 550 euro28. 
+Per il contribuente, quindi, l’effetto finanziario complessivo riferito al cespite 
+considerato è pari a 770 euro29 di detrazione netta. 
+Ipotesi 2 
+Il 1° marzo 2021 il contribuente in regime forfetario acquista un cespite 
+ammortizzabile (diverso dagli immobili) per 6.100 euro (5.000 imponibile + 1.100 
+IVA) e, non essendo tenuto agli adempimenti IVA, non detrae l’imposta. 
+Nel 2022 lo stesso contribuente, avendo perso i requisiti di legge per applicare 
+il regime forfetario, entra in regime ordinario. L’imposta di 1.100 euro è, quindi, 
+detratta per 4/5 nella dichiarazione IVA 2023 – relativa all’anno 2022 – per un 
+importo a credito (in aumento) di 880 euro30. 
+Nel 2023 il contribuente rientra nel regime forfetario, avendone maturato – con 
+riferimento all’anno 2022 – nuovamente i requisiti. Nella dichiarazione IVA 2023 – 
+relativa all’anno 2022 – rettifica di 3/5 l’imposta originaria di 1.100 euro, per un 
+importo a debito (in aumento) di 660 euro31. 
+Trattandosi, tuttavia, di rettifiche da operare nella medesima dichiarazione – 
+da presentare nel 2023 in relazione al 2022 – il contribuente, in tal caso, effettua 
+ 
+27 1.100/5 = 220; 220 x 4 = 880 euro 
+28 (220 x 6/12) + (220 x 2) = 550 euro 
+29 1.100 – 880 + 550 = 770 euro 
+30 1.100/5 = 220; 220 x 4 = 880 euro 
+31 220 x 3 = 660 euro 
+24 
+complessivamente una sola rettifica (in aumento) dell’importo a credito pari a 220 
+euro32 di detrazione netta. 
+ 
+3.2. 
+Effetti ai fini delle imposte dirette 
+Per effetto delle modifiche recate al citato articolo 1, comma 71, della legge di 
+stabilità 2015, come sopra rappresentato, nel caso in cui i ricavi o compensi percepiti 
+nell’anno risultino superiori a 100.000 euro, il regime forfetario cessa di avere 
+applicazione dall’anno stesso nel quale si verifica detta condizione. In proposito, si 
+ritiene, coerentemente con il dato letterale della disposizione nonché con i criteri di 
+determinazione del reddito del regime forfetario, che per la verifica del predetto limite 
+debba assumere rilevanza il criterio di cassa. 
+Il superamento del limite di 100.000 euro nel corso dell’anno, come chiarito 
+nella relazione illustrativa33 al disegno di legge di bilancio 2023, comporta che per 
+detto periodo d’imposta troveranno applicazione le regole ordinarie di determinazione 
+del reddito d’impresa o di lavoro autonomo. 
+Al riguardo, va da sé che il costo dei beni che concorre alla determinazione del 
+reddito d’impresa o di lavoro autonomo deve essere assunto al netto dell’IVA 
+inizialmente non detratta (in costanza di regime forfetario) e ora rettificabile, per 
+effetto del superamento del limite di 100.000 euro in corso d’anno, nella dichiarazione 
+IVA relativa all’anno del superamento, in applicazione del citato articolo 19-bis2, 
+comma 3, del decreto IVA. Giova ricordare, al riguardo, che l’eventuale mancata 
+rettifica dell’IVA secondo le modalità descritte al paragrafo 3.1.2 non può avere 
+riflessi ai fini della determinazione del reddito, atteso che in tale ipotesi l’indetraibilità 
+ 
+32 880 – 660 = 220 euro 
+33 La relazione illustrativa al disegno di legge di bilancio 2023 chiarisce che, per “il periodo d’imposta in cui i 
+ricavi o i compensi superano i 100.000 euro, il reddito è determinato con le modalità ordinarie”. 
+25 
+dell’IVA non deriverebbe da cause oggettive che precludono l’esercizio del relativo 
+diritto, bensì da una valutazione discrezionale del contribuente34.  
+A titolo esemplificativo, riprendendo l’esempio riportato al precedente 
+paragrafo n. 3.1.2 e ipotizzando che l’operatore commerciale abbia acquistato, nel 
+periodo dal 1° gennaio 2023 al 30 settembre 2023, beni per 36.600 euro (30.000 
+imponibile + 6.600 IVA), il costo dei beni è assunto: 
+- al netto dell’IVA rettificabile per effetto dell’articolo 19-bis2, comma 3, 
+del decreto IVA, ossia per un importo pari a 10.000 euro, per la quota di 
+beni invenduti in magazzino al 1° ottobre 2023 (data di incasso del 
+corrispettivo che fa superare il limite di 100.000 euro di ricavi 
+«percepiti»); 
+- al lordo dell’IVA corrisposta al fornitore, ossia per un importo pari a 
+24.400 euro (20.000 imponibile + 4.400 IVA indetraibile), per la restante 
+quota di beni acquistati e venduti entro il 30 settembre 2023; 
+- in ogni caso, al netto dell’IVA, per i beni acquistati a partire dal 1° ottobre 
+2023. 
+In riferimento agli adempimenti contabili e fiscali si rendono applicabili, per 
+quanto compatibili, i chiarimenti resi con la circolare n. 73/E del 21 dicembre 200735 
+e con gli altri documenti di prassi sull’argomento. 
+In altri termini, la fuoriuscita dal regime per il superamento dei 100.000 euro 
+quale limite di compensi o ricavi implica una serie di adempimenti che il contribuente 
+è tenuto ad assolvere in relazione al periodo d’imposta in corso al momento del 
+superamento. 
+A titolo esemplificativo e non esaustivo, il contribuente deve: 
+ 
+34 Si veda, in senso conforme, la circolare n. 6/E del 3 marzo 2009, paragrafo 1 (“Rinuncia alla detrazione 
+dell’IVA”). 
+35 Con la circolare n. 73/E del 2007 sono stati forniti chiarimenti in merito al regime fiscale semplificato per i 
+contribuenti minimi previsto dall’articolo 1, commi da 96 a 117, della legge finanziaria per il 2008. 
+26 
+- istituire i registri e le scritture contabili previsti dal titolo II del DPR n. 600 
+del 1973 e annotare le operazioni con le modalità e nei termini ivi stabiliti 
+a decorrere dal momento in cui è stato superato il predetto limite; 
+- annotare le operazioni relative alle cessioni di beni e alle prestazioni di 
+servizi, nonché agli acquisti effettuati anteriormente al superamento del 
+predetto limite (a decorrere dall’inizio del periodo d’imposta) entro il 
+termine per la presentazione della dichiarazione annuale;  
+- adempiere agli ulteriori obblighi ordinariamente previsti per le operazioni 
+che determinano il superamento del predetto limite e per quelle effettuate 
+successivamente; 
+- versare, entro il termine ordinariamente previsto, le imposte a saldo, 
+relative all’anno in cui è stato superato il predetto limite, risultanti dalla 
+dichiarazione annuale e calcolate sul reddito determinato nel rispetto delle 
+norme del TUIR in materia di determinazione del reddito di lavoro 
+autonomo e del reddito d’impresa. Resta fermo che, ai fini del versamento 
+degli acconti, si applicano le ordinarie modalità di determinazione degli 
+stessi secondo il metodo storico o il metodo previsionale. In ogni caso, i 
+codici tributo da utilizzare devono essere coerenti con le modalità di 
+determinazione del reddito adottate. Ne consegue, in particolare, che 
+nell’ipotesi in cui il soggetto ex forfetario adotti il metodo storico, lo stesso 
+determinerà entrambi gli acconti con le modalità di calcolo proprie del 
+regime forfetario e verserà gli stessi utilizzando i relativi codici tributo, 
+salvo poi determinare l’imposta applicando le ordinarie modalità di 
+determinazione del reddito e di calcolo dell’IRPEF e versare a saldo quanto 
+effettivamente dovuto. 
+ 
+27 
+3.3. 
+Effetti sulle ritenute alla fonte a titolo d’acconto  
+In ipotesi di superamento del limite di 100.000 euro di ricavi e compensi 
+nell’anno, con ingresso immediato nel regime di determinazione ordinaria del reddito, 
+ai fini IRPEF, occorre chiarire i profili applicativi delle ritenute d’acconto di cui al 
+titolo III del DPR n. 600 del 1973. 
+In particolare, circa l’applicazione della “Ritenuta sui redditi di lavoro 
+autonomo e su altri redditi”, l’articolo 25, comma 1, del citato decreto prevede in via 
+generale che «i soggetti indicati nel primo comma dell’art. 23, che corrispondono a 
+soggetti residenti nel territorio dello Stato compensi comunque denominati, anche 
+sotto forma di partecipazione agli utili, per prestazioni di lavoro autonomo, ancorché 
+non esercitate abitualmente ovvero siano rese a terzi o nell’interesse di terzi o per 
+l’assunzione di obblighi di fare, non fare o permettere devono operare all’atto del 
+pagamento una ritenuta del 20 per cento a titolo di acconto dell’imposta sul reddito 
+delle persone fisiche dovuta dai percipienti, con l’obbligo di rivalsa». 
+Nel caso specifico dei contribuenti in regime forfetario, tale obbligo è derogato 
+dall’articolo 1, comma 67, della legge di stabilità 2015, in base al quale i «ricavi e i 
+compensi relativi al reddito oggetto del regime forfetario non sono assoggettati a 
+ritenuta d’acconto da parte del sostituto d’imposta. A tal fine, i contribuenti 
+rilasciano un’apposita dichiarazione dalla quale risulti che il reddito cui le somme 
+afferiscono è soggetto ad imposta sostitutiva». Inoltre, ai sensi del successivo comma 
+69, i contribuenti che usufruiscono del regime forfetario «non sono tenuti a operare 
+le ritenute alla fonte di cui al titolo III del citato decreto del Presidente della 
+Repubblica n. 600 del 1973, e successive modificazioni, ad eccezione delle ritenute di 
+cui agli articoli 23 e 24 del medesimo decreto». 
+Considerato, però, che «il regime forfetario cessa di avere applicazione 
+dall’anno stesso in cui i ricavi o i compensi percepiti sono superiori a 100.000 euro», 
+ne discende che i compensi percepiti dal professionista ex forfetario, una volta 
+divenuto ordinario, sono assoggettati alla ritenuta d’acconto di cui al citato articolo 
+28 
+25 del DPR n. 600 del 1973 da parte del sostituto d’imposta e, sui compensi erogati 
+per prestazioni professionali ricevute, il medesimo professionista è tenuto a sua volta 
+a operare le ritenute di cui al predetto articolo 25. 
+Posto che le ritenute sono operate «all’atto del pagamento» dei compensi, le 
+stesse devono essere applicate, in via generale, ai compensi del professionista per le 
+prestazioni che comportano il superamento del limite di 100.000 euro «percepiti» e 
+per quelle successive, ma non anche (retroattivamente) ai compensi incassati prima. 
+Va da sé che anche qualora l’operazione sia stata fatturata anticipatamente (rispetto 
+all’incasso) – in costanza di regime forfetario – si ritiene che l’incasso che comporta 
+il superamento della soglia di 100.000 euro debba essere assoggettato a ritenuta. 
+Resta inteso che su tutti i compensi percepiti successivamente all’incasso che 
+comporta il superamento della soglia di 100.000 euro devono essere operate le 
+ritenute, indipendentemente dalla data di fatturazione delle stesse. 
+Analogamente, per le operazioni passive, il professionista assume il ruolo di 
+sostituto d’imposta solo a decorrere dal primo pagamento da effettuarsi 
+successivamente al superamento del predetto limite (anche laddove l’eventuale fattura 
+già ricevuta non indichi l’importo della ritenuta). 
+La novella normativa non modifica, invece, la disciplina delle ritenute di cui ai 
+citati articoli 23 e 24 del medesimo DPR n. 600 del 1973 – rispettivamente, sui redditi 
+di lavoro dipendente e sui redditi assimilati a quelli di lavoro dipendente 
+eventualmente corrisposti dal contribuente forfetario – che devono essere operate a 
+prescindere dal volume di ricavi o compensi percepiti e dal conseguente regime fiscale 
+applicato (ordinario o forfetario). 
+Si richiama, a maggior chiarimento, l’esempio ipotizzato nel paragrafo 3.1.1, 
+in cui il professionista, nel mese di settembre 2023, abbia già fatturato e incassato 
+compensi per 80.000 euro e nel mese di ottobre emetta, nell’ordine, la fattura n. x di 
+4.000 euro, la fattura n. y di 30.000 euro e, infine, la fattura n. z di 5.000 euro. 
+29 
+Nel mese di novembre è incassata la fattura n. y di 30.000 euro, che determina 
+il superamento del limite di 100.000 euro di compensi «percepiti» nel corso del 2023 
+e la fuoriuscita immediata dal regime forfetario. Di conseguenza, il professionista ex 
+forfetario diventato ordinario subisce la ritenuta d’acconto sia sul medesimo incasso 
+della fattura n. y, sia al momento dell’incasso delle fatture n. x di 4.000 euro e n. z di 
+5.000 euro, in quanto le stesse verranno incassate dopo il superamento del predetto 
+limite. Ciò, in ossequio al già richiamato principio di legge secondo cui le ritenute 
+sono operate «all’atto del pagamento» dei compensi. 
+ 
+4. RISPOSTE A QUESITI 
+ 
+4.1. 
+Superamento della soglia di 100.000 euro di ricavi o compensi 
+percepiti – Fatturazione dell’operazione che comporta il superamento  
+Domanda 
+Nel caso di superamento della soglia di 100.000 euro di ricavi o compensi, il 
+contribuente fuoriesce dal regime forfetario e applica l’IVA sulle operazioni effettuate 
+a partire da quelle che comportano il superamento di tale limite. A tal fine, si chiede 
+se debba fatturare: 
+• l’intera operazione con IVA; 
+• senza IVA la parte dell’operazione fino all’importo che concorre al 
+raggiungimento del limite di 100.000 euro e con IVA la parte eccedente; 
+• l’intera operazione sulla base delle regole del regime forfetario senza 
+addebitare l’IVA in rivalsa. 
+Risposta 
+L’articolo 1, comma 71, della legge di stabilità 2015, come modificato 
+dall’articolo 1, comma 54, lettera b), della legge n. 197 del 2022, dispone che il 
+«regime forfetario cessa di avere applicazione dall’anno stesso in cui i ricavi o i 
+30 
+compensi percepiti sono superiori a 100.000 euro. In tale ultimo caso è dovuta 
+l’imposta sul valore aggiunto a partire dalle operazioni effettuate che comportano il 
+superamento del predetto limite». 
+Il dato testuale della locuzione «a partire dalle operazioni effettuate» deve 
+essere interpretato nel senso che l’applicazione del regime ordinario IVA interessa 
+l’operazione il cui incasso comporta il superamento del limite, anche se la relativa 
+fattura è stata emessa in costanza di regime forfetario36, e le operazioni fatturate 
+successivamente all’incasso che ha comportato il superamento del limite dei 100.000 
+euro. A titolo esemplificativo, quindi, se il contribuente forfetario ha conseguito in 
+corso d’anno un volume di ricavi o compensi pari a 90.000 euro, nel momento in cui 
+effettua un’operazione del valore imponibile di 20.000 euro, incassandone 
+contestualmente il corrispettivo, deve emettere la relativa fattura applicando l’IVA sul 
+medesimo valore di 20.000 euro. 
+Coerentemente con l’orientamento della giurisprudenza unionale, non si 
+condivide, invece, l’ipotesi di “scindere” il corrispettivo oggetto di fatturazione, non 
+assoggettando ad IVA l’operazione fino all’importo che concorre al raggiungimento 
+della soglia di 100.000 euro. La Corte di Giustizia dell’Unione europea, peraltro, ha 
+affermato che, se la finalità del regime di esonero dall’IVA è quella di ridurre gli oneri 
+amministrativi a carico delle piccole imprese e dell’amministrazione finanziaria, tale 
+obiettivo non sarebbe perseguibile qualora si rendesse necessario effettuare artificiosi 
+calcoli separati in relazione alla medesima operazione (cfr. sentenza del 2 maggio 
+2019, C-265/18 “Akvilė Jarmuškienė”) 37. 
+ 
+36 Si veda il paragrafo n. 3.1.1. 
+37 Nella citata sentenza, avente a oggetto il caso di una compravendita di due immobili nei confronti dello stesso 
+acquirente, effettuata mediante il medesimo contratto, la Corte di Giustizia ha precisato, ai punti da 35 a 38, 
+quanto segue: 
+“35 Gli elementi componenti tale unica cessione non possono essere scomposti, in quanto ciò risulterebbe 
+artificioso rispetto al sistema dell’IVA (…). 
+36 Ne consegue che l’IVA è dovuta sull’intero valore dell’operazione oggetto del procedimento principale. 
+(…). 
+31 
+ 
+4.2. 
+ Superamento della soglia di 100.000 euro di ricavi o compensi 
+percepiti – Effetti sulle annualità successive 
+Domanda 
+Il contribuente che nel 2023 supera la soglia di 100.000 euro di ricavi o 
+compensi fuoriesce immediatamente dal regime forfetario. Se nel 2024 consegue 
+ricavi o compensi in misura pari o inferiore a 85.000 euro, può rientrare nel regime 
+forfetario a partire dal 2025, fermo restando il rispetto delle altre condizioni? 
+Risposta 
+L’articolo 1, comma 54, della legge di stabilità 2015, nella formulazione 
+vigente fino al 31 dicembre 2022, disponeva che i «contribuenti persone fisiche 
+esercenti attività d’impresa, arti o professioni applicano il regime forfetario di cui al 
+presente comma e ai commi da 55 a 89 del presente articolo se (…) nell’anno 
+precedente: 
+a) hanno conseguito ricavi ovvero hanno percepito compensi, ragguagliati ad 
+anno, non superiori a euro 65.000; (…)». 
+Stante l’innalzamento a 85.000 euro del predetto limite e in assenza di 
+preclusioni normative in tal senso, pertanto, il contribuente che nel 2024 consegue 
+ricavi o percepisce compensi entro tale soglia può, sussistendone gli ulteriori 
+presupposti, rientrare nel regime forfetario a partire dal 2025, ancorché nel 2023 abbia 
+superato il limite di 100.000 euro. 
+ 
+ 
+38 Orbene, si deve sottolineare che gli oneri amministrativi gravanti sull’amministrazione finanziaria 
+interessata e sul contribuente non risulterebbero diminuiti qualora occorresse effettuare calcoli separati, 
+attinenti ai singoli beni di una sola ed unica cessione, oggetto di un unico contratto di compravendita”. 
+32 
+4.3. Superamento della soglia di 100.000 euro di ricavi o compensi 
+percepiti – Soggetti che iniziano l’attività in corso d’anno 
+Domanda 
+Si chiede se un soggetto che inizia l’attività nel corso dell’anno 2023 aderendo 
+al regime forfetario, al fine di determinare il limite di ricavi o compensi di 100.000 
+euro, oltre il quale si fuoriesce immediatamente dal regime, debba ragguagliare il 
+citato importo ad anno. 
+Risposta  
+Per le persone fisiche esercenti attività d’impresa, arti o professioni il regime 
+forfetario rappresenta un regime naturale. Tali contribuenti applicano, pertanto, tale 
+regime nell’anno di inizio dell’attività, salvi i casi di opzione per il regime ordinario 
+di tassazione, di superamento della soglia di 100.000 euro di ricavi o compensi 
+percepiti nel corso dell’anno o in cui gli stessi già sappiano di percepire nell’anno 
+somme (ragguagliate ad anno) superiori alla soglia di 85.000 euro. 
+Negli anni successivi a quello di inizio dell’attività, gli stessi applicano il 
+regime forfetario (salvo diversa opzione) solo qualora nell’anno precedente siano 
+soddisfatti i requisiti di cui alle lettere a) e b) del comma 54 dell’articolo 1 della legge 
+di stabilità 2015. 
+Il primo dei due requisiti (lettera a) prevede che i contribuenti applichino il 
+regime forfetario se, nel periodo d’imposta precedente, «hanno conseguito ricavi 
+ovvero hanno percepito compensi, ragguagliati ad anno, non superiori a euro 
+85.000». 
+Questo è, pertanto, da intendersi come un requisito di permanenza, nel caso in 
+cui nel periodo d’imposta precedente si sia applicato il regime forfetario, oppure di 
+accesso, qualora nel periodo d’imposta precedente si sia applicato il regime ordinario 
+di tassazione ai fini dell’IRPEF. 
+33 
+Analogamente, il comma 71 dell’articolo 1 della legge di stabilità 2015 
+prevede, al primo periodo, le cause di fuoriuscita dal regime forfetario, nel 
+presupposto che nel periodo d’imposta precedente si sia applicato detto regime, 
+disponendo che il «regime forfetario cessa di avere applicazione a partire dall’anno 
+successivo a quello in cui viene meno taluna delle condizioni di cui al comma 54 (…)». 
+Per effetto di tale previsione, i contribuenti che nel primo anno di attività conseguono 
+ricavi o percepiscono compensi per un ammontare, ragguagliato ad anno, superiore a 
+85.000 euro non possono applicare il regime forfetario nell’annualità successiva. 
+Il secondo periodo del comma 71 – come introdotto dall’articolo 1, comma 54, 
+lettera b), della legge di bilancio 2023 – prevede, invece, una causa di fuoriuscita 
+“immediata” da tale regime, in quanto questa ha effetto dall’anno stesso in cui si 
+verifica e non da quello successivo38. 
+In proposito, dalla direttiva UE 2020/28539 si evince che la finalità di prevedere 
+la soglia di 100.000 euro annui per fruire del regime di esonero dall’IVA è in linea 
+con quella di salvaguardare le entrate erariali all’interno dell’Unione40. Tale finalità, 
+inoltre, deve conciliarsi con l’obiettivo, posto dalla medesima direttiva, di «assicurare 
+una transizione graduale delle piccole imprese dalla franchigia all’imposizione»41, 
+ 
+38 Ai sensi del comma 71, secondo periodo, dell’articolo 1 della legge di bilancio 2015, infatti, il «regime 
+forfetario cessa di avere applicazione dall’anno stesso in cui i ricavi o i compensi percepiti sono superiori a 
+100.000 euro. In tale ultimo caso è dovuta l’imposta sul valore aggiunto a partire dalle operazioni effettuate 
+che comportano il superamento del predetto limite». 
+39 Tale direttiva – che modifica la direttiva 2006/112/CE relativa al sistema comune d’imposta sul valore 
+aggiunto per quanto riguarda il regime speciale per le piccole imprese e il regolamento (UE) n. 904/2010 per 
+quanto riguarda la cooperazione amministrativa e lo scambio di informazioni allo scopo di verificare la corretta 
+applicazione del regime speciale per le piccole imprese – disciplina il regime di esonero dall’IVA per le piccole 
+imprese di cui al Titolo XII, Capo 1, della direttiva 2006/112/CE.  
+40 Si veda il terzo periodo del considerando n. 14 della direttiva (UE) 2020/285, secondo cui qualora, «nel corso 
+di un anno civile, venga superata la soglia del volume d’affari annuo nell’Unione, è necessario che la 
+franchigia cessi di applicarsi a partire da quel momento, poiché la funzione della soglia è salvaguardare le 
+entrate». 
+41 Si veda il primo periodo del considerando n. 14 della direttiva (UE) 2020/285, in base al quale, al fine di 
+«assicurare una transizione graduale delle piccole imprese dalla franchigia all’imposizione, ai soggetti passivi 
+dovrebbe essere consentito di continuare a beneficiare della franchigia per le piccole imprese per un periodo 
+di tempo limitato qualora il loro volume d’affari non superi la soglia di franchigia nazionale oltre una 
+percentuale prestabilita di tale soglia (…)». 
+34 
+transizione che si verificherebbe con minore gradualità qualora, per i contribuenti che 
+iniziano l’attività, la citata soglia venisse “ragguagliata ad anno”. 
+In virtù di quanto sopra rappresentato e in considerazione del fatto che il 
+legislatore, nell’ambito della medesima disciplina, ha espressamente previsto il 
+ragguaglio con esclusivo riferimento alla soglia degli 85.000 euro42 e non a quella di 
+100.000 euro, si ritiene che il superamento dei 100.000 euro di ricavi o compensi 
+percepiti rappresenti una fattispecie “speciale” di cessazione del regime forfetario, da 
+intendersi in termini assoluti, considerando, a tal fine, i ricavi o i compensi 
+concretamente percepiti. 
+ 
+4.4. Accesso al regime forfetario - Decadenza da precedenti opzioni  
+Domanda 
+Si chiede se un soggetto che nel 2021 abbia optato per la contabilità ordinaria 
+possa, a partire dal 1° gennaio 2023, applicare il regime forfetario qualora il volume 
+di ricavi e compensi percepiti nel 2022 sia inferiore alla soglia di 85.000 euro di cui 
+all’articolo 1, comma 54, lettera a), della legge di stabilità 2015, come da ultimo 
+modificato, oppure se lo stesso sia obbligato a mantenere il regime della contabilità 
+ordinaria nel rispetto del vincolo triennale. 
+Risposta 
+Si richiama sul punto la circolare n. 11/E del 13 aprile 201743, secondo cui 
+“l’opzione per un regime di determinazione dell’imposta vincola il contribuente alla 
+sua concreta applicazione almeno per un triennio, trascorso il quale si rinnova 
+tacitamente per ciascun anno successivo, finché permane la concreta applicazione 
+ 
+42 In tal senso si veda l’articolo 1, comma 54, lettera a), della legge di stabilità 2015. 
+43 Con la circolare n. 11/E del 2017 sono stati forniti chiarimenti in relazione al regime di determinazione del 
+reddito per le “imprese minori” di cui all’articolo 1, commi da 17 a 23, della legge 11 dicembre 2016, n. 232 
+(c.d. legge di bilancio 2017). 
+35 
+del regime scelto. L’articolo 1 del d.P.R. n. 442 del 199744, tuttavia, consente la 
+variazione dell’opzione e della revoca nel caso di modifica del relativo sistema in 
+conseguenza di nuove disposizioni normative”. 
+Tenuto conto delle modifiche sostanziali apportate al regime forfetario dalle 
+“nuove disposizioni normative” (i.e. la legge di stabilità 2023) e mutuando i 
+chiarimenti resi con la circolare n. 9/E del 2019 – concernenti le precedenti modifiche 
+al regime forfetario apportate dalla legge di stabilità 2015 – ne discende che i soggetti 
+in regime ordinario per opzione nel 2022 possono transitare nel regime forfetario nel 
+2023, qualora in possesso dei relativi requisiti normativi, senza attendere il decorso 
+del triennio previsto per l’esercizio delle opzioni IVA45. 
+Pertanto, il soggetto che nel 2021 abbia optato per la contabilità ordinaria può, 
+a partire dal 1° gennaio 2023, applicare il regime forfetario qualora il volume di ricavi 
+o compensi percepiti nel 2022 sia pari o inferiore alla soglia di 85.000 euro, come 
+modificata dall’articolo 1, comma 54, lettera a), della legge n. 197 del 2022 
+(ovviamente ricorrendo anche gli altri requisiti), senza necessità di osservare il 
+vincolo triennale di permanenza nel regime ordinario. 
+ 
+4.5. Acquisti in reverse-charge in costanza di regime forfetario 
+Domanda 
+Si chiede se nella “Comunicazione liquidazioni periodiche” IVA, da presentare 
+a partire dal trimestre nel corso del quale si fuoriesce dal regime forfetario, debba 
+essere compresa anche l’imposta a debito derivante dalle operazioni in reverse-charge 
+effettuate nel medesimo periodo, ma ancora in regime forfetario. 
+ 
+44 Si veda il comma 1 dell’articolo 1 del DPR n. 442 del 1997, citato nella nota n. 14.  
+45 Con la circolare n. 9/E del 2019, paragrafo 3.2, infatti, è stato chiarito che, tenuto conto “delle significative 
+modifiche apportate al regime forfetario dalla legge di stabilità per il 2019, i soggetti che nel 2018 erano in 
+regime ordinario possono effettuare il passaggio dalla contabilità ordinaria, scelta per opzione, al regime 
+forfetario, senza attendere il decorso del triennio previsto per gli esercizi delle opzioni IVA”.  
+36 
+Risposta 
+Ai sensi dell’articolo 1, comma 60, della legge di stabilità 2015, i «contribuenti 
+che applicano il regime forfetario, per le operazioni per le quali risultano debitori 
+dell’imposta, emettono la fattura o la integrano con l’indicazione dell’aliquota e della 
+relativa imposta e versano l’imposta entro il giorno 16 del mese successivo a quello 
+di effettuazione delle operazioni». 
+È il caso delle operazioni di cui all’articolo 17, comma 6, del decreto IVA, in 
+cui il contribuente forfetario è – in veste di cessionario o di committente – il soggetto 
+debitore d’imposta, tenuto al versamento della stessa con il meccanismo 
+dell’inversione contabile (reverse-charge), tramite il modello F24, entro il giorno 16 
+del mese successivo a quello di effettuazione dell’operazione. 
+In tale ipotesi, il comma 60 citato si limita a prescrivere l’obbligo di 
+versamento dell’imposta, ma non prevede ulteriori deroghe all’esonero dagli 
+adempimenti IVA disposto dal precedente comma 59. 
+Ne discende che nella “Comunicazione liquidazioni periodiche” IVA, da 
+presentare in relazione al periodo (mese/trimestre) nel corso del quale si fuoriesce dal 
+regime forfetario, non deve essere compresa l’IVA a debito derivante dalle operazioni 
+in reverse-charge effettuate in costanza di regime forfetario. 
+L’applicazione delle regole ordinarie in materia di IVA, infatti, decorre dal 
+momento di incasso del corrispettivo dell’operazione che ha comportato il 
+superamento del limite di 100.000 euro di ricavi o compensi «percepiti». 
+Così, a titolo esemplificativo, se il contribuente forfetario (trimestrale) effettua 
+l’acquisto in reverse-charge il 10 aprile 2023 e fuoriesce dal regime forfetario in virtù 
+di un’operazione effettuata il 10 maggio 2023, la liquidazione periodica del secondo 
+trimestre 2023 includerà, oltre all’operazione che ha comportato il superamento della 
+soglia, tutte le operazioni ad essa successive, ma non anche l’anzidetta operazione 
+effettuata in reverse-charge, la cui IVA deve essere versata entro il 16 maggio 2023. 
+ 
+37 
+5. 
+CLAUSOLA DI SALVAGUARDIA  
+Da ultimo, si fa presente che, in considerazione della circostanza che la 
+disciplina in commento produce effetti in relazione alle operazioni già effettuate nel 
+corso dell’anno 2023, gli uffici dell’Agenzia valuteranno, caso per caso, la non 
+applicabilità delle sanzioni, ai sensi dell’articolo 10, comma 3, della legge 27 luglio 
+2000, n. 212, recante lo Statuto dei diritti del contribuente, qualora riscontrino 
+condizioni di obiettiva incertezza in relazione a comportamenti difformi adottati dai 
+contribuenti anteriormente alla pubblicazione del presente documento di prassi. 
+ 
+*** 
+ 
+Le Direzioni regionali vigileranno affinché le istruzioni fornite e i principi 
+enunciati con la presente circolare vengano puntualmente osservati dalle Direzioni 
+provinciali e dagli Uffici dipendenti. 
+ 
+IL DIRETTORE DELL’AGENZIA 
+Ernesto Maria Ruffini 
+(firmato digitalmente) 

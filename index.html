@@ -3,22 +3,116 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LiteBusiness</title>
+    <title>LiteBusiness | Soluzioni Digitali</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
     />
+
+    <style>
+      :root {
+        --primary-gradient: linear-gradient(135deg, #0d6efd 0%, #003d99 100%);
+        --soft-bg: #f8f9fa;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        color: #2d3436;
+      }
+
+      /* Navbar più leggera e trasparente */
+      .navbar {
+        backdrop-filter: blur(10px);
+        background-color: rgba(33, 37, 41, 0.95) !important;
+        padding: 1rem 0;
+      }
+
+      /* Hero Section con gradiente leggero */
+      .hero-section {
+        background: radial-gradient(circle at top right, #e9ecef, #ffffff);
+        padding: 120px 0;
+      }
+
+      /* Card con animazione Hover */
+      .card {
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+        border-radius: 16px;
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+      }
+
+      /* Icone stilizzate */
+      .feature-icon {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-gradient);
+        color: white;
+        border-radius: 12px;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Bottoni arrotondati */
+      .btn {
+        padding: 0.8rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .btn-primary {
+        background: var(--primary-gradient);
+        border: none;
+      }
+
+      .btn-primary:hover {
+        filter: brightness(1.2);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);
+      }
+
+      /* Form migliorato */
+      .form-control {
+        border-radius: 10px;
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+      }
+
+      .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+        border-color: #0d6efd;
+      }
+
+      /* Badge */
+      .badge {
+        font-weight: 500;
+        padding: 0.5em 1em;
+      }
+    </style>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
       <div class="container">
-        <a class="navbar-brand" href="#">LiteBusiness</a>
+        <a class="navbar-brand fw-bold fs-3" href="#"
+          >Lite<span class="text-primary">Business</span></a
+        >
         <button
           class="navbar-toggler"
           type="button"
@@ -29,32 +123,36 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link px-3" href="#">Home</a></li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Home</a>
+              <a class="nav-link px-3" href="#sezione-servizi">Servizi</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#sezione-servizi">Servizi</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#sezione-contatti">Contatti</a>
+              <a class="nav-link px-3" href="#sezione-contatti">Contatti</a>
             </li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <header class="bg-light py-5 border-bottom">
-      <div class="container px-5">
-        <div class="row gx-5 justify-content-center">
-          <div class="col-lg-8 col-xl-7 text-center">
-            <h1 class="display-4 fw-bolder mb-2">LiteBusiness</h1>
-            <p class="lead text-muted mb-4">Soluzioni per commercialisti</p>
+    <header class="hero-section">
+      <div class="container">
+        <div class="row gx-5 align-items-center justify-content-center">
+          <div class="col-lg-8 text-center">
+            <h1 class="display-3 fw-800 mb-3">
+              L'Evoluzione Digitale per
+              <span class="text-primary">Commercialisti</span>
+            </h1>
+            <p class="lead text-muted mb-5 fs-4">
+              Semplifica la gestione, proteggi i dati e scala il tuo studio con
+              tecnologie all'avanguardia.
+            </p>
             <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-              <a class="btn btn-primary btn-lg px-4 me-sm-3" href="chat.html"
-                >Inizia ora</a
+              <a class="btn btn-primary btn-lg shadow" href="chat.html"
+                >Inizia Oras</a
               >
-              <a class="btn btn-outline-dark btn-lg px-4" href="#"
-                >Scopri di più</a
+              <a class="btn btn-outline-dark btn-lg" href="#sezione-servizi"
+                >Scopri i Servizi</a
               >
             </div>
           </div>
@@ -62,47 +160,51 @@
       </div>
     </header>
 
-    <main class="py-5">
-      <div class="container px-5 my-5">
+    <main class="py-5 mt-n5">
+      <div class="container px-5">
         <div class="row gx-5">
           <div class="col-lg-4 mb-5">
-            <div class="card h-100 shadow border-0">
+            <div class="card h-100 border-0 shadow-sm">
               <div class="card-body p-4">
-                <div class="badge bg-primary bg-gradient rounded-pill mb-2">
-                  News
+                <div
+                  class="badge bg-primary-subtle text-primary rounded-pill mb-3"
+                >
+                  Focus News
                 </div>
-                <h5 class="card-title mb-3">Caratteristica 1</h5>
-                <p class="card-text mb-0">
-                  Bootstrap gestisce l'allineamento e il padding con classi
-                  semplici come <code>p-4</code> o <code>mb-3</code>.
+                <h5 class="fw-bold mb-3">Semplicità di Gestione</h5>
+                <p class="text-muted">
+                  Interfacce intuitive progettate per ridurre il carico
+                  cognitivo e velocizzare i processi quotidiani.
                 </p>
               </div>
             </div>
           </div>
           <div class="col-lg-4 mb-5">
-            <div class="card h-100 shadow border-0">
+            <div class="card h-100 border-0 shadow-sm">
               <div class="card-body p-4">
-                <div class="badge bg-primary bg-gradient rounded-pill mb-2">
-                  Pro
+                <div
+                  class="badge bg-success-subtle text-success rounded-pill mb-3"
+                >
+                  Premium
                 </div>
-                <h5 class="card-title mb-3">Caratteristica 2</h5>
-                <p class="card-text mb-0">
-                  Il design si adatta automaticamente a smartphone, tablet e
-                  desktop.
+                <h5 class="fw-bold mb-3">Design Responsivo</h5>
+                <p class="text-muted">
+                  Accedi ai tuoi dati ovunque tu sia: il tuo ufficio è sempre in
+                  tasca con la nostra ottimizzazione mobile.
                 </p>
               </div>
             </div>
           </div>
           <div class="col-lg-4 mb-5">
-            <div class="card h-100 shadow border-0">
+            <div class="card h-100 border-0 shadow-sm">
               <div class="card-body p-4">
-                <div class="badge bg-primary bg-gradient rounded-pill mb-2">
-                  Web
+                <div class="badge bg-info-subtle text-info rounded-pill mb-3">
+                  Versatilità
                 </div>
-                <h5 class="card-title mb-3">Caratteristica 3</h5>
-                <p class="card-text mb-0">
-                  Puoi personalizzare tutto aggiungendo il tuo file CSS dopo
-                  quello di Bootstrap.
+                <h5 class="fw-bold mb-3">Custom Ready</h5>
+                <p class="text-muted">
+                  Architettura flessibile che si integra perfettamente con i
+                  software che già utilizzi nel tuo studio.
                 </p>
               </div>
             </div>
@@ -114,51 +216,55 @@
     <section id="sezione-servizi" class="py-5 bg-light">
       <div class="container px-5 my-5">
         <div class="text-center mb-5">
-          <h2 class="fw-bolder">I Nostri Servizi</h2>
-          <p class="lead fw-normal text-muted mb-0">
-            Soluzioni su misura per far crescere il tuo business
+          <h2 class="fw-800 display-5 mb-3">I Nostri Servizi</h2>
+          <div
+            class="mx-auto"
+            style="
+              width: 60px;
+              height: 4px;
+              background: #0d6efd;
+              border-radius: 2px;
+              margin-bottom: 20px;
+            "
+          ></div>
+          <p class="lead text-muted">
+            Soluzioni su misura per il mercato professionale italiano.
           </p>
         </div>
         <div class="row gx-5">
           <div class="col-lg-4 mb-5">
-            <div class="card h-100 shadow border-0 p-4">
-              <div
-                class="feature bg-primary bg-gradient text-white rounded-3 mb-3 d-inline-flex p-3 w-25"
-              >
+            <div class="card h-100 border-0 p-4 text-center">
+              <div class="feature-icon mx-auto shadow-sm">
                 <i class="bi bi-laptop"></i>
               </div>
-              <h3 class="h4 fw-bolder">Web Design</h3>
-              <p>
-                Creiamo siti web moderni, veloci e ottimizzati per ogni tipo di
-                dispositivo.
+              <h4 class="fw-bold">Web Design</h4>
+              <p class="text-muted">
+                Siti vetrina eleganti per posizionare il tuo brand professionale
+                al top.
               </p>
             </div>
           </div>
           <div class="col-lg-4 mb-5">
-            <div class="card h-100 shadow border-0 p-4">
-              <div
-                class="feature bg-primary bg-gradient text-white rounded-3 mb-3 d-inline-flex p-3 w-25"
-              >
+            <div class="card h-100 border-0 p-4 text-center">
+              <div class="feature-icon mx-auto shadow-sm">
                 <i class="bi bi-graph-up-arrow"></i>
               </div>
-              <h3 class="h4 fw-bolder">Digital Marketing</h3>
-              <p>
-                Strategie mirate per aumentare la tua visibilità online e
-                trovare nuovi clienti.
+              <h4 class="fw-bold">Marketing</h4>
+              <p class="text-muted">
+                Strategie SEO e social per attirare i clienti che il tuo studio
+                merita.
               </p>
             </div>
           </div>
           <div class="col-lg-4 mb-5">
-            <div class="card h-100 shadow border-0 p-4">
-              <div
-                class="feature bg-primary bg-gradient text-white rounded-3 mb-3 d-inline-flex p-3 w-25"
-              >
+            <div class="card h-100 border-0 p-4 text-center">
+              <div class="feature-icon mx-auto shadow-sm">
                 <i class="bi bi-shield-check"></i>
               </div>
-              <h3 class="h4 fw-bolder">Sicurezza Dati</h3>
-              <p>
-                Proteggiamo le tue informazioni aziendali con i più alti
-                standard di sicurezza.
+              <h4 class="fw-bold">Sicurezza</h4>
+              <p class="text-muted">
+                Crittografia end-to-end per la massima protezione dei dati
+                sensibili.
               </p>
             </div>
           </div>
@@ -166,22 +272,20 @@
       </div>
     </section>
 
-    <section id="sezione-contatti" class="py-5 bg-white border-top">
+    <section id="sezione-contatti" class="py-5 bg-white">
       <div class="container px-5 my-5">
-        <div class="text-center mb-5">
-          <div
-            class="feature bg-primary bg-gradient text-white rounded-3 mb-3 d-inline-flex p-3"
-          >
-            <i class="bi bi-envelope-fill fs-3"></i>
-          </div>
-          <h2 class="fw-bolder">Contattaci</h2>
-          <p class="lead fw-normal text-muted mb-0">
-            Siamo qui per aiutarti. Inviaci un messaggio!
-          </p>
-        </div>
         <div class="row gx-5 justify-content-center">
-          <div class="col-lg-8 col-xl-6">
-            <form id="contactForm">
+          <div class="col-lg-8 col-xl-6 text-center">
+            <h2 class="fw-800 mb-3">Parliamo del tuo progetto</h2>
+            <p class="text-muted mb-5">
+              Compila il modulo e un nostro consulente ti ricontatterà entro 24
+              ore.
+            </p>
+
+            <form
+              id="contactForm"
+              class="text-start shadow-lg p-4 p-md-5 rounded-4 bg-white"
+            >
               <div class="form-floating mb-3">
                 <input
                   class="form-control"
@@ -202,7 +306,7 @@
                 />
                 <label for="email">Indirizzo Email</label>
               </div>
-              <div class="form-floating mb-3">
+              <div class="form-floating mb-4">
                 <textarea
                   class="form-control"
                   id="message"
@@ -210,7 +314,7 @@
                   style="height: 10rem"
                   required
                 ></textarea>
-                <label for="message">Messaggio</label>
+                <label for="message">Come possiamo aiutarti?</label>
               </div>
               <div class="d-grid">
                 <button class="btn btn-primary btn-lg" type="submit">
@@ -223,11 +327,19 @@
       </div>
     </section>
 
-    <footer class="py-5 bg-dark">
-      <div class="container">
-        <p class="m-0 text-center text-white">
-          Copyright &copy; LiteBusiness 2026
-        </p>
+    <footer class="py-5 bg-dark text-white-50">
+      <div class="container text-center">
+        <small
+          >Copyright &copy; 2026 LiteBusiness. Tutti i diritti riservati.</small
+        >
+        <div class="mt-2">
+          <a href="#" class="text-white-50 me-3 text-decoration-none"
+            >Privacy Policy</a
+          >
+          <a href="#" class="text-white-50 text-decoration-none"
+            >Termini di Servizio</a
+          >
+        </div>
       </div>
     </footer>
 
@@ -237,11 +349,9 @@
       document
         .getElementById("contactForm")
         .addEventListener("submit", function (e) {
-          e.preventDefault(); // Impedisce il ricaricamento della pagina
-
-          // Qui potresti aggiungere la logica per inviare i dati a Formspree o un server
-          alert("Grazie! Il tuo messaggio è stato inviato con successo.");
-          this.reset(); // Svuota la form
+          e.preventDefault();
+          alert("Messaggio inviato! Ti ricontatteremo a breve.");
+          this.reset();
         });
     </script>
   </body>

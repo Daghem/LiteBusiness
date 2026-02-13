@@ -15,7 +15,7 @@ chiave_api = os.getenv("API_KEY_DEEPSEEK")
 if not chiave_api:
     raise ValueError("Manca API_KEY_DEEPSEEK nel file .env")
 
-llm_model = os.getenv("LLM_MODEL", "deepseek-chat").strip()
+llm_model = "deepseek-chat"
 client = OpenAI(
     api_key=chiave_api,
     base_url="https://api.deepseek.com",

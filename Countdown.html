@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SOMO - Coming Soon</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body,
+      html {
+        height: 100%;
+        font-family: "Montserrat", sans-serif;
+        background-color: #000;
+        color: #fff;
+        overflow: hidden;
+      }
+      .container {
+        display: flex;
+        height: 100vh;
+        width: 100%;
+        position: relative;
+      }
+
+      .background-image {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 65%;
+        height: 100%;
+        background-image:
+          linear-gradient(to right, #000 5%, rgba(0, 0, 0, 0) 45%),
+          url("https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=1000");
+        background-size: cover;
+        background-position: center top;
+        z-index: 1;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: 8%;
+      }
+      .logo {
+        position: absolute;
+        top: 60px;
+        left: 8%;
+        font-weight: 700;
+        font-size: 1.4rem;
+        letter-spacing: 3px;
+      }
+      .hashtag {
+        font-size: 0.75rem;
+        color: #fff;
+        margin-bottom: 5px;
+        letter-spacing: 1px;
+        font-weight: 200;
+        opacity: 0.7;
+      }
+      h1 {
+        font-size: 4rem;
+        margin-bottom: 50px;
+        font-weight: 700;
+      }
+
+      .countdown {
+        display: flex;
+        gap: 40px;
+        margin-bottom: 60px;
+      }
+      .time-block {
+        text-align: left;
+        min-width: 80px;
+      }
+      .number {
+        display: block;
+        font-size: 3.5rem;
+        font-weight: 200;
+        line-height: 1;
+      }
+      .label {
+        font-size: 0.7rem;
+        color: #b39152;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-top: 10px;
+        display: block;
+      }
+
+      .subscription-form {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #444;
+        width: 380px;
+        padding-bottom: 12px;
+      }
+      input[type="email"] {
+        background: transparent;
+        border: none;
+        color: #fff;
+        width: 100%;
+        outline: none;
+        font-family: inherit;
+        font-size: 0.9rem;
+      }
+      .subscribe-btn {
+        background: transparent;
+        border: none;
+        color: #b39152;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 900px) {
+        .background-image {
+          width: 100%;
+          opacity: 0.4;
+        }
+        .content {
+          width: 100%;
+          padding-left: 30px;
+        }
+        h1 {
+          font-size: 3rem;
+        }
+        .countdown {
+          gap: 20px;
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">.SOMO</div>
+      <div class="background-image"></div>
+
+      <div class="content">
+        <p class="hashtag">#underconstruction</p>
+        <h1>Coming Soon</h1>
+
+        <div class="countdown" id="timer-container">
+          <div class="time-block">
+            <span class="number" id="days">00</span>
+            <span class="label">days</span>
+          </div>
+          <div class="time-block">
+            <span class="number" id="hours">00</span>
+            <span class="label">hours</span>
+          </div>
+          <div class="time-block">
+            <span class="number" id="minutes">00</span>
+            <span class="label">minutes</span>
+          </div>
+          <div class="time-block">
+            <span class="number" id="seconds">00</span>
+            <span class="label">seconds</span>
+          </div>
+        </div>
+
+        <form
+          class="subscription-form"
+          onsubmit="
+            event.preventDefault();
+            alert('Iscrizione effettuata!');
+          "
+        >
+          <input type="email" placeholder="Your E-mail" required />
+          <button type="submit" class="subscribe-btn">
+            <span>&rarr;</span> Subscribe
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const launchDate = new Date("March 13, 2026 15:00:00").getTime();
+
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = launchDate - now;
+
+        if (distance < 0) {
+          document.getElementById("timer-container").innerHTML =
+            "<span class='number'>LIVE NOW</span>";
+          clearInterval(interval);
+          return;
+        }
+
+        const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const h = Math.floor(
+          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        );
+        const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("days").innerText = String(d).padStart(2, "0");
+        document.getElementById("hours").innerText = String(h).padStart(2, "0");
+        document.getElementById("minutes").innerText = String(m).padStart(
+          2,
+          "0",
+        );
+        document.getElementById("seconds").innerText = String(s).padStart(
+          2,
+          "0",
+        );
+      }
+
+      const interval = setInterval(updateCountdown, 1000);
+
+      updateCountdown();
+    </script>
+  </body>
+</html>

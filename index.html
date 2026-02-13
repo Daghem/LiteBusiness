@@ -34,7 +34,7 @@
             </li>
             <li class="nav-item"><a class="nav-link" href="#">Servizi</a></li>
             <li class="nav-item">
-              <a class="nav-link" href="contatti.html">Contatti</a>
+              <a class="nav-link" href="#sezione-contatti">Contatti</a>
             </li>
           </ul>
         </div>
@@ -111,6 +111,63 @@
         </div>
       </div>
     </main>
+
+    <section id="sezione-contatti" class="py-5 bg-white border-top">
+      <div class="container px-5 my-5">
+        <div class="text-center mb-5">
+          <div
+            class="feature bg-primary bg-gradient text-white rounded-3 mb-3 d-inline-flex p-3"
+          >
+            <i class="bi bi-envelope-fill fs-3"></i>
+          </div>
+          <h2 class="fw-bolder">Contattaci</h2>
+          <p class="lead fw-normal text-muted mb-0">
+            Siamo qui per aiutarti. Inviaci un messaggio!
+          </p>
+        </div>
+        <div class="row gx-5 justify-content-center">
+          <div class="col-lg-8 col-xl-6">
+            <form id="contactForm">
+              <div class="form-floating mb-3">
+                <input
+                  class="form-control"
+                  id="name"
+                  type="text"
+                  placeholder="Nome"
+                  required
+                />
+                <label for="name">Nome completo</label>
+              </div>
+              <div class="form-floating mb-3">
+                <input
+                  class="form-control"
+                  id="email"
+                  type="email"
+                  placeholder="Email"
+                  required
+                />
+                <label for="email">Indirizzo Email</label>
+              </div>
+              <div class="form-floating mb-3">
+                <textarea
+                  class="form-control"
+                  id="message"
+                  placeholder="Messaggio"
+                  style="height: 10rem"
+                  required
+                ></textarea>
+                <label for="message">Messaggio</label>
+              </div>
+              <div class="d-grid">
+                <button class="btn btn-primary btn-lg" type="submit">
+                  Invia Messaggio
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <footer class="py-5 bg-dark">
       <div class="container">

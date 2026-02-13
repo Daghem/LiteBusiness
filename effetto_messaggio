@@ -1,14 +1,14 @@
 function appendMessage(sender, text, source = null) {
-        const msgDiv = document.createElement("div");
+  const msgDiv = document.createElement("div");
 
-        msgDiv.className = sender === "user" ? "message-user" : "message-ai";
+  msgDiv.className = sender === "user" ? "message-user" : "message-ai";
 
-        if (sender === "user") {
-          msgDiv.innerHTML = `<div class="bubble-user">${text}</div>`;
-          chatBox.appendChild(msgDiv);
-          chatBox.scrollTop = chatBox.scrollHeight;
-        } else {
-          msgDiv.innerHTML = `
+  if (sender === "user") {
+    msgDiv.innerHTML = `<div class="bubble-user">${text}</div>`;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  } else {
+    msgDiv.innerHTML = `
             <div class="bubble-ai">
                 <p class="mb-2 ai-text-container"></p>
                 ${
@@ -22,26 +22,26 @@ function appendMessage(sender, text, source = null) {
                 }
             </div>
           `;
-          chatBox.appendChild(msgDiv);
-          
-          const textContainer = msgDiv.querySelector('.ai-text-container');
-          const sourceBox = msgDiv.querySelector('.source-box');
-          
-          const words = text.split(" ");
-          let i = 0;
+    chatBox.appendChild(msgDiv);
 
-          function typeWriter() {
-            if (i < words.length) {
-              textContainer.innerHTML += words[i].replace(/\n/g, '<br>') + " ";
-              chatBox.scrollTop = chatBox.scrollHeight;
-              i++;
-              setTimeout(typeWriter, 40); 
-            } else if (sourceBox) {
-              sourceBox.style.display = "block";
-              chatBox.scrollTop = chatBox.scrollHeight;
-            }
-          }
-          
-          typeWriter();
-        }
+    const textContainer = msgDiv.querySelector(".ai-text-container");
+    const sourceBox = msgDiv.querySelector(".source-box");
+
+    const words = text.split(" ");
+    let i = 0;
+
+    function typeWriter() {
+      if (i < words.length) {
+        textContainer.innerHTML += words[i].replace(/\n/g, "<br>") + " ";
+        chatBox.scrollTop = chatBox.scrollHeight;
+        i++;
+        setTimeout(typeWriter, 40);
+      } else if (sourceBox) {
+        sourceBox.style.display = "block";
+        chatBox.scrollTop = chatBox.scrollHeight;
       }
+    }
+
+    typeWriter();
+  }
+}

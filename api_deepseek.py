@@ -248,15 +248,11 @@ async def read_root(payload: ChatRequest):
                 if prefix == 46 or prefix == 47:
                     message = (
                         f"Per il codice ATECO {prefix}, {coeff} "
-                        "Controlla sempre il sottocodice completo per il valore esatto. "
-                        "Fonti: 03_Tabella_Coefficienti_Redditivita_ATECO.txt, "
-                        "01_Legge_190-2014_Base_Normativa_e_Coefficienti.txt"
+                        "Controlla sempre il sottocodice completo per il valore esatto."
                     )
                 else:
                     message = (
-                        f"Il coefficiente di redditività per ATECO {prefix} è {coeff}. "
-                        "Fonti: 03_Tabella_Coefficienti_Redditivita_ATECO.txt, "
-                        "01_Legge_190-2014_Base_Normativa_e_Coefficienti.txt"
+                        f"Il coefficiente di redditività per ATECO {prefix} è {coeff}."
                     )
                 return ChatResponse(
                     message=message,
@@ -271,8 +267,7 @@ async def read_root(payload: ChatRequest):
             message=(
                 "Per restare nel regime forfettario, nel periodo precedente ricavi o compensi non devono superare 85.000 euro; "
                 "se durante l'anno superi 100.000 euro, l'uscita dal regime è immediata. "
-                "L'imposta sostitutiva è in via ordinaria al 15%, ridotta al 5% per i primi 5 anni se sono rispettati i requisiti di nuova attività. "
-                "Fonti: 02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.txt, 01_Legge_190-2014_Base_Normativa_e_Coefficienti.txt"
+                "L'imposta sostitutiva è in via ordinaria al 15%, ridotta al 5% per i primi 5 anni se sono rispettati i requisiti di nuova attività."
             ),
             sources=[
                 "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.txt",
@@ -323,7 +318,7 @@ async def read_root(payload: ChatRequest):
                         "Rispondi in italiano in modo sintetico. "
                         "Usa massimo 4 frasi totali. "
                         "Dai prima la risposta diretta. "
-                        "Chiudi con 'Fonti: ...' usando solo i nomi file, separati da virgola."
+                        "Non inserire mai le fonti nel testo della risposta."
                     ),
                 },
             ],

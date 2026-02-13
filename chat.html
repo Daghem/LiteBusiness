@@ -102,7 +102,7 @@
 
         try {
           const result = await inviaDomanda(userText);
-          appendMessage("ai", result.message, result.sources || []);
+          appendMessage("ai", result.message, result.sources || null);
         } catch (err) {
           const detail =
             err?.message ||
@@ -111,39 +111,59 @@
         }
       });
 
-      function appendMessage(sender, text, sources = []) {
+      function appendMessage(sender, text, sources = null) {
         const msgDiv = document.createElement("div");
+
         msgDiv.className = sender === "user" ? "message-user" : "message-ai";
 
-        let contentHtml = "";
-
         if (sender === "user") {
-          contentHtml = `<div class="bubble-user">${text}</div>`;
+          msgDiv.innerHTML = `<div class="bubble-user">${text}</div>`;
+          chatBox.appendChild(msgDiv);
+          chatBox.scrollTop = chatBox.scrollHeight;
         } else {
-          contentHtml = `
-                    <div class="bubble-ai">
-                        <p class="mb-2">${text}</p>
-                        ${
-                          Array.isArray(sources) && sources.length > 0
-                            ? `
-                        <div class="source-box">
-                            <i class="fas fa-book me-1"></i> <strong>Fonti usate:</strong><br>
-                            ${sources
-                              .map(
-                                (source) =>
-                                  `<span class="source-link d-block">${source}</span>`
-                              )
-                              .join("")}
-                        </div>`
-                            : ""
-                        }
-                    </div>
-                `;
-        }
+          const sourceList = Array.isArray(sources)
+            ? sources.filter(Boolean)
+            : sources
+              ? [sources]
+              : [];
 
-        msgDiv.innerHTML = contentHtml;
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
+          const sourceHtml =
+            sourceList.length > 0
+              ? `
+                <div class="source-box" style="display: none;">
+                    <i class="fas fa-book me-1"></i> <strong>Informazione:</strong><br>
+                    <span class="source-link" style="color: #27ae60;">${sourceList.join("<br>")}</span>
+                </div>`
+              : "";
+
+          msgDiv.innerHTML = `
+            <div class="bubble-ai">
+                <p class="mb-2 ai-text-container"></p>
+                ${sourceHtml}
+            </div>
+          `;
+          chatBox.appendChild(msgDiv);
+          
+          const textContainer = msgDiv.querySelector('.ai-text-container');
+          const sourceBox = msgDiv.querySelector('.source-box');
+          
+          const words = text.split(" ");
+          let i = 0;
+
+          function typeWriter() {
+            if (i < words.length) {
+              textContainer.innerHTML += words[i].replace(/\n/g, '<br>') + " ";
+              chatBox.scrollTop = chatBox.scrollHeight;
+              i++;
+              setTimeout(typeWriter, 40); 
+            } else if (sourceBox) {
+              sourceBox.style.display = "block";
+              chatBox.scrollTop = chatBox.scrollHeight;
+            }
+          }
+          
+          typeWriter();
+        }
       }
     </script>
   </body>

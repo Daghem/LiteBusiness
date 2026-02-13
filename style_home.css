@@ -1,0 +1,85 @@
+:root {
+  --primary-gradient: linear-gradient(135deg, #0d6efd 0%, #003d99 100%);
+  --soft-bg: #f8f9fa;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  color: #2d3436;
+}
+
+/* Navbar più leggera e trasparente */
+.navbar {
+  backdrop-filter: blur(10px);
+  background-color: rgba(33, 37, 41, 0.95) !important;
+  padding: 1rem 0;
+}
+
+/* Hero Section con gradiente leggero */
+.hero-section {
+  background: radial-gradient(circle at top right, #e9ecef, #ffffff);
+  padding: 120px 0;
+}
+
+/* Card con animazione Hover */
+.card {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  border-radius: 16px;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Icone stilizzate */
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-gradient);
+  color: white;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Bottoni arrotondati */
+.btn {
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  border: none;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);
+}
+
+/* Form migliorato */
+.form-control {
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+  border-color: #0d6efd;
+}
+
+/* Badge */
+.badge {
+  font-weight: 500;
+  padding: 0.5em 1em;
+}

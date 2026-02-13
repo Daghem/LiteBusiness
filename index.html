@@ -272,56 +272,134 @@
       </div>
     </section>
 
-    <section id="sezione-contatti" class="py-5 bg-white">
+    <section
+      id="sezione-contatti"
+      class="py-5"
+      style="background-color: #fbfcfe"
+    >
       <div class="container px-5 my-5">
-        <div class="row gx-5 justify-content-center">
-          <div class="col-lg-8 col-xl-6 text-center">
-            <h2 class="fw-800 mb-3">Parliamo del tuo progetto</h2>
-            <p class="text-muted mb-5">
-              Compila il modulo e un nostro consulente ti ricontatterà entro 24
-              ore.
-            </p>
+        <div class="row gx-5 justify-content-center align-items-center">
+          <div class="col-lg-5 mb-5 mb-lg-0">
+            <div class="pe-lg-5">
+              <span
+                class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill"
+                >Contattaci</span
+              >
+              <h2 class="fw-800 display-5 mb-4">
+                Per qualsiasi informazione contattaci
+              </h2>
+              <p class="lead text-muted mb-5">
+                Ci occuperemo di prendere in visione la richiesta e verrai
+                ricontattato al più presto
+              </p>
 
-            <form
-              id="contactForm"
-              class="text-start shadow-lg p-4 p-md-5 rounded-4 bg-white"
-            >
-              <div class="form-floating mb-3">
-                <input
-                  class="form-control"
-                  id="name"
-                  type="text"
-                  placeholder="Nome"
-                  required
-                />
-                <label for="name">Nome completo</label>
+              <div class="d-flex align-items-center mb-4">
+                <div
+                  class="flex-shrink-0 bg-white shadow-sm p-3 rounded-4 text-primary"
+                >
+                  <i class="bi bi-envelope-at fs-4"></i>
+                </div>
+                <div class="ms-4">
+                  <h6 class="mb-0 fw-bold">Email</h6>
+                  <p class="text-muted mb-0">info@litebusiness.it</p>
+                </div>
               </div>
-              <div class="form-floating mb-3">
-                <input
-                  class="form-control"
-                  id="email"
-                  type="email"
-                  placeholder="Email"
-                  required
-                />
-                <label for="email">Indirizzo Email</label>
+
+              <div class="d-flex align-items-center mb-4">
+                <div
+                  class="flex-shrink-0 bg-white shadow-sm p-3 rounded-4 text-primary"
+                >
+                  <i class="bi bi-geo-alt fs-4"></i>
+                </div>
+                <div class="ms-4">
+                  <h6 class="mb-0 fw-bold">Sede</h6>
+                  <p class="text-muted mb-0">Milano, Distretto Digitale</p>
+                </div>
               </div>
-              <div class="form-floating mb-4">
-                <textarea
-                  class="form-control"
-                  id="message"
-                  placeholder="Messaggio"
-                  style="height: 10rem"
-                  required
-                ></textarea>
-                <label for="message">Come possiamo aiutarti?</label>
+
+              <div class="d-flex align-items-center">
+                <div
+                  class="flex-shrink-0 bg-white shadow-sm p-3 rounded-4 text-primary"
+                >
+                  <i class="bi bi-clock fs-4"></i>
+                </div>
+                <div class="ms-4">
+                  <h6 class="mb-0 fw-bold">Risposta garantita</h6>
+                  <p class="text-muted mb-0">Entro 24 ore lavorative</p>
+                </div>
               </div>
-              <div class="d-grid">
-                <button class="btn btn-primary btn-lg" type="submit">
-                  Invia Messaggio
-                </button>
-              </div>
-            </form>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="bg-white p-4 p-md-5 rounded-5 shadow-lg border-0">
+              <form id="contactForm">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label
+                      class="form-label small fw-bold text-uppercase text-muted"
+                      >Nome Cognome</label
+                    >
+                    <input
+                      class="form-control bg-light border-0 py-3"
+                      id="name"
+                      type="text"
+                      placeholder="Mario Rossi"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label
+                      class="form-label small fw-bold text-uppercase text-muted"
+                      >Email</label
+                    >
+                    <input
+                      class="form-control bg-light border-0 py-3"
+                      id="email"
+                      type="email"
+                      placeholder="mario@studio.it"
+                      required
+                    />
+                  </div>
+                  <div class="col-12 mt-4">
+                    <label
+                      class="form-label small fw-bold text-uppercase text-muted"
+                      >Il tuo progetto</label
+                    >
+                    <textarea
+                      class="form-control bg-light border-0 py-3"
+                      id="message"
+                      placeholder="Descrivici la tua richiesta"
+                      style="height: 12rem"
+                      required
+                    ></textarea>
+                  </div>
+                  <div class="col-12 mt-4">
+                    <div class="form-check mb-4">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="privacy"
+                        required
+                      />
+                      <label
+                        class="form-check-label small text-muted"
+                        for="privacy"
+                      >
+                        Accetto il trattamento dei dati secondo la Privacy
+                        Policy
+                      </label>
+                    </div>
+                    <button
+                      class="btn btn-primary btn-lg w-100 py-3 shadow-sm fw-bold"
+                      type="submit"
+                    >
+                      Invia Richiesta <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>

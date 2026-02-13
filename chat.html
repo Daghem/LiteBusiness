@@ -106,9 +106,9 @@
           document.getElementById("loadingIndicator").remove();
 
           const aiReply = data.message;
-          const aiSource = "Elaborato tramite DeepSeek AI";
+          const aiSources = Array.isArray(data.sources) ? data.sources : [];
 
-          appendMessage("ai", aiReply, aiSource);
+          appendMessage("ai", aiReply, aiSources);
         } catch (err) {
           console.error("Errore:", err);
 
@@ -123,7 +123,7 @@
         }
       });
 
-      function appendMessage(sender, text, source = null) {
+      function appendMessage(sender, text, sources = null) {
         const msgDiv = document.createElement("div");
         msgDiv.className = sender === "user" ? "message-user" : "message-ai";
 
@@ -132,15 +132,21 @@
           chatBox.appendChild(msgDiv);
           chatBox.scrollTop = chatBox.scrollHeight;
         } else {
+          const sourceList = Array.isArray(sources)
+            ? sources.filter(Boolean)
+            : sources
+              ? [sources]
+              : [];
+
           msgDiv.innerHTML = `
             <div class="bubble-ai">
                 <p class="mb-2 ai-text-container"></p>
                 ${
-                  source
+                  sourceList.length > 0
                     ? `
                 <div class="source-box" style="display: none;">
                     <i class="fas fa-book me-1"></i> <strong>Informazione:</strong><br>
-                    <span class="source-link" style="color: #27ae60;">${source}</span>
+                    <span class="source-link" style="color: #27ae60;">${sourceList.join("<br>")}</span>
                 </div>`
                     : ""
                 }

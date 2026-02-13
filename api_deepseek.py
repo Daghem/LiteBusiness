@@ -11,10 +11,14 @@ from pydantic import BaseModel
 from rag import LocalRAG
 
 load_dotenv()  # Carica le variabili dal file .env
-chiave_api = os.getenv("OPENAI_API_KEY")
+chiave_api = os.getenv("API_KEY_DEEPSEEK")
+if not chiave_api:
+    raise ValueError("Manca API_KEY_DEEPSEEK nel file .env")
 
+llm_model = os.getenv("LLM_MODEL", "deepseek-chat").strip()
 client = OpenAI(
     api_key=chiave_api,
+    base_url="https://api.deepseek.com",
 )
 
 app = fastapi.FastAPI()
@@ -87,7 +91,7 @@ async def read_root(payload: ChatRequest):
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=llm_model,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {
@@ -104,14 +108,14 @@ async def read_root(payload: ChatRequest):
     except RateLimitError:
         return ChatResponse(
             message=(
-                "Quota OpenAI esaurita o limite raggiunto (errore 429). "
-                "Controlla billing/plan su platform.openai.com oppure usa una chiave con credito."
+                "Quota DeepSeek esaurita o limite raggiunto (errore 429). "
+                "Controlla piano e billing del provider selezionato."
             ),
             sources=[],
         )
     except APIError as error:
         return ChatResponse(
-            message=f"Errore API OpenAI: {error}",
+            message=f"Errore API DeepSeek: {error}",
             sources=[],
         )
 

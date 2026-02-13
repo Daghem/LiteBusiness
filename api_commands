@@ -1,0 +1,2 @@
+python3 build_rag_index.py
+uvicorn api_deepseek:app --reload

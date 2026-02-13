@@ -49,7 +49,7 @@
               placeholder="Es: Posso scaricare le spese auto?"
               required
             />
-            <button class="btn btn-primary btn-lg" type="button">
+            <button class="btn btn-primary btn-lg" type="submit">
               <i class="fas fa-paper-plane"></i>
             </button>
           </div>
@@ -69,22 +69,28 @@
       const chatForm = document.getElementById("chatForm");
       const chatBox = document.getElementById("chatBox");
       const inputField = chatForm.querySelector("input");
-      const userText = inputField.value;
-      const contenuto = "content";
-      // Funzione per inviare la domanda all'API (da implementare)
-      function inviaDomanda(userText) {
-        return fetch("http://localhost:8000/", {
+      async function inviaDomanda(userText) {
+        const response = await fetch("http://localhost:8000/", {
           method: "POST",
-          headers: { "Content-Type": "application/json", contenuto: userText },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ content: userText }),
-        })
-          .then((res) => res.json())
-          .then((data) => data.message)
-          .catch((err) => console.error("Errore:", err));
+        });
+        if (!response.ok) {
+          let backendMessage = "";
+          try {
+            const errorPayload = await response.json();
+            backendMessage = errorPayload?.message || "";
+          } catch (_) {}
+          throw new Error(
+            backendMessage
+              ? `HTTP ${response.status}: ${backendMessage}`
+              : `HTTP ${response.status}`
+          );
+        }
+        return response.json();
       }
 
       chatForm.addEventListener("submit", async function (e) {
-        // Aggiunto async qui
         e.preventDefault();
 
         const userText = inputField.value;
@@ -94,20 +100,18 @@
         appendMessage("user", userText);
         inputField.value = "";
 
-        // Invece di setTimeout, aspettiamo la risposta reale
-        // Se vuoi mantenere l'effetto "caricamento", puoi aggiungere un indicatore visivo
         try {
-          const aiReply = await inviaDomanda(userText);
-          console.log(aiReply); // Aspetta la risposta reale
-          const aiSource = "Dati estratti dal Database Vettoriale RAG"; // Poi la renderai dinamica
-
-          appendMessage("ai", aiReply, aiSource);
+          const result = await inviaDomanda(userText);
+          appendMessage("ai", result.message, result.sources || []);
         } catch (err) {
-          appendMessage("ai", "Spiacente, si è verificato un errore.");
+          const detail =
+            err?.message ||
+            "Errore sconosciuto: verifica che il server API sia attivo.";
+          appendMessage("ai", `Errore: ${detail}`);
         }
       });
 
-      function appendMessage(sender, text, source = null) {
+      function appendMessage(sender, text, sources = []) {
         const msgDiv = document.createElement("div");
         msgDiv.className = sender === "user" ? "message-user" : "message-ai";
 
@@ -120,11 +124,16 @@
                     <div class="bubble-ai">
                         <p class="mb-2">${text}</p>
                         ${
-                          source
+                          Array.isArray(sources) && sources.length > 0
                             ? `
                         <div class="source-box">
-                            <i class="fas fa-book me-1"></i> <strong>Fonte verificata:</strong><br>
-                            <a href="#" class="source-link">www.google.com</a>
+                            <i class="fas fa-book me-1"></i> <strong>Fonti usate:</strong><br>
+                            ${sources
+                              .map(
+                                (source) =>
+                                  `<span class="source-link d-block">${source}</span>`
+                              )
+                              .join("")}
                         </div>`
                             : ""
                         }

@@ -85,8 +85,11 @@ async def read_root(payload: ChatRequest):
     system_prompt = (
         "Sei un assistente fiscale per il regime forfettario italiano. "
         "Rispondi solo con informazioni presenti nel CONTEXT. "
-        "Se il CONTEXT non contiene la risposta, dillo esplicitamente. "
-        "Non inventare norme, soglie o scadenze."
+        "Se il CONTEXT non contiene una parte della risposta, dillo in una sola frase breve. "
+        "Non inventare norme, soglie o scadenze. "
+        "Stile obbligatorio: italiano chiaro, tono professionale, nessun markdown, "
+        "nessun uso di **, # o elenchi con trattini. "
+        "Non iniziare con formule tipo 'In base al CONTEXT fornito'."
     )
 
     try:
@@ -99,7 +102,10 @@ async def read_root(payload: ChatRequest):
                     "content": (
                         f"DOMANDA:\n{contenuto}\n\n"
                         f"CONTEXT:\n{context}\n\n"
-                        "Rispondi in italiano in modo sintetico e cita le fonti usate."
+                        "Rispondi in italiano in modo sintetico. "
+                        "Usa massimo 4 frasi totali. "
+                        "Dai prima la risposta diretta. "
+                        "Chiudi con 'Fonti: ...' usando solo i nomi file, separati da virgola."
                     ),
                 },
             ],

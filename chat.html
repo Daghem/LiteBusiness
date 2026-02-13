@@ -69,26 +69,6 @@
       const chatForm = document.getElementById("chatForm");
       const chatBox = document.getElementById("chatBox");
       const inputField = chatForm.querySelector("input");
-      async function inviaDomanda(userText) {
-        const response = await fetch("http://localhost:8000/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: userText }),
-        });
-        if (!response.ok) {
-          let backendMessage = "";
-          try {
-            const errorPayload = await response.json();
-            backendMessage = errorPayload?.message || "";
-          } catch (_) {}
-          throw new Error(
-            backendMessage
-              ? `HTTP ${response.status}: ${backendMessage}`
-              : `HTTP ${response.status}`
-          );
-        }
-        return response.json();
-      }
 
       chatForm.addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -96,24 +76,55 @@
         const userText = inputField.value;
         if (!userText) return;
 
-        // Mostra messaggio Utente
         appendMessage("user", userText);
         inputField.value = "";
 
+        const loadingDiv = document.createElement("div");
+        loadingDiv.className = "message-ai";
+        loadingDiv.id = "loadingIndicator";
+        loadingDiv.innerHTML = `
+          <div class="bubble-ai" style="padding: 12px 24px;">
+              <div class="spinner-grow spinner-grow-sm text-primary opacity-50" role="status"></div>
+              <div class="spinner-grow spinner-grow-sm text-primary opacity-75 mx-1" role="status"></div>
+              <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
+          </div>
+        `;
+        chatBox.appendChild(loadingDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
         try {
-          const result = await inviaDomanda(userText);
-          appendMessage("ai", result.message, result.sources || null);
+          const response = await fetch("http://localhost:8000/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: userText }),
+          });
+
+          if (!response.ok) throw new Error("Errore dal server");
+
+          const data = await response.json();
+
+          document.getElementById("loadingIndicator").remove();
+
+          const aiReply = data.message;
+          const aiSource = "Elaborato tramite DeepSeek AI";
+
+          appendMessage("ai", aiReply, aiSource);
         } catch (err) {
-          const detail =
-            err?.message ||
-            "Errore sconosciuto: verifica che il server API sia attivo.";
-          appendMessage("ai", `Errore: ${detail}`);
+          console.error("Errore:", err);
+
+          if (document.getElementById("loadingIndicator")) {
+            document.getElementById("loadingIndicator").remove();
+          }
+
+          appendMessage(
+            "ai",
+            "Spiacente, impossibile connettersi al server. Assicurati che FastAPI sia avviato sulla porta 8000.",
+          );
         }
       });
 
-      function appendMessage(sender, text, sources = null) {
+      function appendMessage(sender, text, source = null) {
         const msgDiv = document.createElement("div");
-
         msgDiv.className = sender === "user" ? "message-user" : "message-ai";
 
         if (sender === "user") {
@@ -121,47 +132,39 @@
           chatBox.appendChild(msgDiv);
           chatBox.scrollTop = chatBox.scrollHeight;
         } else {
-          const sourceList = Array.isArray(sources)
-            ? sources.filter(Boolean)
-            : sources
-              ? [sources]
-              : [];
-
-          const sourceHtml =
-            sourceList.length > 0
-              ? `
-                <div class="source-box" style="display: none;">
-                    <i class="fas fa-book me-1"></i> <strong>Informazione:</strong><br>
-                    <span class="source-link" style="color: #27ae60;">${sourceList.join("<br>")}</span>
-                </div>`
-              : "";
-
           msgDiv.innerHTML = `
             <div class="bubble-ai">
                 <p class="mb-2 ai-text-container"></p>
-                ${sourceHtml}
+                ${
+                  source
+                    ? `
+                <div class="source-box" style="display: none;">
+                    <i class="fas fa-book me-1"></i> <strong>Informazione:</strong><br>
+                    <span class="source-link" style="color: #27ae60;">${source}</span>
+                </div>`
+                    : ""
+                }
             </div>
           `;
           chatBox.appendChild(msgDiv);
-          
-          const textContainer = msgDiv.querySelector('.ai-text-container');
-          const sourceBox = msgDiv.querySelector('.source-box');
-          
+
+          const textContainer = msgDiv.querySelector(".ai-text-container");
+          const sourceBox = msgDiv.querySelector(".source-box");
           const words = text.split(" ");
           let i = 0;
 
           function typeWriter() {
             if (i < words.length) {
-              textContainer.innerHTML += words[i].replace(/\n/g, '<br>') + " ";
+              textContainer.innerHTML += words[i].replace(/\n/g, "<br>") + " ";
               chatBox.scrollTop = chatBox.scrollHeight;
               i++;
-              setTimeout(typeWriter, 40); 
+              setTimeout(typeWriter, 40);
             } else if (sourceBox) {
               sourceBox.style.display = "block";
               chatBox.scrollTop = chatBox.scrollHeight;
             }
           }
-          
+
           typeWriter();
         }
       }

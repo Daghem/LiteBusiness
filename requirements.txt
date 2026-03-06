@@ -4,3 +4,5 @@ openai
 httpx
 uvicorn[standard]
 pymupdf
+qdrant-client
+sentence-transformers

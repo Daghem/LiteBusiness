@@ -9,7 +9,7 @@ from openai import OpenAI
 from openai import APIError, RateLimitError
 from pydantic import BaseModel
 
-from rag import LocalRAG, RetrievedChunk
+from rag_qdrant import QdrantRAG, RetrievedChunk
 
 load_dotenv()  # Carica le variabili dal file .env
 chiave_api = os.getenv("API_KEY_DEEPSEEK")
@@ -31,7 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-rag = LocalRAG()
+rag = QdrantRAG.from_env()
 rag_load_error = None
 try:
     rag.load()
@@ -218,10 +218,10 @@ def _merge_results(primary: List[RetrievedChunk], extras: List[RetrievedChunk], 
 
 
 def _search_with_intent(query: str) -> List[RetrievedChunk]:
-    primary = rag.search(query, top_k=8, min_score=0.06)
+    primary = rag.search(query, top_k=8, min_score=0.2)
     extra_results: List[RetrievedChunk] = []
     for expanded_query in _intent_expansions(query):
-        extra_results.extend(rag.search(expanded_query, top_k=4, min_score=0.05))
+        extra_results.extend(rag.search(expanded_query, top_k=4, min_score=0.18))
     return _merge_results(primary, extra_results, top_k=8)
 
 
@@ -230,7 +230,7 @@ async def read_root(payload: ChatRequest):
     if rag_load_error:
         return ChatResponse(
             message=(
-                "Indice RAG non disponibile. Esegui prima: "
+                "Indice RAG su Qdrant non disponibile. Esegui prima: "
                 "`python3 build_rag_index.py`."
             ),
             sources=[],

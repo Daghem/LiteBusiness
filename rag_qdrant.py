@@ -151,6 +151,15 @@ class QdrantRAG:
                 ),
                 on_disk_payload=True,
             )
+        self._ensure_payload_indexes()
+
+    def _ensure_payload_indexes(self) -> None:
+        self.client.create_payload_index(
+            collection_name=self.collection_name,
+            field_name="regime",
+            field_schema=models.PayloadSchemaType.KEYWORD,
+            wait=True,
+        )
 
     def build_from_pdf_directory(
         self,
@@ -240,6 +249,7 @@ class QdrantRAG:
             raise FileNotFoundError(
                 f"Collection Qdrant non trovata: {self.collection_name}"
             )
+        self._ensure_payload_indexes()
         points, _ = self.client.scroll(
             collection_name=self.collection_name,
             limit=1,

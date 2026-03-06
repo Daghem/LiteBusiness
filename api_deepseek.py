@@ -1,6 +1,8 @@
 import os
 import re
+import unicodedata
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 from pathlib import Path
 from typing import List
 
@@ -147,12 +149,161 @@ DEFAULT_REGIME_ID = next(
 )
 
 
+def _normalize_match_text(text: str) -> str:
+    normalized = unicodedata.normalize("NFKD", text.lower())
+    normalized = "".join(char for char in normalized if not unicodedata.combining(char))
+    normalized = normalized.replace("’", "'")
+    return normalized
+
+
+def _tokenize_for_matching(text: str) -> list[str]:
+    return re.findall(r"[a-z0-9%]+", _normalize_match_text(text))
+
+
+def _is_close_alias_token(token: str, alias_token: str) -> bool:
+    if token == alias_token:
+        return True
+    if len(token) < 5 or len(alias_token) < 5:
+        return False
+    if any(char.isdigit() for char in token + alias_token):
+        return False
+    if abs(len(token) - len(alias_token)) > 2:
+        return False
+    if token[0] != alias_token[0] or token[-1] != alias_token[-1]:
+        return False
+    return SequenceMatcher(None, token, alias_token).ratio() >= 0.82
+
+
+def _query_matches_alias(query: str, alias: str) -> bool:
+    normalized_query = _normalize_match_text(query)
+    normalized_alias = _normalize_match_text(alias)
+    if normalized_alias in normalized_query:
+        return True
+
+    alias_tokens = [token for token in normalized_alias.split() if token]
+    query_tokens = _tokenize_for_matching(normalized_query)
+    if not alias_tokens or not query_tokens:
+        return False
+    if len(alias_tokens) == 1:
+        return any(_is_close_alias_token(token, alias_tokens[0]) for token in query_tokens)
+
+    window_size = len(alias_tokens)
+    for start in range(len(query_tokens) - window_size + 1):
+        window = query_tokens[start : start + window_size]
+        if all(
+            candidate == expected or _is_close_alias_token(candidate, expected)
+            for candidate, expected in zip(window, alias_tokens)
+        ):
+            return True
+    return False
+
+
+def _query_mentions_regime_id(query: str, regime_id: str) -> bool:
+    profile = next((item for item in REGIME_PROFILES if item.regime_id == regime_id), None)
+    if profile is None:
+        return False
+    return any(_query_matches_alias(query, alias) for alias in profile.aliases)
+
+
+EXACT_QUERY_TOKEN_REPLACEMENTS = {
+    "forchettario": "forfettario",
+    "forfetario": "forfettario",
+    "forfetarrio": "forfettario",
+    "forfettarrio": "forfettario",
+    "forfetaio": "forfettario",
+    "alliquota": "aliquota",
+    "aliquuota": "aliquota",
+    "aligquota": "aliquota",
+    "sogllia": "soglia",
+    "sogglia": "soglia",
+    "intrastad": "intrastat",
+    "intrastatto": "intrastat",
+    "intrastatt": "intrastat",
+    "vieds": "vies",
+    "veis": "vies",
+    "viess": "vies",
+    "bolllo": "bollo",
+    "inpss": "inps",
+    "atteco": "ateco",
+    "atceo": "ateco",
+    "contibuti": "contributi",
+    "contributtiva": "contributiva",
+    "contributtivi": "contributivi",
+    "fatturrato": "fatturato",
+    "fattturato": "fatturato",
+    "incasato": "incassato",
+    "incasssato": "incassato",
+    "scadneza": "scadenza",
+    "domnada": "domanda",
+    "impsota": "imposta",
+    "extraue": "extra ue",
+    "partitaiva": "partita iva",
+}
+
+CANONICAL_QUERY_TOKENS = (
+    "forfettario",
+    "aliquota",
+    "soglia",
+    "intrastat",
+    "contributi",
+    "contributiva",
+    "contributivi",
+    "fatturato",
+    "incassato",
+    "scadenza",
+    "domanda",
+    "imposta",
+    "sostitutiva",
+    "agevolazione",
+    "artigiani",
+    "commercianti",
+    "partecipazioni",
+    "controllo",
+    "societa",
+    "requisiti",
+    "ricavi",
+    "compensi",
+    "dicitura",
+    "riduzione",
+    "ateco",
+    "forfettari",
+)
+
+
+def _canonicalize_tax_token(match: re.Match[str]) -> str:
+    token = match.group(0)
+    exact_replacement = EXACT_QUERY_TOKEN_REPLACEMENTS.get(token)
+    if exact_replacement is not None:
+        return exact_replacement
+    if len(token) < 6 or any(char.isdigit() for char in token):
+        return token
+
+    best_match = token
+    best_score = 0.0
+    for candidate in CANONICAL_QUERY_TOKENS:
+        if token[0] != candidate[0] or token[-1] != candidate[-1]:
+            continue
+        if abs(len(token) - len(candidate)) > 2:
+            continue
+        score = SequenceMatcher(None, token, candidate).ratio()
+        if score >= 0.84 and score > best_score:
+            best_match = candidate
+            best_score = score
+    return best_match
+
+
+def _normalize_tax_query(query: str) -> str:
+    normalized = _normalize_match_text(query)
+    normalized = re.sub(r"[a-z0-9%]+", _canonicalize_tax_token, normalized)
+    return re.sub(r"\s+", " ", normalized).strip()
+
+
 def _contains_percent_reference(query: str, value: str) -> bool:
     return re.search(rf"(?<!\d){re.escape(value)}\s*%", query) is not None
 
 
 def _has_inps_35_context(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return any(
         term in q
         for term in (
@@ -172,7 +323,7 @@ def _has_inps_35_context(query: str) -> bool:
 
 
 def _has_non_inps_domain_context(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return any(
         term in q
         for term in (
@@ -253,7 +404,7 @@ def _lookup_coefficiente_ateco(prefix: int, subcode: int | None = None) -> str |
 
 
 def _is_ateco_coeff_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_ateco_ref = "ateco" in q or re.search(r"\bcodice\s*[0-9]{2}", q) is not None
     return (
         has_ateco_ref
@@ -265,7 +416,7 @@ def _is_ateco_coeff_query(query: str) -> bool:
 
 
 def _is_ateco_list_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return (
         "ateco" in q
         and (
@@ -283,7 +434,7 @@ def _is_ateco_list_query(query: str) -> bool:
 
 
 def _is_ateco_codes_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return "ateco" in q and (
         "tutti i codici" in q
         or "elenco codici" in q
@@ -292,7 +443,7 @@ def _is_ateco_codes_query(query: str) -> bool:
 
 
 def _is_off_topic_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return any(
         term in q
         for term in (
@@ -309,21 +460,22 @@ def _is_off_topic_query(query: str) -> bool:
 
 
 def _is_limit_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return any(term in q for term in ("quanto posso guadagn", "limite", "soglia", "ricavi", "compensi"))
 
 
 def _is_tax_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return any(term in q for term in ("quanto vengo tass", "tassat", "imposta", "aliquota", "sostitutiva"))
 
 
 def _is_forfettario_query(query: str) -> bool:
-    return "forfett" in query.lower()
+    q = _normalize_tax_query(query)
+    return "forfett" in q or _query_mentions_regime_id(query, "forfettario")
 
 
 def _is_tax_regime_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return any(
         term in q
         for term in (
@@ -353,11 +505,56 @@ def _is_tax_regime_query(query: str) -> bool:
     )
 
 
+def _is_forfettario_intro_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_forfettario = _is_forfettario_query(q)
+    has_intro_intent = any(
+        term in q
+        for term in (
+            "cos'e",
+            "cos e",
+            "che cos'e",
+            "che cos e",
+            "spiegami",
+            "spiegare",
+            "in parole semplici",
+            "in pratica",
+            "come funziona",
+            "come funziona in generale",
+            "di cosa si tratta",
+        )
+    )
+    technical_terms = (
+        "ateco",
+        "vies",
+        "intrastat",
+        "td17",
+        "bollo",
+        "inps",
+        "35%",
+        "soglia",
+        "ricavi",
+        "compensi",
+        "srl",
+        "ex datore",
+        "lavoro dipendente",
+        "cassa professionale",
+        "google ads",
+        "uscita",
+        "scadenza",
+        "acconto",
+        "saldo",
+        "causa ostativa",
+        "cause ostative",
+        "regimi speciali",
+    )
+    return has_forfettario and has_intro_intent and not any(term in q for term in technical_terms)
+
+
 def _match_regime_profiles(query: str) -> List[RegimeProfile]:
-    q = query.lower()
     matches: List[RegimeProfile] = []
     for profile in REGIME_PROFILES:
-        if any(alias in q for alias in profile.aliases):
+        if any(_query_matches_alias(query, alias) for alias in profile.aliases):
             matches.append(profile)
     return matches
 
@@ -387,7 +584,7 @@ def _regime_scope_message(active_regime: RegimeProfile | None = None) -> str:
 
 
 def _is_vies_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return (
         "vies" in q
         or (
@@ -398,7 +595,7 @@ def _is_vies_query(query: str) -> bool:
 
 
 def _is_bollo_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_bollo = "bollo" in q
     has_estero = any(term in q for term in ("estera", "estere", "estero", "extra-ue", "extra ue", "ue"))
     has_threshold = any(term in q for term in ("77,47", "77.47", "2 euro", "2,00"))
@@ -406,7 +603,7 @@ def _is_bollo_query(query: str) -> bool:
 
 
 def _is_eu_b2b_services_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     if "b2c" in q:
         return False
     has_service = "serviz" in q or "b2b" in q
@@ -427,7 +624,7 @@ def _is_eu_b2b_services_query(query: str) -> bool:
 
 
 def _is_extra_ue_services_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_service = "serviz" in q
     has_extra_context = any(
         term in q
@@ -445,7 +642,7 @@ def _is_extra_ue_services_query(query: str) -> bool:
 
 
 def _is_eu_b2c_services_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_service = "serviz" in q
     has_b2c_context = any(
         term in q
@@ -461,14 +658,14 @@ def _is_eu_b2c_services_query(query: str) -> bool:
 
 
 def _is_forfettario_exit_100k_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_threshold = any(term in q for term in ("100.000", "100000", "100k"))
     has_exit_intent = any(term in q for term in ("esco", "uscita", "subito", "anno dopo", "quando"))
     return has_threshold and has_exit_intent
 
 
 def _is_cash_basis_threshold_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_cash_terms = any(
         term in q for term in ("fatturato", "incassato", "incassi", "criterio di cassa")
     )
@@ -479,7 +676,7 @@ def _is_cash_basis_threshold_query(query: str) -> bool:
 
 
 def _is_aliquota_5_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_aliquota = any(term in q for term in ("aliquota", "imposta sostitutiva")) or _contains_percent_reference(q, "5")
     has_five = _contains_percent_reference(q, "5") or "5 per cento" in q
     has_when = any(term in q for term in ("quando", "applica", "si applica"))
@@ -487,26 +684,26 @@ def _is_aliquota_5_query(query: str) -> bool:
 
 
 def _is_ads_reverse_charge_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_ads = any(term in q for term in ("google ads", "facebook ads", "meta ads"))
     has_reverse_context = any(term in q for term in ("td17", "reverse", "iva", "autofattura"))
     return has_ads and has_reverse_context
 
 
 def _is_intrastat_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return "intrastat" in q
 
 
 def _is_extra_ue_wording_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_extra_context = any(term in q for term in ("extra-ue", "extra ue", "fuori ue"))
     has_wording_intent = any(term in q for term in ("dicitura", "artt. 7", "7-septies", "articoli 7"))
     return has_extra_context and has_wording_intent
 
 
 def _is_bollo_exact_threshold_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_threshold = "77,47" in q or "77.47" in q
     has_exact_intent = any(term in q for term in ("esatt", "uguale", "pari a", "preciso"))
     has_bollo = "bollo" in q
@@ -514,7 +711,7 @@ def _is_bollo_exact_threshold_query(query: str) -> bool:
 
 
 def _is_employment_income_threshold_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_employment_context = any(
         term in q
         for term in (
@@ -540,7 +737,7 @@ def _is_employment_income_threshold_query(query: str) -> bool:
 
 
 def _is_employment_income_under_threshold_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_employment_context = any(
         term in q
         for term in (
@@ -564,7 +761,7 @@ def _is_employment_income_under_threshold_query(query: str) -> bool:
 
 
 def _is_employment_cessation_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     return (
         "rapporto di lavoro" in q
         and "cessat" in q
@@ -573,7 +770,7 @@ def _is_employment_cessation_query(query: str) -> bool:
 
 
 def _is_inps_35_general_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     strong_terms = (
         "riduzione contributiva",
         "riduzione inps",
@@ -630,7 +827,7 @@ def _is_inps_35_general_query(query: str) -> bool:
 
 
 def _is_forfettario_domain_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     domain_terms = (
         "forfett",
         "regime",
@@ -700,7 +897,7 @@ def _is_forfettario_domain_query(query: str) -> bool:
 
 
 def _is_inps_35_deadline_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_inps_context = _has_inps_35_context(q)
     has_deadline_intent = any(
         term in q
@@ -716,7 +913,7 @@ def _is_inps_35_deadline_query(query: str) -> bool:
 
 
 def _is_inps_35_short_deadline_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_inps_context = _has_inps_35_context(q)
     has_deadline_intent = any(
         term in q
@@ -732,7 +929,7 @@ def _is_inps_35_short_deadline_query(query: str) -> bool:
 
 
 def _is_inps_35_march_decorrenza_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_march_example = "10 marzo" in q or ("marzo" in q and any(term in q for term in ("domanda", "invio", "invi")))
     has_decorrenza_intent = any(
         term in q
@@ -750,7 +947,7 @@ def _is_inps_35_march_decorrenza_query(query: str) -> bool:
 
 
 def _is_inps_35_reapply_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_renounce = any(
         term in q
         for term in (
@@ -775,7 +972,7 @@ def _is_inps_35_reapply_query(query: str) -> bool:
 
 
 def _is_inps_35_renewal_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_inps_35_context = _has_inps_35_context(q)
     has_renewal_intent = "rinnova" in q or "rinnovo" in q
     has_auto_intent = "automatic" in q or "ogni anno" in q
@@ -783,14 +980,14 @@ def _is_inps_35_renewal_query(query: str) -> bool:
 
 
 def _is_inps_35_cassa_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_35 = _has_inps_35_context(q)
     has_cassa = "cassa" in q or "professionist" in q
     return has_35 and has_cassa
 
 
 def _is_srl_control_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_srl = "srl" in q or "societa" in q or "società" in q
     has_control = any(term in q for term in ("controllo", "2359", "controllo di fatto"))
     has_forfettario_intent = any(
@@ -808,7 +1005,7 @@ def _is_srl_control_query(query: str) -> bool:
 
 
 def _is_inps_35_new_activity_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_new_activity = any(
         term in q
         for term in (
@@ -829,7 +1026,7 @@ def _is_inps_35_new_activity_query(query: str) -> bool:
 
 
 def _is_inps_35_apply_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_apply_intent = any(
         term in q
         for term in (
@@ -845,7 +1042,7 @@ def _is_inps_35_apply_query(query: str) -> bool:
 
 
 def _is_inps_35_late_deadline_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_late_deadline = any(
         term in q
         for term in (
@@ -861,7 +1058,7 @@ def _is_inps_35_late_deadline_query(query: str) -> bool:
 
 
 def _is_inps_35_loss_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_loss_intent = any(
         term in q for term in ("si perde", "quando si perde", "perdo", "perdita")
     )
@@ -869,14 +1066,14 @@ def _is_inps_35_loss_query(query: str) -> bool:
 
 
 def _is_ex_datore_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_ex_datore = "ex datore" in q or "datore di lavoro" in q
     has_ostativa = any(term in q for term in ("causa ostativa", "ostativo", "forfettario"))
     return has_ex_datore and has_ostativa
 
 
 def _is_ex_datore_after_two_years_query(query: str) -> bool:
-    q = query.lower()
+    q = _normalize_tax_query(query)
     has_ex_datore = _is_ex_datore_query(q)
     has_time_reference = any(
         term in q
@@ -913,7 +1110,7 @@ def _clean_model_answer(answer: str) -> str:
 def _intent_expansions(query: str, regime_id: str) -> List[str]:
     if regime_id != "forfettario":
         return []
-    q = query.lower()
+    q = _normalize_tax_query(query)
     expansions: List[str] = []
 
     if "ateco" in q:
@@ -1001,13 +1198,23 @@ def _merge_results(primary: List[RetrievedChunk], extras: List[RetrievedChunk], 
 
 
 def _search_with_intent(query: str, regime_id: str) -> List[RetrievedChunk]:
-    primary = rag.search(query, top_k=8, min_score=0.2, regime_ids=[regime_id])
+    normalized_query = _normalize_tax_query(query)
+    primary_queries = [normalized_query]
+    if query.strip() and normalized_query != query.strip().lower():
+        primary_queries.append(query.strip())
+
+    primary_results: List[RetrievedChunk] = []
+    for primary_query in primary_queries:
+        primary_results.extend(
+            rag.search(primary_query, top_k=8, min_score=0.2, regime_ids=[regime_id])
+        )
+
     extra_results: List[RetrievedChunk] = []
-    for expanded_query in _intent_expansions(query, regime_id=regime_id):
+    for expanded_query in _intent_expansions(normalized_query, regime_id=regime_id):
         extra_results.extend(
             rag.search(expanded_query, top_k=4, min_score=0.18, regime_ids=[regime_id])
         )
-    return _merge_results(primary, extra_results, top_k=8)
+    return _merge_results(primary_results, extra_results, top_k=8)
 
 
 @app.post("/", response_model=ChatResponse)
@@ -1021,9 +1228,10 @@ async def read_root(payload: ChatRequest):
             sources=[],
         )
 
-    contenuto = payload.content.strip()
-    if not contenuto:
+    raw_contenuto = payload.content.strip()
+    if not raw_contenuto:
         return ChatResponse(message="Inserisci una domanda valida.", sources=[])
+    contenuto = _normalize_tax_query(raw_contenuto)
 
     active_regime, regime_explicit, regime_ambiguous = _resolve_regime(contenuto)
     if regime_ambiguous:
@@ -1047,6 +1255,22 @@ async def read_root(payload: ChatRequest):
                 "Riformula la domanda in questo ambito."
             ),
             sources=[],
+        )
+
+    if is_forfettario_regime and _is_forfettario_intro_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Il regime forfettario è un regime fiscale agevolato per partite IVA individuali. "
+                "In pratica, il reddito imponibile non si calcola sottraendo tutte le spese reali una per una, "
+                "ma applicando ai ricavi un coefficiente di redditività legato all'attività svolta. "
+                "Su quel reddito si paga di norma un'imposta sostitutiva del 15%, che in alcuni casi scende al 5% "
+                "per le nuove attività. Prevede anche semplificazioni IVA e contabili, ma si può usare solo se "
+                "rispetti i requisiti e non hai cause ostative."
+            ),
+            sources=[
+                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+                "04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf",
+            ],
         )
 
     if is_forfettario_regime and _is_ateco_coeff_query(contenuto):

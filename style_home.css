@@ -83,3 +83,28 @@ body {
   font-weight: 500;
   padding: 0.5em 1em;
 }
+
+.navbar-logo {
+  transition: transform 0.3s ease;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 60px; /* Qui puoi aumentare quanto vuoi! */
+  width: auto;
+  transition: transform 0.3s ease;
+  z-index: 10;
+}
+
+.navbar-brand:hover .navbar-logo {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.navbar-brand {
+  position: relative;
+  /* Aumenta questo valore finché il testo non è alla distanza desiderata */
+  padding-left: 110px !important;
+  display: flex;
+  align-items: center;
+  min-height: 60px; /* Aiuta a mantenere l'allineamento verticale */
+}

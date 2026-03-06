@@ -31,7 +31,13 @@
     </div>
 
     <div class="container chat-container" id="chatBox">
-      <div class="message-ai">
+      <div class="message-ai d-flex align-items-end mb-3">
+        <img
+          src="robot.png"
+          alt="Robot"
+          class="me-2 mb-1"
+          style="width: 65px; height: 65px; object-fit: contain"
+        />
         <div class="bubble-ai">
           <p class="mb-0">
             Buongiorno. Sono l'assistente virtuale di
@@ -89,7 +95,17 @@
         appendMessage("user", userText);
         inputField.value = "";
 
-        const loadingDiv = createLoadingIndicator();
+        const loadingDiv = document.createElement("div");
+        loadingDiv.className = "message-ai d-flex align-items-end mb-3";
+        loadingDiv.id = "loadingIndicator";
+        loadingDiv.innerHTML = `
+          <img src="robot.png" alt="Robot" class="me-2 mb-1" style="width: 65px; height: 65px; object-fit: contain;">
+          <div class="bubble-ai" style="padding: 12px 24px;">
+            <div class="spinner-grow spinner-grow-sm text-primary opacity-50" role="status"></div>
+              <div class="spinner-grow spinner-grow-sm text-primary opacity-75 mx-1" role="status"></div>
+              <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
+          </div>
+        `;
         chatBox.appendChild(loadingDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -157,7 +173,10 @@
 
       function appendMessage(sender, text, sources = null) {
         const msgDiv = document.createElement("div");
-        msgDiv.className = sender === "user" ? "message-user" : "message-ai";
+        msgDiv.className =
+          sender === "user"
+            ? "message-user"
+            : "message-ai d-flex align-items-end mb-3";
 
         if (sender === "user") {
           const bubble = document.createElement("div");
@@ -173,44 +192,21 @@
               ? [sources]
               : [];
 
-          const bubble = document.createElement("div");
-          bubble.className = "bubble-ai";
-
-          const textContainer = document.createElement("p");
-          textContainer.className = "mb-2 ai-text-container";
-          textContainer.style.whiteSpace = "pre-wrap";
-          bubble.appendChild(textContainer);
-
-          let sourceBox = null;
-          if (sourceList.length > 0) {
-            sourceBox = document.createElement("div");
-            sourceBox.className = "source-box";
-            sourceBox.style.display = "none";
-
-            const icon = document.createElement("i");
-            icon.className = "fas fa-book me-1";
-            sourceBox.appendChild(icon);
-
-            const title = document.createElement("strong");
-            title.textContent = "Informazione:";
-            sourceBox.appendChild(title);
-            sourceBox.appendChild(document.createElement("br"));
-
-            sourceList.forEach((source, index) => {
-              const line = document.createElement("span");
-              line.className = "source-link";
-              line.style.color = "#27ae60";
-              line.textContent = source;
-              sourceBox.appendChild(line);
-              if (index < sourceList.length - 1) {
-                sourceBox.appendChild(document.createElement("br"));
-              }
-            });
-
-            bubble.appendChild(sourceBox);
-          }
-
-          msgDiv.appendChild(bubble);
+          msgDiv.innerHTML = `
+            <img src="robot.png" alt="Robot" class="me-2 mb-1" style="width: 65px; height: 65px; object-fit: contain;">
+            <div class="bubble-ai">
+                <p class="mb-2 ai-text-container"></p>
+                ${
+                  sourceList.length > 0
+                    ? `
+                <div class="source-box" style="display: none;">
+                    <i class="fas fa-book me-1"></i> <strong>Informazione:</strong><br>
+                    <span class="source-link" style="color: #27ae60;">${sourceList.join("<br>")}</span>
+                </div>`
+                    : ""
+                }
+            </div>
+          `;
           chatBox.appendChild(msgDiv);
 
           const words = text.split(" ");

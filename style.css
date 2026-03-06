@@ -158,3 +158,41 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.05);
   padding: 2px;
 }
+
+/* --- PULIZIA E SISTEMAZIONE HEADER CHAT --- */
+
+.chat-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 10px 0; /* Ridotto leggermente per bilanciare il logo grande */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Questo è il bordo sotto l'header, tienilo se ti piace */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-brand-chat {
+  position: relative;
+  padding-left: 95px !important; /* Spazio per il logo */
+  display: flex;
+  align-items: center;
+  text-decoration: none; /* Rimuove sottolineatura link */
+  color: inherit; /* Mantiene colore testo originale */
+}
+
+/* Regole specifiche per il logo nella chat */
+.chat-logo {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 70px; /* Stessa dimensione dell'index */
+  width: auto;
+  object-fit: contain;
+
+  /* --- AZZERAMENTO CORNICI --- */
+  border: none !important; /* Rimuove qualsiasi bordo */
+  background: transparent !important; /* Assicura sfondo trasparente */
+  box-shadow: none !important; /* Rimuove ombre che sembrano cornici */
+  padding: 0 !important; /* Rimuove padding interno */
+}

@@ -208,7 +208,8 @@
             </div>
           `;
           chatBox.appendChild(msgDiv);
-
+          const textContainer = msgDiv.querySelector(".ai-text-container");
+          const sourceBox = msgDiv.querySelector(".source-box");
           const words = text.split(" ");
           let i = 0;
 

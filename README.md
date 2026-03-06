@@ -2,7 +2,7 @@
 
 ## Progetto ITS
 
-Applicazione web con assistente AI per il regime forfettario.
+Applicazione web con assistente AI per regimi fiscali italiani.
 Il retrieval documentale usa Qdrant (database vettoriale) con indicizzazione diretta dai PDF normativi.
 
 ## Stack
@@ -41,3 +41,6 @@ EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 
 - L'indice non usa piu' `testi_estratti_2026` per la ricerca runtime.
 - I chunk testuali vengono salvati come payload su Qdrant e recuperati on-demand.
+- Le cartelle `Normativo_*` vengono indicizzate automaticamente come corpora distinti.
+- Ogni corpus viene associato a un `regime` nel payload Qdrant, cosi' il chatbot puo' filtrare i risultati per regime.
+- Le regole hardcoded attuali restano specializzate sul regime forfettario; per altri regimi il chatbot usa il flusso RAG/LLM sui documenti caricati.

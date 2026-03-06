@@ -72,26 +72,24 @@
       const chatForm = document.getElementById("chatForm");
       const chatBox = document.getElementById("chatBox");
       const inputField = chatForm.querySelector("input");
+      const sendButton = chatForm.querySelector("button[type='submit']");
+      let isRequestInFlight = false;
 
       chatForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
-        const userText = inputField.value;
+        const userText = inputField.value.trim();
         if (!userText) return;
+        if (isRequestInFlight) return;
+
+        isRequestInFlight = true;
+        inputField.disabled = true;
+        sendButton.disabled = true;
 
         appendMessage("user", userText);
         inputField.value = "";
 
-        const loadingDiv = document.createElement("div");
-        loadingDiv.className = "message-ai";
-        loadingDiv.id = "loadingIndicator";
-        loadingDiv.innerHTML = `
-          <div class="bubble-ai" style="padding: 12px 24px;">
-              <div class="spinner-grow spinner-grow-sm text-primary opacity-50" role="status"></div>
-              <div class="spinner-grow spinner-grow-sm text-primary opacity-75 mx-1" role="status"></div>
-              <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
-          </div>
-        `;
+        const loadingDiv = createLoadingIndicator();
         chatBox.appendChild(loadingDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -106,7 +104,9 @@
 
           const data = await response.json();
 
-          document.getElementById("loadingIndicator").remove();
+          if (loadingDiv.parentNode) {
+            loadingDiv.remove();
+          }
 
           const aiReply = data.message;
           const aiSources = Array.isArray(data.sources) ? data.sources : [];
@@ -115,23 +115,55 @@
         } catch (err) {
           console.error("Errore:", err);
 
-          if (document.getElementById("loadingIndicator")) {
-            document.getElementById("loadingIndicator").remove();
+          if (loadingDiv.parentNode) {
+            loadingDiv.remove();
           }
 
           appendMessage(
             "ai",
             "Spiacente, impossibile connettersi al server. Assicurati che FastAPI sia avviato sulla porta 8000.",
           );
+        } finally {
+          isRequestInFlight = false;
+          inputField.disabled = false;
+          sendButton.disabled = false;
+          inputField.focus();
         }
       });
+
+      function createLoadingIndicator() {
+        const wrapper = document.createElement("div");
+        wrapper.className = "message-ai";
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble-ai";
+        bubble.style.padding = "12px 24px";
+
+        const opacities = ["0.5", "0.75", "1"];
+        opacities.forEach((opacity, idx) => {
+          const spinner = document.createElement("div");
+          spinner.className = "spinner-grow spinner-grow-sm text-primary";
+          spinner.setAttribute("role", "status");
+          spinner.style.opacity = opacity;
+          if (idx === 1) {
+            spinner.classList.add("mx-1");
+          }
+          bubble.appendChild(spinner);
+        });
+
+        wrapper.appendChild(bubble);
+        return wrapper;
+      }
 
       function appendMessage(sender, text, sources = null) {
         const msgDiv = document.createElement("div");
         msgDiv.className = sender === "user" ? "message-user" : "message-ai";
 
         if (sender === "user") {
-          msgDiv.innerHTML = `<div class="bubble-user">${text}</div>`;
+          const bubble = document.createElement("div");
+          bubble.className = "bubble-user";
+          bubble.textContent = text;
+          msgDiv.appendChild(bubble);
           chatBox.appendChild(msgDiv);
           chatBox.scrollTop = chatBox.scrollHeight;
         } else {
@@ -141,30 +173,52 @@
               ? [sources]
               : [];
 
-          msgDiv.innerHTML = `
-            <div class="bubble-ai">
-                <p class="mb-2 ai-text-container"></p>
-                ${
-                  sourceList.length > 0
-                    ? `
-                <div class="source-box" style="display: none;">
-                    <i class="fas fa-book me-1"></i> <strong>Informazione:</strong><br>
-                    <span class="source-link" style="color: #27ae60;">${sourceList.join("<br>")}</span>
-                </div>`
-                    : ""
-                }
-            </div>
-          `;
+          const bubble = document.createElement("div");
+          bubble.className = "bubble-ai";
+
+          const textContainer = document.createElement("p");
+          textContainer.className = "mb-2 ai-text-container";
+          textContainer.style.whiteSpace = "pre-wrap";
+          bubble.appendChild(textContainer);
+
+          let sourceBox = null;
+          if (sourceList.length > 0) {
+            sourceBox = document.createElement("div");
+            sourceBox.className = "source-box";
+            sourceBox.style.display = "none";
+
+            const icon = document.createElement("i");
+            icon.className = "fas fa-book me-1";
+            sourceBox.appendChild(icon);
+
+            const title = document.createElement("strong");
+            title.textContent = "Informazione:";
+            sourceBox.appendChild(title);
+            sourceBox.appendChild(document.createElement("br"));
+
+            sourceList.forEach((source, index) => {
+              const line = document.createElement("span");
+              line.className = "source-link";
+              line.style.color = "#27ae60";
+              line.textContent = source;
+              sourceBox.appendChild(line);
+              if (index < sourceList.length - 1) {
+                sourceBox.appendChild(document.createElement("br"));
+              }
+            });
+
+            bubble.appendChild(sourceBox);
+          }
+
+          msgDiv.appendChild(bubble);
           chatBox.appendChild(msgDiv);
 
-          const textContainer = msgDiv.querySelector(".ai-text-container");
-          const sourceBox = msgDiv.querySelector(".source-box");
           const words = text.split(" ");
           let i = 0;
 
           function typeWriter() {
             if (i < words.length) {
-              textContainer.innerHTML += words[i].replace(/\n/g, "<br>") + " ";
+              textContainer.textContent += words[i] + " ";
               chatBox.scrollTop = chatBox.scrollHeight;
               i++;
               setTimeout(typeWriter, 40);

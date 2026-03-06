@@ -77,22 +77,43 @@ ATECO_GROUPS = [
 ]
 
 
-def _extract_ateco_prefix(query: str) -> int | None:
-    match = re.search(r"\bateco\s*([0-9]{2})(?:[.\s-]?[0-9]{0,2})?\b", query, flags=re.IGNORECASE)
+def _extract_ateco_components(query: str) -> tuple[int, int | None] | None:
+    match = re.search(
+        r"\bateco\s*([0-9]{2})(?:[.\s-]?([0-9]{1,2}))?\b",
+        query,
+        flags=re.IGNORECASE,
+    )
     if not match:
-        match = re.search(r"\bcodice\s*([0-9]{2})(?:[.\s-]?[0-9]{0,2})?\b", query, flags=re.IGNORECASE)
+        match = re.search(
+            r"\bcodice\s*([0-9]{2})(?:[.\s-]?([0-9]{1,2}))?\b",
+            query,
+            flags=re.IGNORECASE,
+        )
     if not match:
         return None
-    return int(match.group(1))
+    prefix = int(match.group(1))
+    subcode = int(match.group(2)) if match.group(2) else None
+    return prefix, subcode
 
 
-def _lookup_coefficiente_ateco(prefix: int) -> str | None:
+def _lookup_coefficiente_ateco(prefix: int, subcode: int | None = None) -> str | None:
     if prefix == 46:
+        if subcode is not None:
+            if subcode == 1 or 10 <= subcode <= 19:
+                return "62%"
+            return "40%"
         return (
             "Dipende dal sottocodice ATECO 46: "
             "46.1 = 62%, mentre 46.2-46.9 = 40%."
         )
     if prefix == 47:
+        if subcode is not None:
+            if subcode == 81:
+                return "40%"
+            if 82 <= subcode <= 89:
+                return "54%"
+            if 10 <= subcode <= 79 or 90 <= subcode <= 99:
+                return "40%"
         return (
             "Dipende dal sottocodice ATECO 47: "
             "47.81 = 40%, 47.82-47.89 = 54%, "
@@ -129,6 +150,182 @@ def _is_tax_query(query: str) -> bool:
 
 def _is_forfettario_query(query: str) -> bool:
     return "forfett" in query.lower()
+
+
+def _is_vies_query(query: str) -> bool:
+    q = query.lower()
+    return (
+        "vies" in q
+        or (
+            any(term in q for term in ("intracomunit", "unione europea", "ue"))
+            and any(term in q for term in ("iscrizion", "obbligator", "quando serve", "a cosa serve"))
+        )
+    )
+
+
+def _is_bollo_query(query: str) -> bool:
+    q = query.lower()
+    has_bollo = "bollo" in q
+    has_estero = any(term in q for term in ("estera", "estere", "estero", "extra-ue", "extra ue", "ue"))
+    has_threshold = any(term in q for term in ("77,47", "77.47", "2 euro", "2,00"))
+    return has_bollo and (has_estero or has_threshold)
+
+
+def _is_eu_b2b_services_query(query: str) -> bool:
+    q = query.lower()
+    if "b2c" in q:
+        return False
+    has_service = "serviz" in q
+    has_eu_context = any(
+        term in q
+        for term in (
+            "b2b",
+            "cliente ue",
+            "unione europea",
+            "intracomunit",
+            "verso ue",
+            "nell'ue",
+            "in ue",
+        )
+    )
+    has_invoice_intent = any(term in q for term in ("fattur", "dicitura", "iva", "come", "vendita"))
+    return has_service and has_eu_context and has_invoice_intent
+
+
+def _is_extra_ue_services_query(query: str) -> bool:
+    q = query.lower()
+    has_service = "serviz" in q
+    has_extra_context = any(
+        term in q
+        for term in (
+            "extra-ue",
+            "extra ue",
+            "usa",
+            "fuori ue",
+            "cliente estero",
+            "verso estero",
+        )
+    )
+    has_invoice_intent = any(term in q for term in ("fattur", "dicitura", "iva", "come", "vendita"))
+    return has_service and has_extra_context and has_invoice_intent
+
+
+def _is_eu_b2c_services_query(query: str) -> bool:
+    q = query.lower()
+    has_service = "serviz" in q
+    has_b2c_context = any(
+        term in q
+        for term in (
+            "b2c",
+            "cliente privato ue",
+            "privato ue",
+            "consumatore ue",
+        )
+    )
+    has_invoice_intent = any(term in q for term in ("fattur", "dicitura", "iva", "come", "vendita"))
+    return has_service and has_b2c_context and has_invoice_intent
+
+
+def _is_bollo_exact_threshold_query(query: str) -> bool:
+    q = query.lower()
+    has_threshold = "77,47" in q or "77.47" in q
+    has_exact_intent = any(term in q for term in ("esatt", "uguale", "pari a", "preciso"))
+    has_bollo = "bollo" in q
+    return has_bollo and has_threshold and has_exact_intent
+
+
+def _is_employment_income_threshold_query(query: str) -> bool:
+    q = query.lower()
+    has_employment_context = any(
+        term in q
+        for term in (
+            "lavoro dipendente",
+            "reddito da lavoro dipendente",
+            "redditi da lavoro dipendente",
+            "reddito dipendente",
+        )
+    )
+    has_threshold_or_access_intent = any(
+        term in q
+        for term in (
+            "30.000",
+            "30000",
+            "trentamila",
+            "posso stare",
+            "posso rimanere",
+            "accesso",
+            "forfettario",
+        )
+    )
+    return has_employment_context and has_threshold_or_access_intent
+
+
+def _is_forfettario_domain_query(query: str) -> bool:
+    q = query.lower()
+    domain_terms = (
+        "forfett",
+        "regime",
+        "ateco",
+        "iva",
+        "inps",
+        "contribut",
+        "fattur",
+        "bollo",
+        "vies",
+        "reverse charge",
+        "inversione contabile",
+        "intrastat",
+        "b2b",
+        "b2c",
+        "extra-ue",
+        "extra ue",
+        "intracomunit",
+        "cliente ue",
+        "cliente estero",
+        "vendita servizi",
+        "ricavi",
+        "compensi",
+        "imposta",
+        "aliquota",
+        "sostitutiva",
+        "soglia",
+        "quadro lm",
+        "artigiani",
+        "commercianti",
+        "partita iva",
+        "scadenz",
+        "acconto",
+        "saldo",
+        "cause ostative",
+        "lavoro dipendente",
+    )
+    return any(term in q for term in domain_terms)
+
+
+def _is_inps_35_deadline_query(query: str) -> bool:
+    q = query.lower()
+    has_inps_context = any(
+        term in q
+        for term in (
+            "inps",
+            "riduzione contributiva",
+            "35%",
+            "artigiani",
+            "commercianti",
+            "agevolazione",
+        )
+    )
+    has_deadline_intent = any(
+        term in q
+        for term in (
+            "scadenz",
+            "entro quando",
+            "termine",
+            "quando va presentata",
+            "presentazione",
+        )
+    )
+    return has_inps_context and has_deadline_intent
 
 
 def _intent_expansions(query: str) -> List[str]:
@@ -170,6 +367,8 @@ def _intent_expansions(query: str) -> List[str]:
                 "riduzione contributiva 35% regime forfettario",
                 "inps artigiani commercianti forfettario 2026",
                 "aliquote gestione separata 2026",
+                "domanda riduzione contributiva 35 entro 28 febbraio",
+                "scadenza domanda agevolazione contributiva artigiani commercianti",
             ]
         )
 
@@ -241,11 +440,16 @@ async def read_root(payload: ChatRequest):
         return ChatResponse(message="Inserisci una domanda valida.", sources=[])
 
     if _is_ateco_coeff_query(contenuto):
-        prefix = _extract_ateco_prefix(contenuto)
-        if prefix is not None:
-            coeff = _lookup_coefficiente_ateco(prefix)
+        ateco_data = _extract_ateco_components(contenuto)
+        if ateco_data is not None:
+            prefix, subcode = ateco_data
+            coeff = _lookup_coefficiente_ateco(prefix, subcode=subcode)
             if coeff is not None:
-                if prefix == 46 or prefix == 47:
+                if subcode is not None and coeff.endswith("%"):
+                    message = (
+                        f"Il coefficiente di redditività per ATECO {prefix}.{subcode} è {coeff}."
+                    )
+                elif prefix == 46 or prefix == 47:
                     message = (
                         f"Per il codice ATECO {prefix}, {coeff} "
                         "Controlla sempre il sottocodice completo per il valore esatto."
@@ -257,8 +461,8 @@ async def read_root(payload: ChatRequest):
                 return ChatResponse(
                     message=message,
                     sources=[
-                        "03_Tabella_Coefficienti_Redditivita_ATECO.txt",
-                        "01_Legge_190-2014_Base_Normativa_e_Coefficienti.txt",
+                        "03_Tabella_Coefficienti_Redditivita_ATECO.pdf",
+                        "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
                     ],
                 )
 
@@ -270,9 +474,127 @@ async def read_root(payload: ChatRequest):
                 "L'imposta sostitutiva è in via ordinaria al 15%, ridotta al 5% per i primi 5 anni se sono rispettati i requisiti di nuova attività."
             ),
             sources=[
-                "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.txt",
-                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.txt",
+                "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
+                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
             ],
+        )
+
+    if _is_inps_35_deadline_query(contenuto):
+        return ChatResponse(
+            message=(
+                "La domanda per la riduzione contributiva INPS del 35% si presenta solo online nel Cassetto "
+                "Previdenziale Artigiani e Commercianti (accesso con SPID/CIE/CNS). "
+                "Per i contribuenti già attivi va presentata entro il 28 febbraio di ogni anno; "
+                "se inviata dopo, l'agevolazione decorre dal 1° gennaio dell'anno successivo. "
+                "Per le nuove attività, la richiesta va fatta tempestivamente dopo l'iscrizione previdenziale."
+            ),
+            sources=[
+                "11_Guida_Riduzione_Contributiva_35_INPS.pdf",
+                "10_Circolare_INPS_14-2026_Artigiani_e_Commercianti.pdf",
+            ],
+        )
+
+    if _is_vies_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Sì, per il forfettario l'iscrizione al VIES è necessaria quando effettua operazioni "
+                "intracomunitarie (vendita di servizi o acquisto di beni/servizi nell'UE). "
+                "Serve a operare con partita IVA abilitata nei rapporti UE."
+            ),
+            sources=[
+                "12_Operazioni_Estere_VIES_Reverse_Charge_e_Dogane.pdf",
+            ],
+        )
+
+    if _is_bollo_exact_threshold_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No, con importo esattamente pari a 77,47 euro il bollo non si applica. "
+                "L'imposta di bollo da 2,00 euro scatta solo oltre 77,47 euro."
+            ),
+            sources=[
+                "08b_Manuale_AdE_Imposta_Bollo_Fatture_Elettroniche.pdf",
+                "08a_Guida_Pratica_Fatturazione_Elettronica_Forfettari_2026.pdf",
+            ],
+        )
+
+    if _is_bollo_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Sì, se la fattura supera 77,47 euro si applica l'imposta di bollo da 2,00 euro, "
+                "anche nelle fatture verso l'estero. "
+                "In fattura va indicata la dicitura di assolvimento del bollo; "
+                "il versamento è gestito con liquidazione periodica tramite i canali dell'Agenzia delle Entrate."
+            ),
+            sources=[
+                "08b_Manuale_AdE_Imposta_Bollo_Fatture_Elettroniche.pdf",
+                "08a_Guida_Pratica_Fatturazione_Elettronica_Forfettari_2026.pdf",
+            ],
+        )
+
+    if _is_eu_b2c_services_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Nei documenti disponibili è trattata in modo esplicito soprattutto la casistica B2B UE "
+                "(reverse charge e Intrastat). "
+                "Per servizi B2C verso cliente UE la disciplina IVA dipende dal tipo di servizio e dal luogo di consumo, "
+                "quindi serve una verifica specifica prima di emettere fattura."
+            ),
+            sources=[
+                "12_Operazioni_Estere_VIES_Reverse_Charge_e_Dogane.pdf",
+                "08a_Guida_Pratica_Fatturazione_Elettronica_Forfettari_2026.pdf",
+            ],
+        )
+
+    if _is_eu_b2b_services_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Per servizi B2B verso cliente UE, la fattura si emette senza IVA con dicitura "
+                "\"Reverse Charge\" o \"Inversione contabile\" e richiede iscrizione VIES. "
+                "Per queste operazioni è previsto l'adempimento Intrastat. "
+                "Se la fattura supera 77,47 euro, si applica anche il bollo da 2,00 euro."
+            ),
+            sources=[
+                "12_Operazioni_Estere_VIES_Reverse_Charge_e_Dogane.pdf",
+                "08a_Guida_Pratica_Fatturazione_Elettronica_Forfettari_2026.pdf",
+            ],
+        )
+
+    if _is_extra_ue_services_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Per servizi verso cliente extra-UE, la fattura è senza IVA con dicitura: "
+                "\"Operazione non soggetta ai sensi degli artt. da 7 a 7-septies del DPR 633/72\". "
+                "Se l'importo supera 77,47 euro, si applica il bollo da 2,00 euro."
+            ),
+            sources=[
+                "12_Operazioni_Estere_VIES_Reverse_Charge_e_Dogane.pdf",
+                "08b_Manuale_AdE_Imposta_Bollo_Fatture_Elettroniche.pdf",
+            ],
+        )
+
+    if _is_employment_income_threshold_query(contenuto):
+        return ChatResponse(
+            message=(
+                "In generale, con redditi da lavoro dipendente o assimilati superiori a 30.000 euro "
+                "non puoi applicare il regime forfettario. "
+                "La soglia non rileva se il rapporto di lavoro è cessato. "
+                "Restano comunque da verificare anche le altre cause ostative."
+            ),
+            sources=[
+                "04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf",
+                "05_Circolare_9E-2019_Approfondimento_Cause_Ostative.pdf",
+                "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
+            ],
+        )
+
+    if not _is_forfettario_domain_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Posso aiutarti solo su temi fiscali e contributivi del regime forfettario. "
+                "Riformula la domanda in questo ambito."
+            ),
+            sources=[],
         )
 
     retrieved = _search_with_intent(contenuto)

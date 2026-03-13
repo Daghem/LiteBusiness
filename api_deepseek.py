@@ -557,7 +557,31 @@ def _is_ateco_codes_query(query: str) -> bool:
         "tutti i codici" in q
         or "elenco codici" in q
         or "quali sono tutti i codici" in q
+        or "codici ateco" in q
+        or "elenco ateco" in q
+        or "quali sono i codici" in q
     )
+
+
+def _is_random_ateco_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_ateco = "ateco" in q
+    has_random_intent = any(
+        term in q
+        for term in (
+            "a caso",
+            "random",
+            "uno a caso",
+            "qualsiasi",
+            "dammi un codice",
+        )
+    )
+    return has_ateco and has_random_intent
+
+
+def _is_quadro_lm_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    return "quadro lm" in q or ("lm" in q and "quadro" in q)
 
 
 def _is_off_topic_query(query: str) -> bool:
@@ -598,18 +622,29 @@ def _is_tax_regime_query(query: str) -> bool:
         term in q
         for term in (
             "regime",
+            "forfett",
             "fisco",
             "fiscal",
             "imposta",
             "aliquota",
             "iva",
             "contribut",
+            "reddito",
+            "imponib",
             "ricavi",
             "compensi",
             "soglia",
             "fattur",
             "detra",
             "dedu",
+            "residenza",
+            "rientr",
+            "uscit",
+            "apertura",
+            "attivita",
+            "partecipaz",
+            "srl",
+            "societ",
             "scadenz",
             "acconto",
             "saldo",
@@ -1444,6 +1479,18 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
+    if allow_stable and is_forfettario_regime and _is_quadro_lm_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Il Quadro LM è la sezione del Modello Redditi Persone Fisiche dedicata ai contribuenti "
+                "che applicano il regime forfettario. Serve a determinare il reddito imponibile e "
+                "l'imposta sostitutiva dovuta."
+            ),
+            sources=[
+                "09_Guida_Tecnica_Quadro_LM_Dichiarazione_Redditi.pdf",
+            ],
+        )
+
     if allow_critical and is_forfettario_regime and _is_ateco_coeff_query(contenuto):
         ateco_data = _extract_ateco_components(contenuto)
         if ateco_data is not None:
@@ -1487,6 +1534,19 @@ async def read_root(payload: ChatRequest):
                     "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
                 ],
             )
+
+    if allow_critical and is_forfettario_regime and _is_random_ateco_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Non posso inventare un codice ATECO a caso. Nei documenti disponibili non c'è "
+                "l'elenco completo dei codici ATECO italiani; c'è solo la tabella dei gruppi ATECO "
+                "con i relativi coefficienti. Se mi dai un codice specifico, posso dirti il coefficiente."
+            ),
+            sources=[
+                "03_Tabella_Coefficienti_Redditivita_ATECO.pdf",
+                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+            ],
+        )
 
     if allow_critical and is_forfettario_regime and _is_ateco_codes_query(contenuto):
         return ChatResponse(

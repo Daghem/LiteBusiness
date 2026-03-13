@@ -1,7 +1,9 @@
+import json
 import os
 import re
 import unicodedata
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import List
@@ -13,6 +15,7 @@ from openai import OpenAI
 from openai import APIError, RateLimitError
 from pydantic import BaseModel
 
+from lexical_fallback import LexicalChunk, LexicalFallbackIndex
 from rag_qdrant import CorpusConfig, QdrantRAG, RetrievedChunk
 
 load_dotenv()  # Carica le variabili dal file .env
@@ -41,6 +44,60 @@ try:
     rag.load()
 except Exception as error:  # pragma: no cover
     rag_load_error = str(error)
+
+LEXICAL_FALLBACK_ENABLED = os.getenv("LEXICAL_FALLBACK_ENABLED", "1") != "0"
+LOG_RAG_EVENTS = os.getenv("LOG_RAG_EVENTS", "0") == "1"
+LOG_DIR = Path(os.getenv("LOG_DIR", "logs"))
+HARD_CODED_MODE = os.getenv("HARD_CODED_MODE", "all").strip().lower()
+HARD_CODED_CATEGORIES = {
+    "all": {"critical", "stable", "optional"},
+    "balanced": {"critical", "stable"},
+    "critical": {"critical"},
+}
+ALLOWED_HARD_CODED = HARD_CODED_CATEGORIES.get(HARD_CODED_MODE, {"critical", "stable"})
+
+
+def _log_rag_event(event: str, payload: dict) -> None:
+    if not LOG_RAG_EVENTS:
+        return
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    record = {
+        "event": event,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        **payload,
+    }
+    log_path = LOG_DIR / "rag_events.jsonl"
+    with log_path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+def _build_lexical_index(regime_ids: List[str]) -> LexicalFallbackIndex | None:
+    if rag_load_error:
+        return None
+    chunks: List[LexicalChunk] = []
+    try:
+        for payload in rag.iter_payload_chunks(regime_ids=regime_ids, batch_size=256):
+            regime = payload.get("regime")
+            source = payload.get("source")
+            chunk_id = payload.get("chunk_id")
+            text = payload.get("text")
+            if regime is None or source is None or chunk_id is None or text is None:
+                continue
+            chunks.append(
+                LexicalChunk(
+                    regime=str(regime),
+                    source=str(source),
+                    chunk_id=int(chunk_id),
+                    text=str(text),
+                )
+            )
+    except Exception:
+        return None
+    if not chunks:
+        return None
+    return LexicalFallbackIndex.from_chunks(chunks)
+
+
 
 
 class ChatRequest(BaseModel):
@@ -147,6 +204,15 @@ DEFAULT_REGIME_ID = next(
     (profile.regime_id for profile in REGIME_PROFILES if profile.is_default),
     REGIME_PROFILES[0].regime_id,
 )
+
+lexical_index: LexicalFallbackIndex | None = None
+if LEXICAL_FALLBACK_ENABLED:
+    regime_ids = [profile.regime_id for profile in REGIME_PROFILES]
+    lexical_index = _build_lexical_index(regime_ids)
+    if lexical_index is None:
+        lexical_index = LexicalFallbackIndex.from_local_index(
+            Path("rag_index/index.json")
+        )
 
 
 def _normalize_match_text(text: str) -> str:
@@ -297,6 +363,58 @@ def _normalize_tax_query(query: str) -> str:
     normalized = re.sub(r"[a-z0-9%]+", _canonicalize_tax_token, normalized)
     return re.sub(r"\s+", " ", normalized).strip()
 
+
+def _allow_hardcoded(category: str) -> bool:
+    return category in ALLOWED_HARD_CODED
+
+
+DEFINITION_PATTERNS = (
+    r"(?:cos'?e|cosa e|che cos'?e|che cosa e)",
+    r"(?:definizione di|definisci)",
+    r"(?:cosa significa|che significa|significa)",
+)
+
+
+def _extract_definition_term(query: str) -> str | None:
+    q = _normalize_tax_query(query)
+    if not any(re.search(pattern, q) for pattern in DEFINITION_PATTERNS):
+        return None
+
+    patterns = [
+        r"(?:cos'?e|cosa e|che cos'?e|che cosa e)\s+(?:il|lo|la|l')?\s*([^?.,;]+)",
+        r"(?:definizione di|definisci)\s+(?:il|lo|la|l')?\s*([^?.,;]+)",
+        r"(?:cosa significa|che significa|significa)\s+(?:il|lo|la|l')?\s*([^?.,;]+)",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, q)
+        if match:
+            term = match.group(1).strip()
+            term = re.sub(r"\s+", " ", term)
+            term = term.strip(" \"'")
+            if 1 <= len(term.split()) <= 6:
+                return term
+    return None
+
+
+def _term_appears_in_text(term: str, text: str) -> bool:
+    if not term or not text:
+        return False
+    pattern = re.compile(rf"\\b{re.escape(term)}\\b", flags=re.IGNORECASE)
+    return pattern.search(text) is not None
+
+
+def _collect_term_mentions(term: str, regime_id: str) -> List[LexicalChunk]:
+    if lexical_index is None:
+        return []
+    return lexical_index.find_mentions(term, regime_id=regime_id)
+
+
+def _definition_fallback_message(term: str) -> str:
+    return (
+        f"Il termine {term} è citato nei documenti disponibili ma non viene definito. "
+        "Se vuoi una definizione, aggiungi una fonte che lo spieghi oppure chiedi "
+        "una risposta generale senza vincoli di fonte."
+    )
 
 def _contains_percent_reference(query: str, value: str) -> bool:
     return re.search(rf"(?<!\d){re.escape(value)}\s*%", query) is not None
@@ -1113,6 +1231,16 @@ def _intent_expansions(query: str, regime_id: str) -> List[str]:
     q = _normalize_tax_query(query)
     expansions: List[str] = []
 
+    definition_term = _extract_definition_term(q)
+    if definition_term:
+        expansions.extend(
+            [
+                f"definizione {definition_term}",
+                f"cos'e {definition_term}",
+                f"{definition_term} significato",
+            ]
+        )
+
     if "ateco" in q:
         expansions.append("tabella coefficienti redditività ateco allegato 4")
 
@@ -1197,24 +1325,64 @@ def _merge_results(primary: List[RetrievedChunk], extras: List[RetrievedChunk], 
     return selected
 
 
-def _search_with_intent(query: str, regime_id: str) -> List[RetrievedChunk]:
+def _dynamic_score_thresholds(query: str) -> List[float]:
+    token_count = len(_normalize_tax_query(query).split())
+    if token_count <= 3:
+        return [0.16, 0.12, 0.08]
+    if token_count <= 6:
+        return [0.2, 0.14, 0.1]
+    return [0.22, 0.18, 0.12]
+
+
+def _search_with_intent(query: str, regime_id: str) -> tuple[List[RetrievedChunk], str]:
     normalized_query = _normalize_tax_query(query)
     primary_queries = [normalized_query]
     if query.strip() and normalized_query != query.strip().lower():
         primary_queries.append(query.strip())
 
-    primary_results: List[RetrievedChunk] = []
-    for primary_query in primary_queries:
-        primary_results.extend(
-            rag.search(primary_query, top_k=8, min_score=0.2, regime_ids=[regime_id])
-        )
+    thresholds = _dynamic_score_thresholds(normalized_query)
+    for threshold in thresholds:
+        primary_results: List[RetrievedChunk] = []
+        for primary_query in primary_queries:
+            primary_results.extend(
+                rag.search(
+                    primary_query,
+                    top_k=8,
+                    min_score=threshold,
+                    regime_ids=[regime_id],
+                )
+            )
 
-    extra_results: List[RetrievedChunk] = []
-    for expanded_query in _intent_expansions(normalized_query, regime_id=regime_id):
-        extra_results.extend(
-            rag.search(expanded_query, top_k=4, min_score=0.18, regime_ids=[regime_id])
+        extra_results: List[RetrievedChunk] = []
+        for expanded_query in _intent_expansions(normalized_query, regime_id=regime_id):
+            extra_results.extend(
+                rag.search(
+                    expanded_query,
+                    top_k=4,
+                    min_score=max(threshold - 0.02, 0.05),
+                    regime_ids=[regime_id],
+                )
+            )
+        merged = _merge_results(primary_results, extra_results, top_k=8)
+        if merged:
+            return merged, "semantic"
+
+    if lexical_index is None:
+        return [], "none"
+
+    lexical_hits = lexical_index.search(normalized_query, top_k=8, regime_id=regime_id)
+    if not lexical_hits:
+        return [], "none"
+    return [
+        RetrievedChunk(
+            regime=chunk.regime,
+            source=chunk.source,
+            chunk_id=chunk.chunk_id,
+            text=chunk.text,
+            score=score,
         )
-    return _merge_results(primary_results, extra_results, top_k=8)
+        for chunk, score in lexical_hits
+    ], "lexical"
 
 
 @app.post("/", response_model=ChatResponse)
@@ -1247,6 +1415,9 @@ async def read_root(payload: ChatRequest):
         return ChatResponse(message=_regime_scope_message(), sources=[])
 
     is_forfettario_regime = active_regime.regime_id == "forfettario"
+    allow_critical = _allow_hardcoded("critical")
+    allow_stable = _allow_hardcoded("stable")
+    allow_optional = _allow_hardcoded("optional")
 
     if _is_off_topic_query(contenuto):
         return ChatResponse(
@@ -1257,7 +1428,7 @@ async def read_root(payload: ChatRequest):
             sources=[],
         )
 
-    if is_forfettario_regime and _is_forfettario_intro_query(contenuto):
+    if allow_optional and is_forfettario_regime and _is_forfettario_intro_query(contenuto):
         return ChatResponse(
             message=(
                 "Il regime forfettario è un regime fiscale agevolato per partite IVA individuali. "
@@ -1273,7 +1444,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_ateco_coeff_query(contenuto):
+    if allow_critical and is_forfettario_regime and _is_ateco_coeff_query(contenuto):
         ateco_data = _extract_ateco_components(contenuto)
         if ateco_data is not None:
             prefix, subcode = ateco_data
@@ -1317,7 +1488,7 @@ async def read_root(payload: ChatRequest):
                 ],
             )
 
-    if is_forfettario_regime and _is_ateco_codes_query(contenuto):
+    if allow_critical and is_forfettario_regime and _is_ateco_codes_query(contenuto):
         return ChatResponse(
             message=(
                 "Nei documenti disponibili non c'è un elenco completo di tutti i codici ATECO italiani; "
@@ -1330,7 +1501,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_forfettario_query(contenuto) and _is_limit_query(contenuto) and _is_tax_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_forfettario_query(contenuto) and _is_limit_query(contenuto) and _is_tax_query(contenuto):
         return ChatResponse(
             message=(
                 "Per restare nel regime forfettario, nel periodo precedente ricavi o compensi non devono superare 85.000 euro; "
@@ -1343,7 +1514,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_forfettario_query(contenuto) and _is_limit_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_forfettario_query(contenuto) and _is_limit_query(contenuto):
         return ChatResponse(
             message=(
                 "Per il regime forfettario, la soglia ordinaria è 85.000 euro di ricavi o compensi. "
@@ -1355,7 +1526,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_forfettario_exit_100k_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_forfettario_exit_100k_query(contenuto):
         return ChatResponse(
             message=(
                 "Se superi 100.000 euro di ricavi o compensi nell'anno, l'uscita dal forfettario è immediata "
@@ -1366,7 +1537,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_cash_basis_threshold_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_cash_basis_threshold_query(contenuto):
         return ChatResponse(
             message=(
                 "Per le soglie del regime forfettario conta quanto incassi, non quanto fatturi, perché si applica "
@@ -1379,7 +1550,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_aliquota_5_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_aliquota_5_query(contenuto):
         return ChatResponse(
             message=(
                 "L'aliquota del 5% si applica alle nuove attività che rispettano i requisiti previsti "
@@ -1391,7 +1562,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_apply_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_apply_query(contenuto):
         return ChatResponse(
             message=(
                 "La domanda per la riduzione INPS del 35% è esclusivamente telematica. "
@@ -1404,7 +1575,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_deadline_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_deadline_query(contenuto):
         return ChatResponse(
             message=(
                 "La domanda per la riduzione contributiva INPS del 35% si presenta solo online nel Cassetto "
@@ -1419,7 +1590,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_late_deadline_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_late_deadline_query(contenuto):
         return ChatResponse(
             message=(
                 "Sì, puoi presentarla anche dopo il 28 febbraio, ma per i contribuenti già attivi la riduzione "
@@ -1432,7 +1603,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_short_deadline_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_short_deadline_query(contenuto):
         return ChatResponse(
             message=(
                 "Per i contribuenti già attivi, la domanda per la riduzione INPS del 35% va presentata "
@@ -1444,7 +1615,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_march_decorrenza_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_march_decorrenza_query(contenuto):
         return ChatResponse(
             message=(
                 "Se presenti la domanda il 10 marzo, la riduzione non decorre nell'anno in corso ma dal "
@@ -1456,7 +1627,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_new_activity_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_new_activity_query(contenuto):
         return ChatResponse(
             message=(
                 "Per una nuova attività, la richiesta della riduzione INPS del 35% va fatta dopo l'iscrizione "
@@ -1469,7 +1640,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_reapply_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_reapply_query(contenuto):
         return ChatResponse(
             message=(
                 "Sì, se rinunci puoi presentare una nuova domanda in seguito, purché tu sia ancora nel "
@@ -1483,7 +1654,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_renewal_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_renewal_query(contenuto):
         return ChatResponse(
             message=(
                 "Sì, l'agevolazione si rinnova se continui ad avere i requisiti del regime forfettario e "
@@ -1496,7 +1667,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_loss_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_loss_query(contenuto):
         return ChatResponse(
             message=(
                 "L'agevolazione del 35% si perde se non restano i requisiti per applicarla o se presenti "
@@ -1508,7 +1679,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_cassa_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_cassa_query(contenuto):
         return ChatResponse(
             message=(
                 "No, la riduzione INPS del 35% non si applica ai professionisti iscritti a una Cassa "
@@ -1522,7 +1693,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_inps_35_general_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_inps_35_general_query(contenuto):
         return ChatResponse(
             message=(
                 "La riduzione INPS del 35% è riservata agli imprenditori individuali forfettari iscritti alla "
@@ -1538,7 +1709,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_ex_datore_after_two_years_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_ex_datore_after_two_years_query(contenuto):
         return ChatResponse(
             message=(
                 "No, non è ostativo se il rapporto con l'ex datore di lavoro è cessato da oltre due periodi "
@@ -1551,7 +1722,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_srl_control_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_srl_control_query(contenuto):
         return ChatResponse(
             message=(
                 "In presenza di controllo, anche di fatto, una partecipazione in SRL può costituire causa "
@@ -1565,7 +1736,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_vies_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_vies_query(contenuto):
         return ChatResponse(
             message=(
                 "Sì, per il forfettario l'iscrizione al VIES è necessaria quando effettua operazioni "
@@ -1577,7 +1748,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_ads_reverse_charge_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_ads_reverse_charge_query(contenuto):
         return ChatResponse(
             message=(
                 "Per acquisti di servizi esteri come Google Ads o Facebook Ads, in forfettario si applica "
@@ -1590,7 +1761,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_bollo_exact_threshold_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_bollo_exact_threshold_query(contenuto):
         return ChatResponse(
             message=(
                 "No, con importo esattamente pari a 77,47 euro il bollo non si applica. "
@@ -1602,7 +1773,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_bollo_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_bollo_query(contenuto):
         return ChatResponse(
             message=(
                 "Sì, se la fattura supera 77,47 euro si applica l'imposta di bollo da 2,00 euro, "
@@ -1616,7 +1787,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_intrastat_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_intrastat_query(contenuto):
         return ChatResponse(
             message=(
                 "Nei documenti, l'Intrastat è richiamato per le operazioni di servizi B2B verso soggetti UE. "
@@ -1627,7 +1798,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_eu_b2c_services_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_eu_b2c_services_query(contenuto):
         return ChatResponse(
             message=(
                 "Nei documenti disponibili è trattata in modo esplicito soprattutto la casistica B2B UE "
@@ -1641,7 +1812,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_eu_b2b_services_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_eu_b2b_services_query(contenuto):
         return ChatResponse(
             message=(
                 "Per servizi B2B verso cliente UE, la fattura si emette senza IVA con dicitura "
@@ -1655,7 +1826,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_extra_ue_wording_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_extra_ue_wording_query(contenuto):
         return ChatResponse(
             message=(
                 "La dicitura da usare per servizi extra-UE è: "
@@ -1666,7 +1837,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_extra_ue_services_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_extra_ue_services_query(contenuto):
         return ChatResponse(
             message=(
                 "Per servizi verso cliente extra-UE, la fattura è senza IVA con dicitura: "
@@ -1679,7 +1850,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_employment_income_under_threshold_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_employment_income_under_threshold_query(contenuto):
         return ChatResponse(
             message=(
                 "Con reddito da lavoro dipendente pari a 29.000 euro, la sola soglia dei 30.000 euro "
@@ -1692,7 +1863,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_employment_income_threshold_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_employment_income_threshold_query(contenuto):
         return ChatResponse(
             message=(
                 "In generale, con redditi da lavoro dipendente o assimilati superiori a 30.000 euro "
@@ -1707,7 +1878,7 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
-    if is_forfettario_regime and _is_employment_cessation_query(contenuto):
+    if allow_stable and is_forfettario_regime and _is_employment_cessation_query(contenuto):
         return ChatResponse(
             message=(
                 "Sì: se il rapporto di lavoro dipendente è cessato, la soglia dei 30.000 euro non rileva "
@@ -1737,14 +1908,89 @@ async def read_root(payload: ChatRequest):
             sources=[],
         )
 
-    retrieved = _search_with_intent(contenuto, regime_id=active_regime.regime_id)
+    definition_term = _extract_definition_term(raw_contenuto)
+    term_mentions: List[LexicalChunk] = []
+    if definition_term:
+        term_mentions = _collect_term_mentions(definition_term, active_regime.regime_id)
+
+    retrieved, retrieval_mode = _search_with_intent(
+        contenuto, regime_id=active_regime.regime_id
+    )
     if not retrieved:
+        if definition_term and term_mentions:
+            _log_rag_event(
+                "definition_cited_not_defined",
+                {
+                    "query": raw_contenuto,
+                    "regime": active_regime.regime_id,
+                    "term": definition_term,
+                    "sources": list(dict.fromkeys(chunk.source for chunk in term_mentions))[:4],
+                },
+            )
+            return ChatResponse(
+                message=_definition_fallback_message(definition_term),
+                sources=list(dict.fromkeys(chunk.source for chunk in term_mentions))[:4],
+            )
+        _log_rag_event(
+            "rag_no_results",
+            {"query": raw_contenuto, "regime": active_regime.regime_id},
+        )
         return ChatResponse(
             message=(
                 f"Non trovo informazioni pertinenti nei documenti caricati per {active_regime.label.lower()}. "
                 "Riformula la domanda o aggiungi documentazione."
             ),
             sources=[],
+        )
+
+    if definition_term:
+        has_term_in_context = any(
+            _term_appears_in_text(definition_term, item.text) for item in retrieved
+        )
+        if retrieval_mode == "lexical" and (term_mentions or has_term_in_context):
+            sources = (
+                list(dict.fromkeys(chunk.source for chunk in term_mentions))[:4]
+                if term_mentions
+                else list(dict.fromkeys(item.source for item in retrieved))[:4]
+            )
+            _log_rag_event(
+                "definition_cited_not_defined",
+                {
+                    "query": raw_contenuto,
+                    "regime": active_regime.regime_id,
+                    "term": definition_term,
+                    "sources": sources,
+                },
+            )
+            return ChatResponse(
+                message=_definition_fallback_message(definition_term),
+                sources=sources,
+            )
+        if not has_term_in_context and term_mentions:
+            _log_rag_event(
+                "definition_cited_not_defined",
+                {
+                    "query": raw_contenuto,
+                    "regime": active_regime.regime_id,
+                    "term": definition_term,
+                    "sources": list(dict.fromkeys(chunk.source for chunk in term_mentions))[:4],
+                },
+            )
+            return ChatResponse(
+                message=_definition_fallback_message(definition_term),
+                sources=list(dict.fromkeys(chunk.source for chunk in term_mentions))[:4],
+            )
+
+    top_score = max(item.score for item in retrieved)
+    if top_score < 0.12:
+        _log_rag_event(
+            "rag_low_confidence",
+            {
+                "query": raw_contenuto,
+                "regime": active_regime.regime_id,
+                "top_score": top_score,
+                "sources": list(dict.fromkeys(item.source for item in retrieved))[:4],
+            },
         )
 
     context_blocks = []
@@ -1761,6 +2007,8 @@ async def read_root(payload: ChatRequest):
         f"Sei un assistente fiscale per {active_regime.label.lower()} in Italia. "
         "Rispondi solo con informazioni presenti nel CONTEXT. "
         "Se il CONTEXT non contiene una parte della risposta, dillo in una sola frase breve. "
+        "Se un termine è solo citato ma non definito, dillo esplicitamente. "
+        "Non affermare che un termine non è menzionato se compare nel CONTEXT. "
         "Non inventare norme, soglie o scadenze. "
         "Stile obbligatorio: italiano chiaro, tono professionale, nessun markdown, "
         "nessun uso di **, # o elenchi con trattini. "

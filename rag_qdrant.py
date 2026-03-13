@@ -5,6 +5,7 @@ import re
 from typing import Iterable, List
 
 import fitz  # PyMuPDF
+import xml.etree.ElementTree as ElementTree
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from sentence_transformers import SentenceTransformer
@@ -92,7 +93,7 @@ class QdrantRAG:
         for candidate in sorted(Path(base_dir).glob("Normativo_*")):
             if not candidate.is_dir():
                 continue
-            if any(candidate.glob("*.pdf")):
+            if any(candidate.rglob("*.pdf")) or any(candidate.rglob("*.xml")):
                 corpora.append(cls.derive_corpus_config(candidate))
         return corpora
 
@@ -128,6 +129,18 @@ class QdrantRAG:
             for page in document:
                 pages.append(page.get_text())
         return "".join(pages)
+
+    @staticmethod
+    def extract_text_from_xml(xml_path: Path) -> str:
+        tree = ElementTree.parse(xml_path)
+        root = tree.getroot()
+        text_parts: List[str] = []
+        for node in root.iter():
+            if node.text:
+                text_parts.append(node.text)
+            if node.tail:
+                text_parts.append(node.tail)
+        return " ".join(text_parts)
 
     def _collection_exists(self) -> bool:
         try:
@@ -191,24 +204,31 @@ class QdrantRAG:
     ) -> int:
         raw_chunks = []
         for corpus in corpora:
-            pdf_files = sorted(corpus.path.glob("*.pdf"))
-            if not pdf_files:
-                raise FileNotFoundError(f"Nessun PDF trovato in {corpus.path}")
-            for pdf_path in pdf_files:
-                text = self.extract_text_from_pdf(pdf_path)
+            doc_files = sorted(
+                [*corpus.path.rglob("*.pdf"), *corpus.path.rglob("*.xml")]
+            )
+            if not doc_files:
+                raise FileNotFoundError(
+                    f"Nessun documento .pdf/.xml trovato in {corpus.path}"
+                )
+            for doc_path in doc_files:
+                if doc_path.suffix.lower() == ".xml":
+                    text = self.extract_text_from_xml(doc_path)
+                else:
+                    text = self.extract_text_from_pdf(doc_path)
                 chunks = self.chunk_text(text, chunk_size=chunk_size, overlap=overlap)
                 for chunk_id, chunk_text in enumerate(chunks):
                     raw_chunks.append(
                         {
                             "regime": corpus.regime_id,
-                            "source": pdf_path.name,
+                            "source": doc_path.name,
                             "chunk_id": chunk_id,
                             "text": chunk_text,
                         }
                     )
 
         if not raw_chunks:
-            raise ValueError("Nessun chunk generato dai PDF")
+            raise ValueError("Nessun chunk generato dai documenti")
 
         probe_vec = self.embedder.embed_query(raw_chunks[0]["text"])
         self.ensure_collection(vector_size=len(probe_vec), recreate=recreate_collection)
@@ -258,6 +278,39 @@ class QdrantRAG:
         )
         if not points:
             raise ValueError(f"Collection Qdrant vuota: {self.collection_name}")
+
+    def iter_payload_chunks(
+        self,
+        regime_ids: List[str] | None = None,
+        batch_size: int = 256,
+    ) -> Iterable[dict]:
+        normalized_regimes = None
+        if regime_ids:
+            normalized_regimes = {
+                self.normalize_regime_id(item) for item in regime_ids if item
+            }
+
+        offset = None
+        while True:
+            points, next_offset = self.client.scroll(
+                collection_name=self.collection_name,
+                limit=batch_size,
+                offset=offset,
+                with_payload=True,
+                with_vectors=False,
+            )
+            if not points:
+                break
+            for point in points:
+                payload = point.payload or {}
+                if normalized_regimes:
+                    regime = payload.get("regime")
+                    if regime not in normalized_regimes:
+                        continue
+                yield payload
+            if next_offset is None:
+                break
+            offset = next_offset
 
     def search(
         self,

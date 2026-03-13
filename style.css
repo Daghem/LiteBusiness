@@ -1,4 +1,4 @@
-/* style.css - VERSIONE "MODERN & SEXY" */
+/* style.css - VERSIONE "MODERN & SEXY" CON GLASSMORPHISM */
 
 /* 1. Sfondo e Font Moderno */
 body {
@@ -17,13 +17,43 @@ body {
 
 /* 2. Header "Glassmorphism" (Effetto vetro) */
 .chat-header {
-  background: rgba(255, 255, 255, 0.9); /* Bianco semitrasparente */
-  backdrop-filter: blur(10px); /* Sfocatura sfondo */
-  color: #333;
-  padding: 20px;
+  position: fixed; /* Lo stacca dal flusso e lo fa galleggiare */
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.65); /* Bianco semitrasparente al 65% */
+  backdrop-filter: blur(12px); /* Sfocatura sfondo (magia del vetro) */
+  -webkit-backdrop-filter: blur(12px); /* Supporto Safari/iOS */
+  padding: 10px 0;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); /* Ombra morbida */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4); /* Riflesso del vetro */
   z-index: 1000;
+}
+
+.navbar-brand-chat {
+  position: relative;
+  padding-left: 95px !important; /* Spazio per il logo */
+  display: flex;
+  align-items: center;
+  text-decoration: none; /* Rimuove sottolineatura link */
+  color: inherit; /* Mantiene colore testo originale */
+}
+
+/* Regole specifiche per il logo nella chat */
+.chat-logo {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 70px; /* Stessa dimensione dell'index */
+  width: auto;
+  object-fit: contain;
+
+  /* --- AZZERAMENTO CORNICI --- */
+  border: none !important; /* Rimuove qualsiasi bordo */
+  background: transparent !important; /* Assicura sfondo trasparente */
+  box-shadow: none !important; /* Rimuove ombre che sembrano cornici */
+  padding: 0 !important; /* Rimuove padding interno */
 }
 
 /* 3. Area Chat */
@@ -31,6 +61,7 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 30px;
+  padding-top: 100px; /* IMPORTANTE: Spinge giù i messaggi per non farli coprire dall'header fisso */
   padding-bottom: 100px;
 }
 
@@ -152,47 +183,4 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.chat-header img {
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 2px;
-}
-
-/* --- PULIZIA E SISTEMAZIONE HEADER CHAT --- */
-
-.chat-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 10px 0; /* Ridotto leggermente per bilanciare il logo grande */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Questo è il bordo sotto l'header, tienilo se ti piace */
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.navbar-brand-chat {
-  position: relative;
-  padding-left: 95px !important; /* Spazio per il logo */
-  display: flex;
-  align-items: center;
-  text-decoration: none; /* Rimuove sottolineatura link */
-  color: inherit; /* Mantiene colore testo originale */
-}
-
-/* Regole specifiche per il logo nella chat */
-.chat-logo {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 70px; /* Stessa dimensione dell'index */
-  width: auto;
-  object-fit: contain;
-
-  /* --- AZZERAMENTO CORNICI --- */
-  border: none !important; /* Rimuove qualsiasi bordo */
-  background: transparent !important; /* Assicura sfondo trasparente */
-  box-shadow: none !important; /* Rimuove ombre che sembrano cornici */
-  padding: 0 !important; /* Rimuove padding interno */
 }

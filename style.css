@@ -65,6 +65,34 @@ body {
   padding-bottom: 100px;
 }
 
+.chat-history-tools {
+  margin-left: auto;
+}
+
+.history-badge {
+  font-size: 0.78rem;
+  color: #5f6c7b;
+  background: rgba(102, 126, 234, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.15);
+  border-radius: 999px;
+  padding: 8px 14px;
+  white-space: nowrap;
+}
+
+.history-reset-btn {
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-weight: 600;
+  border-color: rgba(45, 52, 54, 0.15);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.history-reset-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(102, 126, 234, 0.35);
+  color: #4f5fcf;
+}
+
 /* Scrollbar personalizzata (più sottile) */
 .chat-container::-webkit-scrollbar {
   width: 6px;
@@ -91,10 +119,14 @@ body {
   color: white;
   border-radius: 20px 20px 5px 20px; /* Forma più organica */
   padding: 15px 25px;
-  max-width: 70%;
   box-shadow: 0 10px 20px rgba(118, 75, 162, 0.2); /* Ombra colorata */
   font-size: 1rem;
   line-height: 1.5;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .message-ai {
@@ -104,16 +136,37 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
+.message-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: fit-content;
+}
+
+.message-card-user {
+  align-items: flex-end;
+  max-width: 70%;
+}
+
+.message-card-ai {
+  align-items: flex-start;
+  max-width: 80%;
+}
+
 .bubble-ai {
   background-color: white;
   color: #2d3436;
   border-radius: 20px 20px 20px 5px;
   padding: 20px 30px; /* Più spazioso */
-  max-width: 80%;
   border: none; /* Via i bordi vecchi */
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* Ombra leggerissima */
   font-size: 1rem;
   line-height: 1.6;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* 5. Stile per le Citazioni (RAG) più carino */
@@ -134,6 +187,51 @@ body {
   color: #27ae60;
   text-decoration: none;
   font-weight: 700;
+}
+
+.message-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.message-actions-user {
+  justify-content: flex-end;
+}
+
+.message-actions-ai {
+  justify-content: flex-start;
+}
+
+.message-action-btn {
+  border: 1px solid rgba(45, 52, 54, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+  color: #5f6c7b;
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font-size: 0.82rem;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-action-btn:hover:not(:disabled) {
+  background: #ffffff;
+  color: #2d3436;
+  border-color: rgba(102, 126, 234, 0.28);
+  transform: translateY(-1px);
+}
+
+.message-action-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
 }
 
 /* 6. Input Area "Galleggiante" */
@@ -182,5 +280,84 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.chat-header img {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 2px;
+}
+
+/* --- PULIZIA E SISTEMAZIONE HEADER CHAT --- */
+
+.chat-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 10px 0; /* Ridotto leggermente per bilanciare il logo grande */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Questo è il bordo sotto l'header, tienilo se ti piace */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-brand-chat {
+  position: relative;
+  padding-left: 95px !important; /* Spazio per il logo */
+  display: flex;
+  align-items: center;
+  text-decoration: none; /* Rimuove sottolineatura link */
+  color: inherit; /* Mantiene colore testo originale */
+}
+
+/* Regole specifiche per il logo nella chat */
+.chat-logo {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 70px; /* Stessa dimensione dell'index */
+  width: auto;
+  object-fit: contain;
+
+  /* --- AZZERAMENTO CORNICI --- */
+  border: none !important; /* Rimuove qualsiasi bordo */
+  background: transparent !important; /* Assicura sfondo trasparente */
+  box-shadow: none !important; /* Rimuove ombre che sembrano cornici */
+  padding: 0 !important; /* Rimuove padding interno */
+}
+
+@media (max-width: 768px) {
+  .chat-header .container {
+    justify-content: center !important;
+  }
+
+  .chat-history-tools {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  .history-badge {
+    font-size: 0.72rem;
+    padding: 7px 12px;
+  }
+
+  .chat-container {
+    padding: 20px 16px 110px;
+  }
+
+  .message-card-user,
+  .message-card-ai {
+    max-width: 88%;
+  }
+
+  .message-actions {
+    gap: 6px;
+  }
+
+  .message-action-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.76rem;
   }
 }

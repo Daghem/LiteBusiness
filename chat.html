@@ -18,7 +18,7 @@
   </head>
   <body>
     <div class="chat-header d-flex align-items-center">
-      <div class="container d-flex align-items-center">
+      <div class="container d-flex align-items-center justify-content-between gap-3 flex-wrap">
         <a
           class="navbar-brand-chat fw-bold fs-3"
           href="index.html"
@@ -27,26 +27,16 @@
           <img src="logo.png" alt="FlyTax Logo" class="chat-logo" />
           Fly<span class="text-primary">Tax</span>
         </a>
-      </div>
-    </div>
-
-    <div class="container chat-container" id="chatBox">
-      <div class="message-ai d-flex align-items-end mb-3">
-        <img
-          src="robot.png"
-          alt="Robot"
-          class="me-2 mb-1"
-          style="width: 65px; height: 65px; object-fit: contain"
-        />
-        <div class="bubble-ai">
-          <p class="mb-0">
-            Buongiorno. Sono l'assistente virtuale di
-            <strong>FlyTax</strong>. <br />Ponimi un quesito sul Regime
-            Forfettario e analizzerò le normative ufficiali per te.
-          </p>
+        <div class="chat-history-tools d-flex align-items-center gap-2">
+          <span class="history-badge">Cronologia salvata in questo browser</span>
+          <button class="btn btn-outline-secondary btn-sm history-reset-btn" id="resetChatButton" type="button">
+            Nuova chat
+          </button>
         </div>
       </div>
     </div>
+
+    <div class="container chat-container" id="chatBox"></div>
 
     <div class="input-area">
       <div class="container">
@@ -79,35 +69,31 @@
       const chatBox = document.getElementById("chatBox");
       const inputField = chatForm.querySelector("input");
       const sendButton = chatForm.querySelector("button[type='submit']");
+      const resetChatButton = document.getElementById("resetChatButton");
+      const CHAT_STORAGE_KEY = "flytax-chat-history-v1";
+      const INTRO_MESSAGE =
+        "Buongiorno. Sono l'assistente virtuale di FlyTax.\nPonimi un quesito sul Regime Forfettario e analizzerò le normative ufficiali per te.";
       let isRequestInFlight = false;
+      let chatHistory = [];
+
+      initializeChat();
 
       chatForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
         const userText = inputField.value.trim();
-        if (!userText) return;
-        if (isRequestInFlight) return;
+        if (!userText || isRequestInFlight) return;
 
         isRequestInFlight = true;
         inputField.disabled = true;
         sendButton.disabled = true;
 
-        appendMessage("user", userText);
+        addMessage("user", userText, []);
         inputField.value = "";
 
-        const loadingDiv = document.createElement("div");
-        loadingDiv.className = "message-ai d-flex align-items-end mb-3";
-        loadingDiv.id = "loadingIndicator";
-        loadingDiv.innerHTML = `
-          <img src="robot.png" alt="Robot" class="me-2 mb-1" style="width: 65px; height: 65px; object-fit: contain;">
-          <div class="bubble-ai" style="padding: 12px 24px;">
-            <div class="spinner-grow spinner-grow-sm text-primary opacity-50" role="status"></div>
-              <div class="spinner-grow spinner-grow-sm text-primary opacity-75 mx-1" role="status"></div>
-              <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
-          </div>
-        `;
+        const loadingDiv = createLoadingIndicator();
         chatBox.appendChild(loadingDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        scrollChatToBottom();
 
         try {
           const response = await fetch("http://localhost:8000/", {
@@ -119,25 +105,18 @@
           if (!response.ok) throw new Error("Errore dal server");
 
           const data = await response.json();
-
-          if (loadingDiv.parentNode) {
-            loadingDiv.remove();
-          }
-
-          const aiReply = data.message;
-          const aiSources = Array.isArray(data.sources) ? data.sources : [];
-
-          appendMessage("ai", aiReply, aiSources);
-        } catch (err) {
-          console.error("Errore:", err);
-
-          if (loadingDiv.parentNode) {
-            loadingDiv.remove();
-          }
-
-          appendMessage(
+          removeLoadingIndicator(loadingDiv);
+          addMessage("ai", data.message, Array.isArray(data.sources) ? data.sources : [], {
+            animate: true,
+          });
+        } catch (error) {
+          console.error("Errore:", error);
+          removeLoadingIndicator(loadingDiv);
+          addMessage(
             "ai",
             "Spiacente, impossibile connettersi al server. Assicurati che FastAPI sia avviato sulla porta 8000.",
+            [],
+            { animate: true },
           );
         } finally {
           isRequestInFlight = false;
@@ -147,86 +126,288 @@
         }
       });
 
-      function createLoadingIndicator() {
-        const wrapper = document.createElement("div");
-        wrapper.className = "message-ai";
+      resetChatButton.addEventListener("click", function () {
+        if (isRequestInFlight) return;
+        chatHistory = [];
+        localStorage.removeItem(CHAT_STORAGE_KEY);
+        renderChat();
+        inputField.value = "";
+        inputField.focus();
+      });
 
-        const bubble = document.createElement("div");
-        bubble.className = "bubble-ai";
-        bubble.style.padding = "12px 24px";
-
-        const opacities = ["0.5", "0.75", "1"];
-        opacities.forEach((opacity, idx) => {
-          const spinner = document.createElement("div");
-          spinner.className = "spinner-grow spinner-grow-sm text-primary";
-          spinner.setAttribute("role", "status");
-          spinner.style.opacity = opacity;
-          if (idx === 1) {
-            spinner.classList.add("mx-1");
-          }
-          bubble.appendChild(spinner);
-        });
-
-        wrapper.appendChild(bubble);
-        return wrapper;
+      function initializeChat() {
+        chatHistory = loadChatHistory();
+        renderChat();
       }
 
-      function appendMessage(sender, text, sources = null) {
+      function createMessageId() {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") {
+          return window.crypto.randomUUID();
+        }
+        return `msg-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function normalizeSources(sources) {
+        return Array.isArray(sources) ? sources.filter(Boolean) : [];
+      }
+
+      function loadChatHistory() {
+        try {
+          const raw = localStorage.getItem(CHAT_STORAGE_KEY);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return [];
+          return parsed
+            .filter((item) => item && item.sender && item.text)
+            .map((item) => ({
+              id: item.id || createMessageId(),
+              sender: item.sender,
+              text: item.text,
+              sources: normalizeSources(item.sources),
+            }));
+        } catch (error) {
+          console.error("Cronologia non leggibile:", error);
+          return [];
+        }
+      }
+
+      function saveChatHistory() {
+        try {
+          localStorage.setItem(
+            CHAT_STORAGE_KEY,
+            JSON.stringify(chatHistory.slice(-100)),
+          );
+        } catch (error) {
+          console.error("Cronologia non salvabile:", error);
+        }
+      }
+
+      function addMessage(sender, text, sources = [], options = {}) {
+        const message = {
+          id: createMessageId(),
+          sender,
+          text,
+          sources: normalizeSources(sources),
+        };
+        chatHistory.push(message);
+        saveChatHistory();
+        renderMessage(message, {
+          animate: options.animate === true && sender === "ai",
+        });
+      }
+
+      function renderChat() {
+        chatBox.innerHTML = "";
+        renderIntroMessage();
+        chatHistory.forEach((message) => renderMessage(message, { animate: false }));
+        scrollChatToBottom();
+      }
+
+      function renderIntroMessage() {
+        const introMessage = {
+          id: "intro",
+          sender: "ai",
+          text: INTRO_MESSAGE,
+          sources: [],
+        };
+        renderMessage(introMessage, { animate: false, isIntro: true });
+      }
+
+      function renderMessage(message, options = {}) {
+        const { animate = false, isIntro = false } = options;
         const msgDiv = document.createElement("div");
+        msgDiv.dataset.messageId = message.id;
         msgDiv.className =
-          sender === "user"
+          message.sender === "user"
             ? "message-user"
             : "message-ai d-flex align-items-end mb-3";
 
-        if (sender === "user") {
+        if (message.sender === "user") {
+          const contentWrap = document.createElement("div");
+          contentWrap.className = "message-card message-card-user";
+
           const bubble = document.createElement("div");
           bubble.className = "bubble-user";
-          bubble.textContent = text;
-          msgDiv.appendChild(bubble);
-          chatBox.appendChild(msgDiv);
-          chatBox.scrollTop = chatBox.scrollHeight;
-        } else {
-          const sourceList = Array.isArray(sources)
-            ? sources.filter(Boolean)
-            : sources
-              ? [sources]
-              : [];
+          bubble.textContent = message.text;
 
-          msgDiv.innerHTML = `
-            <img src="robot.png" alt="Robot" class="me-2 mb-1" style="width: 65px; height: 65px; object-fit: contain;">
-            <div class="bubble-ai">
-                <p class="mb-2 ai-text-container"></p>
-                ${
-                  sourceList.length > 0
-                    ? `
-                <div class="source-box" style="display: none;">
-                    <i class="fas fa-book me-1"></i> <strong>Informazione:</strong><br>
-                    <span class="source-link" style="color: #27ae60;">${sourceList.join("<br>")}</span>
-                </div>`
-                    : ""
-                }
-            </div>
-          `;
+          const actions = createMessageActions(message, { isIntro });
+          contentWrap.appendChild(bubble);
+          contentWrap.appendChild(actions);
+          msgDiv.appendChild(contentWrap);
           chatBox.appendChild(msgDiv);
-          const textContainer = msgDiv.querySelector(".ai-text-container");
-          const sourceBox = msgDiv.querySelector(".source-box");
-          const words = text.split(" ");
-          let i = 0;
+          scrollChatToBottom();
+          return;
+        }
+
+        msgDiv.innerHTML = `
+          <img src="robot.png" alt="Robot" class="me-2 mb-1" style="width: 65px; height: 65px; object-fit: contain;">
+          <div class="message-card message-card-ai">
+            <div class="bubble-ai">
+              <p class="mb-2 ai-text-container"></p>
+              ${
+                message.sources.length > 0
+                  ? `
+              <div class="source-box" style="display: none;">
+                <i class="fas fa-book me-1"></i> <strong>Informazione:</strong><br>
+                <span class="source-link" style="color: #27ae60;">${message.sources.join("<br>")}</span>
+              </div>`
+                  : ""
+              }
+            </div>
+          </div>
+        `;
+        chatBox.appendChild(msgDiv);
+
+        const card = msgDiv.querySelector(".message-card-ai");
+        const textContainer = msgDiv.querySelector(".ai-text-container");
+        const sourceBox = msgDiv.querySelector(".source-box");
+
+        if (animate) {
+          const words = message.text.split(" ");
+          let index = 0;
 
           function typeWriter() {
-            if (i < words.length) {
-              textContainer.textContent += words[i] + " ";
-              chatBox.scrollTop = chatBox.scrollHeight;
-              i++;
+            if (index < words.length) {
+              textContainer.textContent += `${words[index]} `;
+              scrollChatToBottom();
+              index++;
               setTimeout(typeWriter, 40);
-            } else if (sourceBox) {
-              sourceBox.style.display = "block";
-              chatBox.scrollTop = chatBox.scrollHeight;
+              return;
             }
+            if (sourceBox) {
+              sourceBox.style.display = "block";
+            }
+            card.appendChild(createMessageActions(message, { isIntro }));
+            scrollChatToBottom();
           }
 
           typeWriter();
+          return;
         }
+
+        textContainer.textContent = message.text;
+        if (sourceBox) {
+          sourceBox.style.display = message.sources.length > 0 ? "block" : "none";
+        }
+        card.appendChild(createMessageActions(message, { isIntro }));
+        scrollChatToBottom();
+      }
+
+      function createMessageActions(message, options = {}) {
+        const { isIntro = false } = options;
+        const actions = document.createElement("div");
+        actions.className =
+          message.sender === "user"
+            ? "message-actions message-actions-user"
+            : "message-actions message-actions-ai";
+
+        if (!isIntro) {
+          const copyButton = document.createElement("button");
+          copyButton.type = "button";
+          copyButton.className = "message-action-btn";
+          copyButton.innerHTML = '<i class="fas fa-copy" aria-hidden="true"></i>';
+          copyButton.title = "Copia il messaggio";
+          copyButton.setAttribute("aria-label", "Copia il messaggio");
+          copyButton.addEventListener("click", () => copyMessage(message, copyButton));
+          actions.appendChild(copyButton);
+        }
+
+        if (message.sender === "user" && !isIntro) {
+          const editButton = document.createElement("button");
+          editButton.type = "button";
+          editButton.className = "message-action-btn";
+          editButton.innerHTML = '<i class="fas fa-pen" aria-hidden="true"></i>';
+          editButton.title = "Riapre il messaggio e rimuove le risposte successive";
+          editButton.setAttribute("aria-label", "Modifica il messaggio");
+          editButton.addEventListener("click", () => editUserMessage(message.id));
+          actions.appendChild(editButton);
+        }
+
+        return actions;
+      }
+
+      async function copyMessage(message, button) {
+        const textToCopy =
+          message.sender === "ai" && message.sources.length > 0
+            ? `${message.text}\n\nFonti:\n${message.sources.join("\n")}`
+            : message.text;
+
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(textToCopy);
+          } else {
+            fallbackCopyText(textToCopy);
+          }
+          flashActionState(button, "Copiato");
+        } catch (error) {
+          console.error("Copia non riuscita:", error);
+          flashActionState(button, "Errore");
+        }
+      }
+
+      function fallbackCopyText(text) {
+        const tempArea = document.createElement("textarea");
+        tempArea.value = text;
+        tempArea.setAttribute("readonly", "");
+        tempArea.style.position = "absolute";
+        tempArea.style.left = "-9999px";
+        document.body.appendChild(tempArea);
+        tempArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempArea);
+      }
+
+      function flashActionState(button, label) {
+        const original = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i>';
+        button.setAttribute("aria-label", label);
+        button.disabled = true;
+        setTimeout(() => {
+          button.innerHTML = original;
+          button.setAttribute(
+            "aria-label",
+            original.includes("fa-pen") ? "Modifica il messaggio" : "Copia il messaggio",
+          );
+          button.disabled = false;
+        }, 1200);
+      }
+
+      function editUserMessage(messageId) {
+        if (isRequestInFlight) return;
+        const targetIndex = chatHistory.findIndex((message) => message.id === messageId);
+        if (targetIndex === -1) return;
+
+        inputField.value = chatHistory[targetIndex].text;
+        chatHistory = chatHistory.slice(0, targetIndex);
+        saveChatHistory();
+        renderChat();
+        inputField.focus();
+        inputField.setSelectionRange(inputField.value.length, inputField.value.length);
+      }
+
+      function createLoadingIndicator() {
+        const loadingDiv = document.createElement("div");
+        loadingDiv.className = "message-ai d-flex align-items-end mb-3";
+        loadingDiv.id = "loadingIndicator";
+        loadingDiv.innerHTML = `
+          <img src="robot.png" alt="Robot" class="me-2 mb-1" style="width: 65px; height: 65px; object-fit: contain;">
+          <div class="bubble-ai" style="padding: 12px 24px;">
+            <div class="spinner-grow spinner-grow-sm text-primary opacity-50" role="status"></div>
+            <div class="spinner-grow spinner-grow-sm text-primary opacity-75 mx-1" role="status"></div>
+            <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
+          </div>
+        `;
+        return loadingDiv;
+      }
+
+      function removeLoadingIndicator(loadingDiv) {
+        if (loadingDiv && loadingDiv.parentNode) {
+          loadingDiv.remove();
+        }
+      }
+
+      function scrollChatToBottom() {
+        chatBox.scrollTop = chatBox.scrollHeight;
       }
     </script>
   </body>

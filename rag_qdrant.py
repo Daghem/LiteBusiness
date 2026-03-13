@@ -1,9 +1,11 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+import re
+from typing import Iterable, List
 
 import fitz  # PyMuPDF
+import xml.etree.ElementTree as ElementTree
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from sentence_transformers import SentenceTransformer
@@ -11,10 +13,18 @@ from sentence_transformers import SentenceTransformer
 
 @dataclass
 class RetrievedChunk:
+    regime: str
     source: str
     chunk_id: int
     text: str
     score: float
+
+
+@dataclass(frozen=True)
+class CorpusConfig:
+    regime_id: str
+    label: str
+    path: Path
 
 
 class SentenceTransformerEmbedder:
@@ -60,6 +70,34 @@ class QdrantRAG:
         )
 
     @staticmethod
+    def normalize_regime_id(value: str) -> str:
+        text = value.strip().lower()
+        text = re.sub(r"^normativo_", "", text)
+        text = re.sub(r"_agg_\d{4}$", "", text)
+        text = re.sub(r"[^a-z0-9]+", "_", text)
+        text = re.sub(r"_+", "_", text).strip("_")
+        if text == "forfettari":
+            return "forfettario"
+        return text or "generico"
+
+    @classmethod
+    def derive_corpus_config(cls, pdf_dir: Path) -> CorpusConfig:
+        pdf_dir = Path(pdf_dir)
+        regime_id = cls.normalize_regime_id(pdf_dir.name)
+        label = regime_id.replace("_", " ").title()
+        return CorpusConfig(regime_id=regime_id, label=label, path=pdf_dir)
+
+    @classmethod
+    def discover_pdf_corpora(cls, base_dir: Path = Path(".")) -> List[CorpusConfig]:
+        corpora = []
+        for candidate in sorted(Path(base_dir).glob("Normativo_*")):
+            if not candidate.is_dir():
+                continue
+            if any(candidate.rglob("*.pdf")) or any(candidate.rglob("*.xml")):
+                corpora.append(cls.derive_corpus_config(candidate))
+        return corpora
+
+    @staticmethod
     def chunk_text(text: str, chunk_size: int = 1200, overlap: int = 200) -> List[str]:
         text = text.strip()
         if not text:
@@ -92,6 +130,18 @@ class QdrantRAG:
                 pages.append(page.get_text())
         return "".join(pages)
 
+    @staticmethod
+    def extract_text_from_xml(xml_path: Path) -> str:
+        tree = ElementTree.parse(xml_path)
+        root = tree.getroot()
+        text_parts: List[str] = []
+        for node in root.iter():
+            if node.text:
+                text_parts.append(node.text)
+            if node.tail:
+                text_parts.append(node.tail)
+        return " ".join(text_parts)
+
     def _collection_exists(self) -> bool:
         try:
             self.client.get_collection(self.collection_name)
@@ -114,35 +164,71 @@ class QdrantRAG:
                 ),
                 on_disk_payload=True,
             )
+        self._ensure_payload_indexes()
+
+    def _ensure_payload_indexes(self) -> None:
+        self.client.create_payload_index(
+            collection_name=self.collection_name,
+            field_name="regime",
+            field_schema=models.PayloadSchemaType.KEYWORD,
+            wait=True,
+        )
 
     def build_from_pdf_directory(
         self,
         pdf_dir: Path = Path("Normativo_Forfettari_Agg_2026"),
+        regime_id: str | None = None,
         chunk_size: int = 1200,
         overlap: int = 200,
         embed_batch_size: int = 32,
         recreate_collection: bool = True,
     ) -> int:
-        pdf_dir = Path(pdf_dir)
-        pdf_files = sorted(pdf_dir.glob("*.pdf"))
-        if not pdf_files:
-            raise FileNotFoundError(f"Nessun PDF trovato in {pdf_dir}")
+        corpus = self.derive_corpus_config(Path(pdf_dir))
+        if regime_id:
+            corpus = CorpusConfig(regime_id=self.normalize_regime_id(regime_id), label=corpus.label, path=corpus.path)
+        return self.build_from_pdf_directories(
+            corpora=[corpus],
+            chunk_size=chunk_size,
+            overlap=overlap,
+            embed_batch_size=embed_batch_size,
+            recreate_collection=recreate_collection,
+        )
 
+    def build_from_pdf_directories(
+        self,
+        corpora: Iterable[CorpusConfig],
+        chunk_size: int = 1200,
+        overlap: int = 200,
+        embed_batch_size: int = 32,
+        recreate_collection: bool = True,
+    ) -> int:
         raw_chunks = []
-        for pdf_path in pdf_files:
-            text = self.extract_text_from_pdf(pdf_path)
-            chunks = self.chunk_text(text, chunk_size=chunk_size, overlap=overlap)
-            for chunk_id, chunk_text in enumerate(chunks):
-                raw_chunks.append(
-                    {
-                        "source": pdf_path.name,
-                        "chunk_id": chunk_id,
-                        "text": chunk_text,
-                    }
+        for corpus in corpora:
+            doc_files = sorted(
+                [*corpus.path.rglob("*.pdf"), *corpus.path.rglob("*.xml")]
+            )
+            if not doc_files:
+                raise FileNotFoundError(
+                    f"Nessun documento .pdf/.xml trovato in {corpus.path}"
                 )
+            for doc_path in doc_files:
+                if doc_path.suffix.lower() == ".xml":
+                    text = self.extract_text_from_xml(doc_path)
+                else:
+                    text = self.extract_text_from_pdf(doc_path)
+                chunks = self.chunk_text(text, chunk_size=chunk_size, overlap=overlap)
+                for chunk_id, chunk_text in enumerate(chunks):
+                    raw_chunks.append(
+                        {
+                            "regime": corpus.regime_id,
+                            "source": doc_path.name,
+                            "chunk_id": chunk_id,
+                            "text": chunk_text,
+                        }
+                    )
 
         if not raw_chunks:
-            raise ValueError("Nessun chunk generato dai PDF")
+            raise ValueError("Nessun chunk generato dai documenti")
 
         probe_vec = self.embedder.embed_query(raw_chunks[0]["text"])
         self.ensure_collection(vector_size=len(probe_vec), recreate=recreate_collection)
@@ -161,6 +247,7 @@ class QdrantRAG:
                         id=point_id,
                         vector=vector,
                         payload={
+                            "regime": item["regime"],
                             "source": item["source"],
                             "chunk_id": item["chunk_id"],
                             "text": item["text"],
@@ -182,6 +269,7 @@ class QdrantRAG:
             raise FileNotFoundError(
                 f"Collection Qdrant non trovata: {self.collection_name}"
             )
+        self._ensure_payload_indexes()
         points, _ = self.client.scroll(
             collection_name=self.collection_name,
             limit=1,
@@ -191,17 +279,62 @@ class QdrantRAG:
         if not points:
             raise ValueError(f"Collection Qdrant vuota: {self.collection_name}")
 
+    def iter_payload_chunks(
+        self,
+        regime_ids: List[str] | None = None,
+        batch_size: int = 256,
+    ) -> Iterable[dict]:
+        normalized_regimes = None
+        if regime_ids:
+            normalized_regimes = {
+                self.normalize_regime_id(item) for item in regime_ids if item
+            }
+
+        offset = None
+        while True:
+            points, next_offset = self.client.scroll(
+                collection_name=self.collection_name,
+                limit=batch_size,
+                offset=offset,
+                with_payload=True,
+                with_vectors=False,
+            )
+            if not points:
+                break
+            for point in points:
+                payload = point.payload or {}
+                if normalized_regimes:
+                    regime = payload.get("regime")
+                    if regime not in normalized_regimes:
+                        continue
+                yield payload
+            if next_offset is None:
+                break
+            offset = next_offset
+
     def search(
         self,
         query: str,
         top_k: int = 4,
         min_score: float = 0.2,
+        regime_ids: List[str] | None = None,
     ) -> List[RetrievedChunk]:
         query = query.strip()
         if not query:
             return []
 
         query_vector = self.embedder.embed_query(query)
+        query_filter = None
+        if regime_ids:
+            normalized_regimes = [self.normalize_regime_id(item) for item in regime_ids if item]
+            if normalized_regimes:
+                if len(normalized_regimes) == 1:
+                    match = models.MatchValue(value=normalized_regimes[0])
+                else:
+                    match = models.MatchAny(any=normalized_regimes)
+                query_filter = models.Filter(
+                    must=[models.FieldCondition(key="regime", match=match)]
+                )
 
         # Compatibilita' tra versioni del client:
         # - nuove: query_points(...)
@@ -213,6 +346,7 @@ class QdrantRAG:
                 limit=top_k,
                 with_payload=True,
                 score_threshold=min_score,
+                query_filter=query_filter,
             )
             hits = response.points
         else:
@@ -222,18 +356,21 @@ class QdrantRAG:
                 limit=top_k,
                 with_payload=True,
                 score_threshold=min_score,
+                query_filter=query_filter,
             )
 
         results: List[RetrievedChunk] = []
         for hit in hits:
             payload = hit.payload or {}
+            regime = payload.get("regime")
             text = payload.get("text")
             source = payload.get("source")
             chunk_id = payload.get("chunk_id")
-            if text is None or source is None or chunk_id is None:
+            if regime is None or text is None or source is None or chunk_id is None:
                 continue
             results.append(
                 RetrievedChunk(
+                    regime=str(regime),
                     source=str(source),
                     chunk_id=int(chunk_id),
                     text=str(text),

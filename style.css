@@ -1,67 +1,55 @@
-/* style.css - VERSIONE "MODERN & SEXY" CON GLASSMORPHISM */
-
-/* 1. Sfondo e Font Moderno */
 body {
-  background: linear-gradient(
-    135deg,
-    #f5f7fa 0%,
-    #c3cfe2 100%
-  ); /* Sfumatura elegante */
-  font-family:
-    "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* Font più pulito */
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   height: 100vh;
   display: flex;
   flex-direction: column;
   margin: 0;
 }
 
-/* 2. Header "Glassmorphism" (Effetto vetro) */
 .chat-header {
-  position: fixed; /* Lo stacca dal flusso e lo fa galleggiare */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background: rgba(255, 255, 255, 0.65); /* Bianco semitrasparente al 65% */
-  backdrop-filter: blur(12px); /* Sfocatura sfondo (magia del vetro) */
-  -webkit-backdrop-filter: blur(12px); /* Supporto Safari/iOS */
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: 10px 0;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); /* Ombra morbida */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4); /* Riflesso del vetro */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   z-index: 1000;
 }
 
 .navbar-brand-chat {
   position: relative;
-  padding-left: 95px !important; /* Spazio per il logo */
+  padding-left: 95px !important;
   display: flex;
   align-items: center;
-  text-decoration: none; /* Rimuove sottolineatura link */
-  color: inherit; /* Mantiene colore testo originale */
+  text-decoration: none;
+  color: inherit;
 }
 
-/* Regole specifiche per il logo nella chat */
 .chat-logo {
   position: absolute;
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  height: 70px; /* Stessa dimensione dell'index */
+  height: 70px;
   width: auto;
   object-fit: contain;
-
-  /* --- AZZERAMENTO CORNICI --- */
-  border: none !important; /* Rimuove qualsiasi bordo */
-  background: transparent !important; /* Assicura sfondo trasparente */
-  box-shadow: none !important; /* Rimuove ombre che sembrano cornici */
-  padding: 0 !important; /* Rimuove padding interno */
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
-/* 3. Area Chat */
+/* --- SPAZIO AUMENTATO QUI SOTTO --- */
 .chat-container {
   flex: 1;
   overflow-y: auto;
   padding: 30px;
-  padding-top: 100px; /* IMPORTANTE: Spinge giù i messaggi per non farli coprire dall'header fisso */
+  padding-top: 140px; /* Da 100px a 140px per staccarlo dalla barra */
   padding-bottom: 100px;
 }
 
@@ -93,33 +81,28 @@ body {
   color: #4f5fcf;
 }
 
-/* Scrollbar personalizzata (più sottile) */
 .chat-container::-webkit-scrollbar {
   width: 6px;
 }
+
 .chat-container::-webkit-scrollbar-thumb {
   background-color: #ccc;
   border-radius: 10px;
 }
 
-/* 4. Messaggi (Bolle più rotonde e moderne) */
 .message-user {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 25px;
-  animation: fadeIn 0.3s ease; /* Animazione di entrata */
+  animation: fadeIn 0.3s ease;
 }
 
 .bubble-user {
-  background: linear-gradient(
-    135deg,
-    #667eea 0%,
-    #764ba2 100%
-  ); /* Sfumatura Viola/Blu moderna */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  border-radius: 20px 20px 5px 20px; /* Forma più organica */
+  border-radius: 20px 20px 5px 20px;
   padding: 15px 25px;
-  box-shadow: 0 10px 20px rgba(118, 75, 162, 0.2); /* Ombra colorata */
+  box-shadow: 0 10px 20px rgba(118, 75, 162, 0.2);
   font-size: 1rem;
   line-height: 1.5;
   overflow-wrap: break-word;
@@ -157,9 +140,9 @@ body {
   background-color: white;
   color: #2d3436;
   border-radius: 20px 20px 20px 5px;
-  padding: 20px 30px; /* Più spazioso */
-  border: none; /* Via i bordi vecchi */
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* Ombra leggerissima */
+  padding: 20px 30px;
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   font-size: 1rem;
   line-height: 1.6;
   overflow-wrap: break-word;
@@ -169,18 +152,18 @@ body {
   min-width: 0;
 }
 
-/* 5. Stile per le Citazioni (RAG) più carino */
 .source-box {
   font-size: 0.9rem;
   margin-top: 15px;
-  background-color: #f0fdf4; /* Verde chiarissimo */
-  border-left: 5px solid #2ecc71; /* Verde brillante */
+  background-color: #f0fdf4;
+  border-left: 5px solid #2ecc71;
   padding: 12px 15px;
   border-radius: 8px;
-  transition: transform 0.2s; /* Animazione al passaggio del mouse */
+  transition: transform 0.2s;
 }
+
 .source-box:hover {
-  transform: translateX(5px); /* Si sposta leggermente */
+  transform: translateX(5px);
 }
 
 .source-link {
@@ -234,44 +217,45 @@ body {
   cursor: default;
 }
 
-/* 6. Input Area "Galleggiante" */
 .input-area {
   position: fixed;
-  bottom: 20px; /* Staccato dal fondo */
+  bottom: 20px;
   left: 50%;
-  transform: translateX(-50%); /* Centrato */
-  width: 90%; /* Non occupa tutto lo schermo */
+  transform: translateX(-50%);
+  width: 90%;
   max-width: 800px;
   background-color: white;
   padding: 15px;
-  border-radius: 50px; /* Completamente rotondo */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Ombra profonda */
+  border-radius: 50px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 }
 
-/* Togliamo i bordi brutti dall'input */
 .input-group {
-  background: white;
+  background: transparent; /* Fixato per la dark mode */
 }
+
 .form-control {
-  border: none; /* Niente bordi */
+  border: none;
   background: transparent;
 }
+
 .form-control:focus {
-  box-shadow: none; /* Via l'alone blu standard */
+  box-shadow: none;
 }
+
 .btn-primary {
-  border-radius: 50px; /* Bottone rotondo */
+  border-radius: 50px;
   padding: 10px 25px;
   background: #667eea;
   border: none;
   transition: background 0.3s;
 }
+
 .btn-primary:hover {
-  background: #764ba2; /* Cambia colore al passaggio */
+  background: #764ba2;
 }
 
-/* Animazione semplice */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -283,81 +267,127 @@ body {
   }
 }
 
-.chat-header img {
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 2px;
-}
-
-/* --- PULIZIA E SISTEMAZIONE HEADER CHAT --- */
-
-.chat-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 10px 0; /* Ridotto leggermente per bilanciare il logo grande */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Questo è il bordo sotto l'header, tienilo se ti piace */
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.navbar-brand-chat {
-  position: relative;
-  padding-left: 95px !important; /* Spazio per il logo */
-  display: flex;
-  align-items: center;
-  text-decoration: none; /* Rimuove sottolineatura link */
-  color: inherit; /* Mantiene colore testo originale */
-}
-
-/* Regole specifiche per il logo nella chat */
-.chat-logo {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 70px; /* Stessa dimensione dell'index */
-  width: auto;
-  object-fit: contain;
-
-  /* --- AZZERAMENTO CORNICI --- */
-  border: none !important; /* Rimuove qualsiasi bordo */
-  background: transparent !important; /* Assicura sfondo trasparente */
-  box-shadow: none !important; /* Rimuove ombre che sembrano cornici */
-  padding: 0 !important; /* Rimuove padding interno */
-}
-
+/* --- SPAZIO AUMENTATO ANCHE SU MOBILE --- */
 @media (max-width: 768px) {
   .chat-header .container {
     justify-content: center !important;
   }
-
   .chat-history-tools {
     width: 100%;
     justify-content: center;
     margin-left: 0;
   }
-
   .history-badge {
     font-size: 0.72rem;
     padding: 7px 12px;
   }
-
   .chat-container {
-    padding: 20px 16px 110px;
+    padding: 140px 16px 110px; /* Da 100px a 140px */
   }
-
   .message-card-user,
   .message-card-ai {
     max-width: 88%;
   }
-
   .message-actions {
     gap: 6px;
   }
-
   .message-action-btn {
     width: 32px;
     height: 32px;
     font-size: 0.76rem;
   }
+}
+
+/* --- REGOLA MANCANTE PER DISEGNARE IL TOGGLE NELLA CHAT --- */
+.theme-switch-wrapper {
+  display: flex;
+  align-items: center;
+}
+.theme-switch {
+  display: inline-block;
+  height: 28px;
+  position: relative;
+  width: 54px;
+  margin-bottom: 0;
+}
+.theme-switch input {
+  display: none;
+}
+.slider {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: 0.4s;
+  border-radius: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+}
+.slider:before {
+  background-color: #ffffff;
+  bottom: 3px;
+  content: "";
+  height: 20px;
+  left: 3px;
+  position: absolute;
+  transition: 0.4s;
+  width: 20px;
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+input:checked + .slider {
+  background-color: #2ecc71;
+  border-color: #2ecc71;
+}
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+.slider-icon {
+  font-size: 12px;
+  z-index: 1;
+}
+
+/* --- FIX DARK MODE PER LA CHAT --- */
+body.dark-custom {
+  background: #121212 !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-custom .bubble-ai {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+  box-shadow: none !important;
+  border: 1px solid #333 !important;
+}
+
+body.dark-custom .source-box {
+  background-color: #18281f !important;
+  border-left-color: #27ae60 !important;
+}
+
+body.dark-custom .history-reset-btn {
+  background: #2b3035 !important;
+  color: #e0e0e0 !important;
+  border: none !important;
+}
+
+/* Scurisce la barra di input in basso */
+body.dark-custom .input-area {
+  background-color: #1e1e1e !important;
+  border: 1px solid #333 !important;
+}
+
+body.dark-custom .form-control {
+  color: white !important;
+}
+
+body.dark-custom .form-control::placeholder {
+  color: #888 !important;
 }

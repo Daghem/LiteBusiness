@@ -6,26 +6,22 @@
 body {
   font-family: "Inter", sans-serif;
   color: #2d3436;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
-/* Navbar più leggera e trasparente */
-.navbar {
-  backdrop-filter: blur(10px);
-  background-color: rgba(33, 37, 41, 0.95) !important;
-  padding: 1rem 0;
-}
-
-/* Hero Section con gradiente leggero */
 .hero-section {
   background: radial-gradient(circle at top right, #e9ecef, #ffffff);
   padding: 120px 0;
+  transition: background 0.3s ease;
 }
 
-/* Card con animazione Hover */
 .card {
   transition:
     transform 0.3s ease,
-    box-shadow 0.3s ease;
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
   border-radius: 16px;
 }
 
@@ -34,7 +30,6 @@ body {
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Icone stilizzate */
 .feature-icon {
   width: 60px;
   height: 60px;
@@ -48,7 +43,6 @@ body {
   margin-bottom: 1.5rem;
 }
 
-/* Bottoni arrotondati */
 .btn {
   padding: 0.8rem 2rem;
   border-radius: 8px;
@@ -66,11 +60,14 @@ body {
   box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);
 }
 
-/* Form migliorato */
 .form-control {
   border-radius: 10px;
   padding: 1rem;
   border: 1px solid #dee2e6;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
 }
 
 .form-control:focus {
@@ -78,33 +75,135 @@ body {
   border-color: #0d6efd;
 }
 
-/* Badge */
 .badge {
   font-weight: 500;
   padding: 0.5em 1em;
 }
 
-.navbar-logo {
-  transition: transform 0.3s ease;
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 60px; /* Qui puoi aumentare quanto vuoi! */
-  width: auto;
-  transition: transform 0.3s ease;
-  z-index: 10;
-}
-
-.navbar-brand:hover .navbar-logo {
-  transform: translateY(-50%) scale(1.1);
-}
-
-.navbar-brand {
-  position: relative;
-  /* Aumenta questo valore finché il testo non è alla distanza desiderata */
-  padding-left: 110px !important;
+.theme-switch-wrapper {
   display: flex;
   align-items: center;
-  min-height: 60px; /* Aiuta a mantenere l'allineamento verticale */
+}
+
+.theme-switch {
+  display: inline-block;
+  height: 28px;
+  position: relative;
+  width: 54px;
+  margin-bottom: 0;
+}
+
+.theme-switch input {
+  display: none;
+}
+
+.slider {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: 0.4s;
+  border-radius: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+}
+
+.slider:before {
+  background-color: #ffffff;
+  bottom: 3px;
+  content: "";
+  height: 20px;
+  left: 3px;
+  position: absolute;
+  transition: 0.4s;
+  width: 20px;
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .slider {
+  background-color: #2ecc71;
+  border-color: #2ecc71;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider-icon {
+  font-size: 12px;
+  z-index: 1;
+}
+
+/* =========================================================
+   DARK MODE OVERRIDES (Il fix definitivo per la leggibilità)
+   ========================================================= */
+body.dark-custom {
+  background-color: #121212 !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-custom .hero-section {
+  background: radial-gradient(circle at top right, #1e1e1e, #121212) !important;
+}
+
+body.dark-custom #sezione-contatti {
+  background-color: #181818 !important;
+}
+
+body.dark-custom .bg-white,
+body.dark-custom .card {
+  background-color: #1e1e1e !important;
+  border: 1px solid #333 !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-custom .bg-light {
+  background-color: #242424 !important;
+  color: #e0e0e0 !important;
+}
+
+/* QUESTO RENDE LE SCRITTE LEGGIBILI */
+body.dark-custom .text-muted {
+  color: #a0aab2 !important;
+}
+
+body.dark-custom .text-dark {
+  color: #e0e0e0 !important;
+}
+
+body.dark-custom .form-control {
+  background-color: #242424 !important;
+  border-color: #444 !important;
+  color: #ffffff !important;
+}
+
+body.dark-custom .form-control::placeholder {
+  color: #777 !important;
+}
+
+body.dark-custom .btn-outline-dark {
+  color: #e0e0e0;
+  border-color: #e0e0e0;
+}
+
+body.dark-custom .btn-outline-dark:hover {
+  background-color: #e0e0e0;
+  color: #121212;
+}
+
+body.dark-custom .dropdown-menu {
+  background-color: #1e1e1e !important;
+  border: 1px solid #333 !important;
+}
+
+body.dark-custom .dropdown-menu .text-muted {
+  color: #a0aab2 !important;
 }

@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlyTax - Dashboard</title>
+    <script>
+      (function () {
+        const savedTheme = localStorage.getItem("flytax-theme");
+        if (savedTheme === "dark") {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="dashboard-orbit orbit-a"></div>
+    <div class="dashboard-orbit orbit-b"></div>
+
+    <div class="dashboard-shell">
+      <header class="topbar">
+        <a class="brand-link" href="index.html">
+          <img src="logo.png" alt="FlyTax Logo" />
+          <span>FlyTax Dashboard</span>
+        </a>
+        <div class="topbar-actions">
+          <button class="btn btn-light theme-toggle" id="themeToggle" type="button" aria-label="Attiva tema scuro">
+            <i class="fas fa-moon"></i>
+            <span>Tema scuro</span>
+          </button>
+          <a class="btn btn-light" href="chat.html">Workspace chat</a>
+        </div>
+      </header>
+
+      <main class="dashboard-grid">
+        <section class="hero-card">
+          <div class="hero-main">
+            <div>
+              <p class="eyebrow">Panoramica workspace</p>
+              <h1>Dashboard del workspace forfettario</h1>
+              <p class="hero-copy">
+                Monitora l'uso del workspace, le domande più frequenti,
+                i feedback recenti e le conversazioni salvate del regime
+                forfettario in un'unica vista.
+              </p>
+            </div>
+            <div class="hero-pills">
+              <span>Regime forfettario</span>
+              <span>Metriche workspace</span>
+              <span>Cronologia e feedback</span>
+            </div>
+          </div>
+          <div class="hero-tools">
+            <div class="hero-side-note">
+              <strong>Vista utente</strong>
+              <span>Questa dashboard mostra solo dati di utilizzo e contenuti del workspace. Le funzioni tecniche e documentali restano nell'area admin separata.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="stats-grid" id="statsGrid"></section>
+
+        <section class="panel-card">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Query frequenti</p>
+              <h2>Domande top</h2>
+            </div>
+          </div>
+          <div class="list-stack" id="topQuestions"></div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Feedback</p>
+              <h2>Ultimi segnali utenti</h2>
+            </div>
+          </div>
+          <div class="list-stack" id="recentFeedback"></div>
+        </section>
+
+        <section class="panel-card wide-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Cronologia</p>
+              <h2>Chat recenti</h2>
+            </div>
+          </div>
+          <div class="list-stack" id="recentChats"></div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const DEFAULT_API_BASE = "http://localhost:8000";
+      const API_BASE_KEY = "flytax-api-base-url";
+      const themeToggle = document.getElementById("themeToggle");
+      const statsGrid = document.getElementById("statsGrid");
+      const topQuestions = document.getElementById("topQuestions");
+      const recentFeedback = document.getElementById("recentFeedback");
+      const recentChats = document.getElementById("recentChats");
+
+      syncThemeToggle();
+      loadOverview();
+
+      themeToggle.addEventListener("click", function () {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        if (isDark) {
+          document.documentElement.removeAttribute("data-theme");
+          localStorage.setItem("flytax-theme", "light");
+        } else {
+          document.documentElement.setAttribute("data-theme", "dark");
+          localStorage.setItem("flytax-theme", "dark");
+        }
+        syncThemeToggle();
+      });
+
+      function syncThemeToggle() {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        themeToggle.innerHTML = isDark
+          ? '<i class="fas fa-sun"></i><span>Tema chiaro</span>'
+          : '<i class="fas fa-moon"></i><span>Tema scuro</span>';
+        themeToggle.setAttribute(
+          "aria-label",
+          isDark ? "Attiva tema chiaro" : "Attiva tema scuro",
+        );
+      }
+
+      async function loadOverview() {
+        try {
+          const response = await fetch(`${getApiBaseUrl()}/admin/overview`);
+          const data = await response.json();
+          if (!response.ok) throw new Error("Panoramica non disponibile");
+          renderStats(data.stats);
+          renderSimpleList(topQuestions, data.stats.top_questions, "Nessuna domanda registrata.");
+          renderFeedback(data.recent_feedback || []);
+          renderChats(data.recent_chats || []);
+        } catch (error) {
+          statsGrid.innerHTML = `<p class="text-danger mb-0">${error.message}</p>`;
+        }
+      }
+
+      function renderStats(stats) {
+        const cards = [
+          ["Chat salvate", stats.total_chats],
+          ["Messaggi totali", stats.total_messages],
+          ["Feedback positivi", stats.positive_feedback],
+          ["Feedback negativi", stats.negative_feedback],
+          ["No results", stats.no_result_events],
+          ["Bassa confidenza", stats.low_confidence_events],
+        ];
+        statsGrid.innerHTML = cards
+          .map(
+            ([label, value]) => `
+              <article class="stat-card">
+                <span>${label}</span>
+                <strong>${value}</strong>
+              </article>`,
+          )
+          .join("");
+      }
+
+      function renderSimpleList(container, items, emptyMessage) {
+        if (!items.length) {
+          container.innerHTML = `<p class="empty-line">${emptyMessage}</p>`;
+          return;
+        }
+        container.innerHTML = items.map((item) => `<div class="list-row">${escapeHtml(item)}</div>`).join("");
+      }
+
+      function renderFeedback(items) {
+        if (!items.length) {
+          recentFeedback.innerHTML = "<p class='empty-line'>Nessun feedback registrato.</p>";
+          return;
+        }
+        recentFeedback.innerHTML = items
+          .reverse()
+          .map(
+            (item) => `
+              <div class="list-row">
+                <strong>${item.vote === "up" ? "Positivo" : "Negativo"}</strong>
+                <span>${escapeHtml(item.message || "")}</span>
+              </div>`,
+          )
+          .join("");
+      }
+
+      function renderChats(items) {
+        if (!items.length) {
+          recentChats.innerHTML = "<p class='empty-line'>Nessuna chat disponibile.</p>";
+          return;
+        }
+        recentChats.innerHTML = items
+          .map(
+            (item) => `
+              <div class="list-row">
+                <strong>${escapeHtml(item.title)}</strong>
+                <span>${item.message_count} messaggi</span>
+              </div>`,
+          )
+          .join("");
+      }
+
+      function getApiBaseUrl() {
+        return (localStorage.getItem(API_BASE_KEY) || DEFAULT_API_BASE).replace(/\/$/, "");
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+    </script>
+  </body>
+</html>

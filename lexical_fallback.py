@@ -15,6 +15,8 @@ class LexicalChunk:
     source: str
     chunk_id: int
     text: str
+    page_start: int | None = None
+    page_end: int | None = None
 
 
 class LexicalFallbackIndex:
@@ -43,6 +45,8 @@ class LexicalFallbackIndex:
                     source=source,
                     chunk_id=int(item.get("chunk_id", 0)),
                     text=str(item.get("text", "")),
+                    page_start=None,
+                    page_end=None,
                 )
             )
         return cls(chunks) if chunks else None

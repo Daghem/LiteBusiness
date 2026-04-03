@@ -3,11 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FlyTax | Soluzioni Digitali</title>
+    <title>FlyTax | Workspace Forfettario</title>
+    <script>
+      (function () {
+        const savedTheme = localStorage.getItem("flytax-theme");
+        if (savedTheme === "dark") {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap"
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
       rel="stylesheet"
     />
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -16,376 +35,317 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
     />
+
     <link rel="stylesheet" href="style_home.css" />
   </head>
   <body>
-    <div
-      class="fixed-top d-flex justify-content-center mt-4 px-3"
-      style="z-index: 1030; gap: 12px"
-    >
-      <nav
-        class="navbar navbar-expand-lg navbar-dark shadow-lg py-2"
-        style="
-          background-color: rgba(15, 15, 15, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-radius: 50px;
-          width: 100%;
-          max-width: 1200px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        "
-      >
-        <div class="container-fluid ps-0 pe-4">
-          <a class="navbar-brand d-flex align-items-center" href="#">
-            <img
-              src="logo.png"
-              alt="FlyTax Logo"
-              class="me-2"
-              style="height: 35px; width: auto"
-            />
-            <span class="fw-bold fs-5 mb-0"
-              >Fly<span class="text-primary">Tax</span></span
-            >
-          </a>
+    <div class="page-orbit orbit-one"></div>
+    <div class="page-orbit orbit-two"></div>
 
-          <button
-            class="navbar-toggler border-0"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
+    <nav class="navbar navbar-expand-lg sticky-top">
+      <div class="container site-shell">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+          <img
+            src="logo.png"
+            alt="FlyTax Logo"
+            class="navbar-logo me-2"
+          />
+          <span class="brand-wordmark">
+            Fly<span class="text-accent">Tax</span>
+          </span>
+        </a>
 
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto align-items-center fw-semibold">
-              <li class="nav-item">
-                <a class="nav-link px-3 text-light py-1" href="#">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link px-3 text-light py-1" href="#sezione-servizi"
-                  >Servizi</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link px-3 text-light py-1"
-                  href="#sezione-contatti"
-                  >Contatti</a
-                >
-              </li>
-            </ul>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <div class="nav-item dropdown">
-              <button
-                class="btn btn-outline-light rounded-pill px-4 py-1 fw-bold"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                data-bs-auto-close="outside"
-              >
-                Accedi
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center">
+            <li class="nav-item"><a class="nav-link px-3" href="#overview">Panoramica</a></li>
+            <li class="nav-item"><a class="nav-link px-3" href="#sezione-servizi">Funzioni</a></li>
+            <li class="nav-item"><a class="nav-link px-3" href="#sezione-contatti">Contatti</a></li>
+            <li class="nav-item ms-lg-2">
+              <button class="btn theme-toggle" id="themeToggle" type="button" aria-label="Attiva tema scuro">
+                <i class="bi bi-moon-stars"></i>
+                <span>Tema scuro</span>
               </button>
+            </li>
+            <li class="nav-item ms-lg-2">
+              <a class="btn btn-nav" href="chat.html">Apri workspace</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
-              <div
-                class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 p-4"
-                style="
-                  width: 300px;
-                  border-radius: 20px;
-                  background-color: #ffffff;
-                "
-              >
-                <form>
-                  <div class="mb-3">
-                    <label
-                      class="form-label small fw-bold text-muted text-uppercase"
-                      >Email o Username</label
-                    >
-                    <input
-                      type="text"
-                      class="form-control bg-light border-0 py-2"
-                      placeholder="mario@studio.it"
-                      required
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label
-                      class="form-label small fw-bold text-muted text-uppercase"
-                      >Password</label
-                    >
-                    <input
-                      type="password"
-                      class="form-control bg-light border-0 py-2"
-                      placeholder="••••••••"
-                      required
-                    />
-                  </div>
-                  <div class="mb-3 form-check">
-                    <input
-                      type="checkbox"
-                      class="form-check-input"
-                      id="ricordami"
-                    />
-                    <label
-                      class="form-check-label small text-muted"
-                      for="ricordami"
-                      >Ricordami</label
-                    >
-                  </div>
-                  <button
-                    type="submit"
-                    class="btn btn-primary w-100 fw-bold rounded-pill shadow-sm"
-                  >
-                    Entra
-                  </button>
-                </form>
+    <header class="hero-section" id="overview">
+      <div class="container site-shell">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow-wrap">
+              <span class="eyebrow-chip">Regime forfettario</span>
+              <span class="eyebrow-chip secondary">Assistente + simulatore + ops</span>
+            </div>
+            <h1 class="hero-title">
+              La cabina di controllo per lavorare sul
+              <span class="text-accent">forfettario</span>
+              in modo più rapido e più leggibile.
+            </h1>
+            <p class="hero-lead">
+              FlyTax unisce chat documentale, fonti normative con estratti,
+              simulazione fiscale orientativa e dashboard operativa in un'unica
+              esperienza pensata per studi e consulenza.
+            </p>
 
-                <div class="dropdown-divider my-3"></div>
+            <div class="hero-actions">
+              <a class="btn btn-primary btn-hero" href="chat.html">
+                Apri workspace
+                <i class="bi bi-arrow-up-right"></i>
+              </a>
+              <a class="btn btn-secondary btn-hero" href="admin.html">
+                Apri dashboard
+                <i class="bi bi-grid-1x2"></i>
+              </a>
+            </div>
 
-                <div class="text-center">
-                  <small class="text-muted">Nuovo su FlyTax?</small><br />
-                  <a
-                    href="#"
-                    class="text-primary fw-bold text-decoration-none"
-                    style="font-size: 0.9rem"
-                    >Registrati ora</a
-                  >
-                </div>
-              </div>
+            <div class="hero-proof">
+              <article class="proof-card">
+                <strong>Chat persistita</strong>
+                <span>Cronologia lato server + browser</span>
+              </article>
+              <article class="proof-card">
+                <strong>Fonti ricche</strong>
+                <span>Estratti, score e pagine dove disponibili</span>
+              </article>
+              <article class="proof-card">
+                <strong>Workflow unico</strong>
+                <span>Q&A, simulatore e gestione documenti nello stesso flusso</span>
+              </article>
             </div>
           </div>
-        </div>
-      </nav>
 
-      <div
-        class="d-flex align-items-center justify-content-center px-3 shadow-lg"
-        style="
-          background-color: rgba(15, 15, 15, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-radius: 50px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        "
-      >
-        <label class="theme-switch m-0" for="checkbox">
-          <input type="checkbox" id="checkbox" />
-          <div class="slider round">
-            <i class="bi bi-moon-stars-fill text-light slider-icon"></i>
-            <i class="bi bi-sun-fill text-warning slider-icon"></i>
-          </div>
-        </label>
-      </div>
-    </div>
-    <header
-      class="hero-section"
-      style="padding-top: 220px; padding-bottom: 60px"
-    >
-      <div class="container">
-        <div class="row gx-5 align-items-center justify-content-center">
-          <div class="col-lg-8 text-center">
-            <h1 class="display-3 fw-800 mb-3">
-              L'Evoluzione Digitale per
-              <span class="text-primary">Commercialisti</span>
-            </h1>
-            <p class="lead text-muted mb-5 fs-4">
-              Semplifica la gestione, proteggi i dati e scala il tuo studio con
-              tecnologie all'avanguardia.
-            </p>
-            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-              <a class="btn btn-primary btn-lg shadow" href="chat.html"
-                >Inizia Ora</a
-              >
-              <a class="btn btn-outline-dark btn-lg" href="#sezione-servizi"
-                >Scopri i Servizi</a
-              >
+          <div class="hero-visual">
+            <div class="hero-dashboard">
+              <div class="dashboard-ribbon">
+                <span>Workspace attivo</span>
+                <span>Forfettario only</span>
+              </div>
+
+              <div class="dashboard-stage">
+                <article class="visual-panel large">
+                  <div class="visual-panel-head">
+                    <span>Assistente documentale</span>
+                    <strong>Confidenza media</strong>
+                  </div>
+                  <p>
+                    “Per il regime forfettario la soglia ordinaria è 85.000 euro,
+                    con uscita immediata oltre 100.000 euro.”
+                  </p>
+                  <div class="source-pill-row">
+                    <span class="source-pill">Circolare 32/E</span>
+                    <span class="source-pill">Legge 190/2014</span>
+                  </div>
+                </article>
+
+                <div class="visual-split">
+                  <article class="visual-panel accent">
+                    <div class="metric-badge">Simulatore</div>
+                    <strong class="metric-value">Netto stimato</strong>
+                    <span class="metric-caption">Ricavi, ATECO, aliquota e previdenza in un colpo solo</span>
+                  </article>
+                  <article class="visual-panel muted">
+                    <div class="metric-badge">Ops</div>
+                    <strong class="metric-value">Upload + reindex</strong>
+                    <span class="metric-caption">Nuovi PDF/XML e monitoraggio query senza risultato</span>
+                  </article>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </header>
 
-    <main class="py-5 mt-n5">
-      <div class="container px-5">
-        <div class="row gx-5">
-          <div class="col-lg-4 mb-5">
-            <div class="card h-100 border-0 shadow">
-              <div class="card-body p-4">
-                <div
-                  class="badge bg-primary-subtle text-primary rounded-pill mb-3"
-                >
-                  Focus News
-                </div>
-                <h5 class="fw-bold mb-3">Semplicità di Gestione</h5>
-                <p class="text-muted">
-                  Interfacce intuitive progettate per ridurre il carico
-                  cognitivo e velocizzare i processi quotidiani.
-                </p>
-              </div>
-            </div>
+    <main>
+      <section class="spotlight-section">
+        <div class="container site-shell">
+          <div class="section-head centered">
+            <span class="section-kicker">Panoramica</span>
+            <h2>Tre modalità, una sola interfaccia di lavoro</h2>
+            <p>
+              Niente salti tra strumenti diversi: ricerca normativa, stima e
+              controllo operativo convivono nello stesso ambiente.
+            </p>
           </div>
-          <div class="col-lg-4 mb-5">
-            <div class="card h-100 border-0 shadow">
-              <div class="card-body p-4">
-                <div
-                  class="badge bg-success-subtle text-success rounded-pill mb-3"
-                >
-                  Premium
-                </div>
-                <h5 class="fw-bold mb-3">Design Responsivo</h5>
-                <p class="text-muted">
-                  Accedi ai tuoi dati ovunque tu sia: il tuo ufficio è sempre in
-                  tasca con la nostra ottimizzazione mobile.
-                </p>
-              </div>
-            </div>
+
+          <div class="spotlight-grid">
+            <article class="spotlight-card lift-card">
+              <span class="card-tag">01</span>
+              <h3>Workspace conversazionale</h3>
+              <p>
+                Cronologia salvata, risposte esportabili, feedback rapido e
+                consultazione delle fonti in un formato davvero leggibile.
+              </p>
+            </article>
+
+            <article class="spotlight-card glass-card">
+              <span class="card-tag">02</span>
+              <h3>Simulatore forfettario</h3>
+              <p>
+                Una stima orientativa costruita sul tuo scenario, utile nelle
+                prime analisi o durante il confronto con il cliente.
+              </p>
+            </article>
+
+            <article class="spotlight-card ember-card">
+              <span class="card-tag">03</span>
+              <h3>Dashboard operativa</h3>
+              <p>
+                Caricamento documenti, reindicizzazione, metriche e feedback
+                recenti per capire subito dove il sistema risponde bene e dove
+                va rinforzato.
+              </p>
+            </article>
           </div>
-          <div class="col-lg-4 mb-5">
-            <div class="card h-100 border-0 shadow">
-              <div class="card-body p-4">
-                <div class="badge bg-info-subtle text-info rounded-pill mb-3">
-                  Versatilità
+        </div>
+      </section>
+
+      <section class="workflow-section">
+        <div class="container site-shell">
+          <div class="workflow-layout">
+            <div class="section-head">
+              <span class="section-kicker">Metodo</span>
+              <h2>Disegnato per un progetto verticale, non per una demo generica</h2>
+              <p>
+                L'interfaccia riflette il focus del progetto: regime
+                forfettario, documentazione ufficiale, operatività rapida.
+              </p>
+            </div>
+
+            <div class="workflow-steps">
+              <article class="workflow-step">
+                <span>01</span>
+                <div>
+                  <h3>Interroga la base normativa</h3>
+                  <p>La chat usa retrieval, fallback e risposta sintetica con fonti in chiaro.</p>
                 </div>
-                <h5 class="fw-bold mb-3">Custom Ready</h5>
-                <p class="text-muted">
-                  Architettura flessibile che si integra perfettamente con i
-                  software che già utilizzi nel tuo studio.
-                </p>
-              </div>
+              </article>
+              <article class="workflow-step">
+                <span>02</span>
+                <div>
+                  <h3>Valuta un caso con il simulatore</h3>
+                  <p>Inserisci i dati essenziali e ottieni una fotografia numerica immediata.</p>
+                </div>
+              </article>
+              <article class="workflow-step">
+                <span>03</span>
+                <div>
+                  <h3>Mantieni viva la base documentale</h3>
+                  <p>Dashboard e reindex chiudono il ciclo senza uscire dall'app.</p>
+                </div>
+              </article>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </section>
 
-    <section id="sezione-servizi" class="py-5 bg-light">
-      <div class="container px-5 my-5">
-        <div class="text-center mb-5">
-          <h2 class="fw-800 display-5 mb-3">I Nostri Servizi</h2>
-          <div
-            class="mx-auto"
-            style="
-              width: 60px;
-              height: 4px;
-              background: #0d6efd;
-              border-radius: 2px;
-              margin-bottom: 20px;
-            "
-          ></div>
-          <p class="lead text-muted">
-            Soluzioni su misura per il mercato professionale italiano.
-          </p>
-        </div>
-        <div class="row gx-5">
-          <div class="col-lg-4 mb-5">
-            <div class="card h-100 border-0 p-4 text-center">
-              <div class="feature-icon mx-auto shadow-sm">
-                <i class="bi bi-laptop"></i>
-              </div>
-              <h4 class="fw-bold">Web Design</h4>
-              <p class="text-muted">
-                Siti vetrina eleganti per posizionare il tuo brand professionale
-                al top.
-              </p>
-            </div>
+      <section id="sezione-servizi" class="service-section">
+        <div class="container site-shell">
+          <div class="section-head centered">
+            <span class="section-kicker">Funzioni Chiave</span>
+            <h2>Una UI più netta, più veloce da leggere, più adatta al lavoro reale</h2>
+            <p>
+              Ogni area del prodotto è stata pensata per ridurre frizione,
+              aumentare chiarezza e rendere le informazioni più “consultabili”.
+            </p>
           </div>
-          <div class="col-lg-4 mb-5">
-            <div class="card h-100 border-0 p-4 text-center">
-              <div class="feature-icon mx-auto shadow-sm">
-                <i class="bi bi-graph-up-arrow"></i>
+
+          <div class="service-grid">
+            <article class="service-card">
+              <div class="feature-icon">
+                <i class="bi bi-chat-square-text"></i>
               </div>
-              <h4 class="fw-bold">Marketing</h4>
-              <p class="text-muted">
-                Strategie SEO e social per attirare i clienti che il tuo studio
-                merita.
+              <h3>Risposte con struttura migliore</h3>
+              <p>
+                Il workspace mette in evidenza confidenza, fonti e azioni
+                disponibili senza appesantire il flusso della conversazione.
               </p>
-            </div>
-          </div>
-          <div class="col-lg-4 mb-5">
-            <div class="card h-100 border-0 p-4 text-center">
-              <div class="feature-icon mx-auto shadow-sm">
-                <i class="bi bi-shield-check"></i>
+            </article>
+
+            <article class="service-card">
+              <div class="feature-icon">
+                <i class="bi bi-calculator-fill"></i>
               </div>
-              <h4 class="fw-bold">Sicurezza</h4>
-              <p class="text-muted">
-                Crittografia end-to-end per la massima protezione dei dati
-                sensibili.
+              <h3>Simulatori e pannelli compatti</h3>
+              <p>
+                Le utilità non sono appendici sparse: vivono in pannelli chiari,
+                apribili e coerenti con il resto del prodotto.
               </p>
-            </div>
+            </article>
+
+            <article class="service-card">
+              <div class="feature-icon">
+                <i class="bi bi-kanban-fill"></i>
+              </div>
+              <h3>Dashboard che sembra una dashboard</h3>
+              <p>
+                Più gerarchia visiva, metriche leggibili e sezioni che aiutano a
+                capire davvero cosa sta succedendo nell'app.
+              </p>
+            </article>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section
-      id="sezione-contatti"
-      class="py-5"
-      style="background-color: #fbfcfe"
-    >
-      <div class="container px-5 my-5">
-        <div class="row gx-5 justify-content-center align-items-center">
-          <div class="col-lg-5 mb-5 mb-lg-0">
-            <div class="pe-lg-5">
-              <span
-                class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill"
-                >Contattaci</span
-              >
-              <h2 class="fw-800 display-5 mb-4">
-                Per qualsiasi informazione contattaci
-              </h2>
-              <p class="lead text-muted mb-5">
-                Ci occuperemo di prendere in visione la richiesta e verrai
-                ricontattato al più presto
+      <section id="sezione-contatti" class="contact-section">
+        <div class="container site-shell">
+          <div class="contact-shell">
+            <div class="contact-copy">
+              <span class="section-kicker">Contatti</span>
+              <h2>Vuoi adattare FlyTax al tuo flusso di lavoro?</h2>
+              <p>
+                Raccontaci il tuo scenario. Possiamo partire dalla UI attuale,
+                dai documenti normativi già caricati o da un workflow che vuoi
+                rendere più rapido.
               </p>
 
-              <div class="d-flex align-items-center mb-4">
-                <div
-                  class="flex-shrink-0 bg-white shadow-sm p-3 rounded-4 text-primary"
-                >
-                  <i class="bi bi-envelope-at fs-4"></i>
+              <div class="contact-points">
+                <div class="contact-point">
+                  <i class="bi bi-envelope-at"></i>
+                  <div>
+                    <strong>Email</strong>
+                    <span>info@flytax.it</span>
+                  </div>
                 </div>
-                <div class="ms-4">
-                  <h6 class="mb-0 fw-bold">Email</h6>
-                  <p class="text-muted mb-0">info@flytax.it</p>
+                <div class="contact-point">
+                  <i class="bi bi-geo-alt"></i>
+                  <div>
+                    <strong>Sede</strong>
+                    <span>Milano, Distretto Digitale</span>
+                  </div>
                 </div>
-              </div>
-
-              <div class="d-flex align-items-center mb-4">
-                <div
-                  class="flex-shrink-0 bg-white shadow-sm p-3 rounded-4 text-primary"
-                >
-                  <i class="bi bi-geo-alt fs-4"></i>
-                </div>
-                <div class="ms-4">
-                  <h6 class="mb-0 fw-bold">Sede</h6>
-                  <p class="text-muted mb-0">Valdagno, Distretto Digitale</p>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <div
-                  class="flex-shrink-0 bg-white shadow-sm p-3 rounded-4 text-primary"
-                >
-                  <i class="bi bi-clock fs-4"></i>
-                </div>
-                <div class="ms-4">
-                  <h6 class="mb-0 fw-bold">Risposta garantita</h6>
-                  <p class="text-muted mb-0">Entro 24 ore lavorative</p>
+                <div class="contact-point">
+                  <i class="bi bi-clock-history"></i>
+                  <div>
+                    <strong>Tempo di risposta</strong>
+                    <span>Entro 24 ore lavorative</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="col-lg-7">
-            <div class="bg-white p-4 p-md-5 rounded-5 shadow-lg border-0">
+            <div class="contact-card">
               <form id="contactForm">
                 <div class="row g-3">
                   <div class="col-md-6">
-                    <label
-                      class="form-label small fw-bold text-uppercase text-muted"
-                      >Nome Cognome</label
-                    >
+                    <label class="form-label">Nome e cognome</label>
                     <input
-                      class="form-control bg-light border-0 py-3"
+                      class="form-control"
                       id="name"
                       type="text"
                       placeholder="Mario Rossi"
@@ -393,32 +353,26 @@
                     />
                   </div>
                   <div class="col-md-6">
-                    <label
-                      class="form-label small fw-bold text-uppercase text-muted"
-                      >Email</label
-                    >
+                    <label class="form-label">Email</label>
                     <input
-                      class="form-control bg-light border-0 py-3"
+                      class="form-control"
                       id="email"
                       type="email"
                       placeholder="mario@studio.it"
                       required
                     />
                   </div>
-                  <div class="col-12 mt-4">
-                    <label
-                      class="form-label small fw-bold text-uppercase text-muted"
-                      >Richiesta</label
-                    >
+                  <div class="col-12">
+                    <label class="form-label">Richiesta</label>
                     <textarea
-                      class="form-control bg-light border-0 py-3"
+                      class="form-control"
                       id="message"
-                      placeholder="Descrivici la tua richiesta"
+                      placeholder="Descrivi il tipo di supporto o personalizzazione che ti serve"
                       style="height: 12rem"
                       required
                     ></textarea>
                   </div>
-                  <div class="col-12 mt-4">
+                  <div class="col-12">
                     <div class="form-check mb-4">
                       <input
                         class="form-check-input"
@@ -426,19 +380,13 @@
                         id="privacy"
                         required
                       />
-                      <label
-                        class="form-check-label small text-muted"
-                        for="privacy"
-                      >
-                        Accetto il trattamento dei dati secondo la Privacy
-                        Policy
+                      <label class="form-check-label small text-muted" for="privacy">
+                        Accetto il trattamento dei dati secondo la Privacy Policy
                       </label>
                     </div>
-                    <button
-                      class="btn btn-primary btn-lg w-100 py-3 shadow-sm fw-bold"
-                      type="submit"
-                    >
-                      Invia Richiesta <i class="bi bi-arrow-right ms-2"></i>
+                    <button class="btn btn-primary btn-submit w-100" type="submit">
+                      Invia richiesta
+                      <i class="bi bi-arrow-right"></i>
                     </button>
                   </div>
                 </div>
@@ -446,26 +394,52 @@
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
 
-    <footer class="py-5 bg-dark text-white-50">
-      <div class="container text-center">
-        <small>Copyright &copy; 2026 FlyTax. Tutti i diritti riservati.</small>
-        <div class="mt-2">
-          <a href="#" class="text-white-50 me-3 text-decoration-none"
-            >Privacy Policy</a
-          >
-          <a href="#" class="text-white-50 text-decoration-none"
-            >Termini di Servizio</a
-          >
+    <footer class="site-footer">
+      <div class="container site-shell footer-shell">
+        <div>
+          <strong>FlyTax</strong>
+          <p>Workspace verticale per il regime forfettario.</p>
+        </div>
+        <div class="footer-links">
+          <a href="chat.html">Workspace</a>
+          <a href="admin.html">Dashboard</a>
+          <a href="#sezione-contatti">Contatti</a>
         </div>
       </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
+      const themeToggle = document.getElementById("themeToggle");
+
+      function syncThemeToggle() {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        themeToggle.innerHTML = isDark
+          ? '<i class="bi bi-sun"></i><span>Tema chiaro</span>'
+          : '<i class="bi bi-moon-stars"></i><span>Tema scuro</span>';
+        themeToggle.setAttribute(
+          "aria-label",
+          isDark ? "Attiva tema chiaro" : "Attiva tema scuro",
+        );
+      }
+
+      themeToggle.addEventListener("click", function () {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        if (isDark) {
+          document.documentElement.removeAttribute("data-theme");
+          localStorage.setItem("flytax-theme", "light");
+        } else {
+          document.documentElement.setAttribute("data-theme", "dark");
+          localStorage.setItem("flytax-theme", "dark");
+        }
+        syncThemeToggle();
+      });
+
+      syncThemeToggle();
+
       document
         .getElementById("contactForm")
         .addEventListener("submit", function (e) {
@@ -473,33 +447,6 @@
           alert("Messaggio inviato! Ti ricontatteremo a breve.");
           this.reset();
         });
-    </script>
-
-    <script>
-      const toggleSwitch = document.querySelector(
-        '.theme-switch input[type="checkbox"]',
-      );
-      const currentTheme = localStorage.getItem("theme");
-
-      if (currentTheme) {
-        document.documentElement.setAttribute("data-bs-theme", currentTheme);
-        if (currentTheme === "dark") {
-          toggleSwitch.checked = true;
-          document.body.classList.add("dark-custom");
-        }
-      }
-
-      toggleSwitch.addEventListener("change", function (e) {
-        if (e.target.checked) {
-          document.documentElement.setAttribute("data-bs-theme", "dark");
-          document.body.classList.add("dark-custom");
-          localStorage.setItem("theme", "dark");
-        } else {
-          document.documentElement.setAttribute("data-bs-theme", "light");
-          document.body.classList.remove("dark-custom");
-          localStorage.setItem("theme", "light");
-        }
-      });
     </script>
   </body>
 </html>

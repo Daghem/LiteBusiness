@@ -18,6 +18,8 @@ class RetrievedChunk:
     chunk_id: int
     text: str
     score: float
+    page_start: int | None = None
+    page_end: int | None = None
 
 
 @dataclass(frozen=True)
@@ -130,6 +132,44 @@ class QdrantRAG:
                 pages.append(page.get_text())
         return "".join(pages)
 
+    @classmethod
+    def extract_pdf_chunks(
+        cls,
+        pdf_path: Path,
+        chunk_size: int = 1200,
+        overlap: int = 200,
+    ) -> List[dict]:
+        chunks: List[dict] = []
+        with fitz.open(pdf_path) as document:
+            for page_index, page in enumerate(document, start=1):
+                page_text = page.get_text().strip()
+                for chunk_text in cls.chunk_text(
+                    page_text,
+                    chunk_size=chunk_size,
+                    overlap=overlap,
+                ):
+                    chunks.append(
+                        {
+                            "text": chunk_text,
+                            "page_start": page_index,
+                            "page_end": page_index,
+                        }
+                    )
+        return chunks
+
+    @classmethod
+    def extract_xml_chunks(
+        cls,
+        xml_path: Path,
+        chunk_size: int = 1200,
+        overlap: int = 200,
+    ) -> List[dict]:
+        text = cls.extract_text_from_xml(xml_path)
+        return [
+            {"text": chunk_text, "page_start": None, "page_end": None}
+            for chunk_text in cls.chunk_text(text, chunk_size=chunk_size, overlap=overlap)
+        ]
+
     @staticmethod
     def extract_text_from_xml(xml_path: Path) -> str:
         tree = ElementTree.parse(xml_path)
@@ -213,17 +253,26 @@ class QdrantRAG:
                 )
             for doc_path in doc_files:
                 if doc_path.suffix.lower() == ".xml":
-                    text = self.extract_text_from_xml(doc_path)
+                    chunks = self.extract_xml_chunks(
+                        doc_path,
+                        chunk_size=chunk_size,
+                        overlap=overlap,
+                    )
                 else:
-                    text = self.extract_text_from_pdf(doc_path)
-                chunks = self.chunk_text(text, chunk_size=chunk_size, overlap=overlap)
-                for chunk_id, chunk_text in enumerate(chunks):
+                    chunks = self.extract_pdf_chunks(
+                        doc_path,
+                        chunk_size=chunk_size,
+                        overlap=overlap,
+                    )
+                for chunk_id, chunk_data in enumerate(chunks):
                     raw_chunks.append(
                         {
                             "regime": corpus.regime_id,
                             "source": doc_path.name,
                             "chunk_id": chunk_id,
-                            "text": chunk_text,
+                            "text": chunk_data["text"],
+                            "page_start": chunk_data.get("page_start"),
+                            "page_end": chunk_data.get("page_end"),
                         }
                     )
 
@@ -251,6 +300,8 @@ class QdrantRAG:
                             "source": item["source"],
                             "chunk_id": item["chunk_id"],
                             "text": item["text"],
+                            "page_start": item.get("page_start"),
+                            "page_end": item.get("page_end"),
                         },
                     )
                 )
@@ -366,6 +417,8 @@ class QdrantRAG:
             text = payload.get("text")
             source = payload.get("source")
             chunk_id = payload.get("chunk_id")
+            page_start = payload.get("page_start")
+            page_end = payload.get("page_end")
             if regime is None or text is None or source is None or chunk_id is None:
                 continue
             results.append(
@@ -375,6 +428,8 @@ class QdrantRAG:
                     chunk_id=int(chunk_id),
                     text=str(text),
                     score=float(hit.score),
+                    page_start=int(page_start) if page_start is not None else None,
+                    page_end=int(page_end) if page_end is not None else None,
                 )
             )
         return results

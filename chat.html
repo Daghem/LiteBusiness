@@ -3,7 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FlyTax - Assistente Forfettario</title>
+    <title>FlyTax - Workspace AI</title>
+    <script>
+      (function () {
+        const savedTheme = localStorage.getItem("flytax-theme");
+        if (savedTheme === "dark") {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -13,189 +28,215 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-    />
 
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div
-      class="fixed-top d-flex justify-content-center mt-4 px-3"
-      style="z-index: 1030; gap: 12px"
-    >
-      <nav
-        class="navbar navbar-dark shadow-lg py-2 px-4"
-        style="
-          background-color: rgba(15, 15, 15, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-radius: 50px;
-          width: 100%;
-          max-width: 1200px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        "
-      >
-        <div
-          class="container-fluid ps-0 pe-0 d-flex justify-content-between align-items-center"
-        >
-          <div class="d-flex align-items-center">
-            <button
-              class="btn btn-link text-white p-0 me-3 border-0"
-              id="sidebarToggleBtn"
-              aria-label="Apri menu"
-            >
-              <i class="bi bi-list fs-3"></i>
-            </button>
-            <a
-              class="navbar-brand d-flex align-items-center m-0"
-              href="index.html"
-            >
-              <img
-                src="logo.png"
-                alt="FlyTax Logo"
-                class="me-2"
-                style="height: 35px; width: auto"
-              />
-              <span class="fw-bold fs-5 mb-0 text-white"
-                >Fly<span class="text-primary">Tax</span></span
-              >
-            </a>
-          </div>
+    <div class="workspace-orbit orbit-a"></div>
+    <div class="workspace-orbit orbit-b"></div>
 
-          <div class="d-flex align-items-center gap-3">
-            <span
-              class="history-badge d-none d-md-inline border-0 text-white-50"
-              >Cronologia salvata</span
-            >
-            <button
-              class="btn btn-outline-light rounded-pill px-4 py-1 fw-bold border-0 history-reset-btn"
-              id="resetChatButton"
-              type="button"
-            >
-              Nuova chat
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      <div
-        class="d-flex align-items-center justify-content-center px-3 shadow-lg"
-        style="
-          background-color: rgba(15, 15, 15, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-radius: 50px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        "
-      >
-        <label class="theme-switch m-0" for="checkbox">
-          <input type="checkbox" id="checkbox" />
-          <div class="slider round">
-            <i class="bi bi-moon-stars-fill text-light slider-icon"></i>
-            <i class="bi bi-sun-fill text-warning slider-icon"></i>
-          </div>
-        </label>
-      </div>
-    </div>
-
-    <div id="flytax-sidebar" class="flytax-sidebar shadow-lg">
-      <div class="d-flex flex-column h-100 p-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h5 class="fw-bold mb-0 text-primary">Il tuo spazio</h5>
-          <button
-            class="btn btn-link text-secondary p-0 border-0"
-            id="closeSidebarBtn"
-          >
-            <i class="bi bi-x-lg fs-5"></i>
+    <div class="chat-header">
+      <div class="container-fluid shell-container">
+        <a class="navbar-brand-chat fw-bold fs-3" href="index.html">
+          <img src="logo.png" alt="FlyTax Logo" class="chat-logo" />
+          Fly<span class="text-primary">Tax</span>
+        </a>
+        <div class="header-actions">
+          <button class="btn btn-light shell-btn theme-toggle" id="themeToggle" type="button" aria-label="Attiva tema scuro">
+            <i class="fas fa-moon"></i>
+            <span>Tema scuro</span>
           </button>
-        </div>
-
-        <div class="mb-4">
-          <h6 class="text-uppercase text-muted small fw-bold mb-3">
-            Cronologia Chat
-          </h6>
-          <ul class="list-unstyled d-flex flex-column gap-2">
-            <li>
-              <a href="#" class="sidebar-link"
-                ><i class="bi bi-chat-left-text me-2"></i> Regime Forfettario
-                2026</a
-              >
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-auto">
-          <h6 class="text-uppercase text-muted small fw-bold mb-3">
-            Preferiti
-          </h6>
-          <ul class="list-unstyled d-flex flex-column gap-2">
-            <li>
-              <a href="#" class="sidebar-link"
-                ><i class="bi bi-star-fill text-warning me-2"></i> Messaggi
-                Salvati</a
-              >
-            </li>
-          </ul>
-        </div>
-
-        <div class="mt-auto pt-3 border-top border-secondary-subtle">
-          <a
-            href="#"
-            class="d-flex align-items-center gap-3 sidebar-account text-decoration-none"
-          >
-            <i class="bi bi-person-circle fs-2 text-secondary"></i>
-            <span class="fw-bold text-truncate">Mario Rossi</span>
+          <button class="btn btn-light shell-btn" id="newChatButton" type="button">
+            <i class="fas fa-plus"></i> Nuova chat
+          </button>
+          <a class="btn btn-light shell-btn" href="admin.html">
+            <i class="fas fa-chart-line"></i> Dashboard
           </a>
         </div>
       </div>
     </div>
 
-    <div class="container chat-container" id="chatBox"></div>
-
-    <div class="input-area">
-      <div class="container">
-        <form id="chatForm">
-          <div class="input-group">
-            <input
-              type="text"
-              class="form-control form-control-lg"
-              placeholder="Es: Posso scaricare le spese auto?"
-              required
-            />
-            <button class="btn btn-primary btn-lg" type="submit">
-              <i class="fas fa-paper-plane"></i>
+    <div class="workspace-shell">
+      <aside class="history-panel">
+        <div class="panel-card history-card">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Cronologia</p>
+              <h2 class="panel-title">Chat salvate</h2>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" id="refreshHistoryButton" type="button">
+              <i class="fas fa-rotate"></i>
             </button>
           </div>
-          <div class="text-center mt-2">
-            <small class="text-muted" style="font-size: 0.7rem"
-              >FlyTax AI può commettere errori. Verificare sempre le fonti
-              citate.</small
-            >
+          <div class="history-list" id="historyList"></div>
+        </div>
+
+        <article class="panel-card sidebar-tool simulator-card">
+          <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+            <div>
+              <p class="panel-eyebrow">Strumento</p>
+              <h3 class="utility-title">Simulatore forfettario</h3>
+            </div>
+            <button class="btn btn-outline-primary btn-sm" id="toggleSimulatorButton" type="button">
+              Apri
+            </button>
+          </div>
+
+          <div class="simulator-body" id="simulatorBody" hidden>
+            <form id="simulatorForm" class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Ricavi</label>
+                <input class="form-control" id="simRicavi" type="number" min="0" step="0.01" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Codice ATECO</label>
+                <input class="form-control" id="simAteco" type="text" placeholder="es. 62.01" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Coefficiente % opzionale</label>
+                <input class="form-control" id="simCoeff" type="number" min="0" max="100" step="0.01" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Aliquota imposta</label>
+                <select class="form-select" id="simAliquota">
+                  <option value="0.15">15%</option>
+                  <option value="0.05">5%</option>
+                </select>
+              </div>
+              <div class="col-md-7">
+                <label class="form-label">Gestione previdenziale</label>
+                <select class="form-select" id="simGestione">
+                  <option value="nessuna">Nessuna</option>
+                  <option value="gestione_separata">Gestione separata</option>
+                  <option value="artigiani_commercianti">Artigiani e commercianti</option>
+                </select>
+              </div>
+              <div class="col-md-5">
+                <label class="form-label">Aliquota contributiva %</label>
+                <input class="form-control" id="simContributi" type="number" min="0" max="100" step="0.01" />
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" id="simRiduzione" type="checkbox" />
+                  <label class="form-check-label" for="simRiduzione">
+                    Applica riduzione INPS 35% se compatibile
+                  </label>
+                </div>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-primary" type="submit">Calcola</button>
+              </div>
+            </form>
+            <div class="simulator-result" id="simulatorResult"></div>
+          </div>
+        </article>
+      </aside>
+
+      <main class="main-stage">
+        <section class="chat-stage panel-card">
+          <div class="chat-stage-head">
+            <div>
+              <p class="panel-eyebrow">Assistente</p>
+              <h2 class="panel-title">Chat normativa</h2>
+            </div>
+            <span class="history-badge">Regime forfettario</span>
+          </div>
+          <div class="chat-container" id="chatBox"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="input-area">
+      <div class="container-fluid shell-container">
+        <form id="chatForm" class="chat-composer">
+          <div class="composer-frame">
+            <div class="composer-input-group">
+              <span class="composer-icon" aria-hidden="true">
+                <i class="fas fa-comment-dots"></i>
+              </span>
+              <input
+                id="chatInput"
+                type="text"
+                class="form-control form-control-lg"
+                placeholder="Es: Quando serve l'iscrizione VIES?"
+                required
+              />
+              <button class="btn btn-primary btn-lg composer-submit" type="submit">
+                <i class="fas fa-paper-plane"></i>
+                <span>Invia</span>
+              </button>
+            </div>
+            <div class="composer-meta">
+              <small class="text-muted disclaimer-text">
+                FlyTax AI può commettere errori. Verificare sempre le fonti e usare il simulatore solo come stima orientativa.
+              </small>
+              <span class="composer-shortcut">Invio per inviare</span>
+            </div>
           </div>
         </form>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
       const chatForm = document.getElementById("chatForm");
       const chatBox = document.getElementById("chatBox");
       const inputField = chatForm.querySelector("input");
       const sendButton = chatForm.querySelector("button[type='submit']");
-      const resetChatButton = document.getElementById("resetChatButton");
-      const CHAT_STORAGE_KEY = "flytax-chat-history-v1";
+      const historyList = document.getElementById("historyList");
+      const themeToggle = document.getElementById("themeToggle");
+      const newChatButton = document.getElementById("newChatButton");
+      const refreshHistoryButton = document.getElementById("refreshHistoryButton");
+      const toggleSimulatorButton = document.getElementById("toggleSimulatorButton");
+      const simulatorBody = document.getElementById("simulatorBody");
+      const simulatorForm = document.getElementById("simulatorForm");
+      const simulatorResult = document.getElementById("simulatorResult");
+      const CHAT_STORAGE_KEY = "flytax-chat-history-v2";
+      const CURRENT_CHAT_ID_KEY = "flytax-current-chat-id";
+      const DEFAULT_API_BASE = "http://localhost:8000";
       const INTRO_MESSAGE =
-        "Buongiorno. Sono l'assistente virtuale di FlyTax.\nPonimi un quesito sul Regime Forfettario e analizzerò le normative ufficiali per te.";
+        "Benvenuto nel workspace FlyTax. Qui lavori solo sul regime forfettario: puoi interrogare la normativa, consultare le fonti con estratti e pagine, salvare la cronologia e usare il simulatore senza uscire dalla stessa interfaccia.";
+
       let isRequestInFlight = false;
       let chatHistory = [];
+      let serverHistory = [];
+      let currentChatId = loadOrCreateChatId();
 
-      initializeChat();
+      initialize();
+
+      async function initialize() {
+        syncThemeToggle();
+        restoreLocalChat();
+        renderChat();
+        await loadServerHistory();
+      }
+
+      themeToggle.addEventListener("click", function () {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        if (isDark) {
+          document.documentElement.removeAttribute("data-theme");
+          localStorage.setItem("flytax-theme", "light");
+        } else {
+          document.documentElement.setAttribute("data-theme", "dark");
+          localStorage.setItem("flytax-theme", "dark");
+        }
+        syncThemeToggle();
+      });
+
+      function syncThemeToggle() {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        themeToggle.innerHTML = isDark
+          ? '<i class="fas fa-sun"></i><span>Tema chiaro</span>'
+          : '<i class="fas fa-moon"></i><span>Tema scuro</span>';
+        themeToggle.setAttribute(
+          "aria-label",
+          isDark ? "Attiva tema chiaro" : "Attiva tema scuro",
+        );
+      }
 
       chatForm.addEventListener("submit", async function (e) {
         e.preventDefault();
+
         const userText = inputField.value.trim();
         if (!userText || isRequestInFlight) return;
 
@@ -203,7 +244,7 @@
         inputField.disabled = true;
         sendButton.disabled = true;
 
-        addMessage("user", userText, []);
+        addMessage({ sender: "user", text: userText, sources: [], sourceDetails: [] });
         inputField.value = "";
 
         const loadingDiv = createLoadingIndicator();
@@ -211,31 +252,43 @@
         scrollChatToBottom();
 
         try {
-          const response = await fetch("http://localhost:8000/", {
+          const response = await fetch(`${getApiBaseUrl()}/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: userText }),
+            body: JSON.stringify({
+              content: userText,
+              regime_id: "forfettario",
+              chat_id: currentChatId,
+            }),
           });
 
           if (!response.ok) throw new Error("Errore dal server");
 
           const data = await response.json();
           removeLoadingIndicator(loadingDiv);
-          addMessage(
-            "ai",
-            data.message,
-            Array.isArray(data.sources) ? data.sources : [],
-            {
-              animate: true,
-            },
-          );
+
+          const assistantMessage = {
+            sender: "ai",
+            text: data.message,
+            sources: normalizeSources(data.sources),
+            sourceDetails: normalizeSourceDetails(data.source_details || []),
+            confidenceLabel: data.confidence_label || null,
+            confidenceScore: typeof data.confidence_score === "number" ? data.confidence_score : null,
+            retrievalMode: data.retrieval_mode || null,
+          };
+          addMessage(assistantMessage, { animate: true });
+          await persistTurn(userText, assistantMessage);
+          await loadServerHistory();
         } catch (error) {
           console.error("Errore:", error);
           removeLoadingIndicator(loadingDiv);
           addMessage(
-            "ai",
-            "Spiacente, impossibile connettersi al server. Assicurati che FastAPI sia avviato sulla porta 8000.",
-            [],
+            {
+              sender: "ai",
+              text: "Spiacente, impossibile connettersi al server. Controlla l'endpoint API salvato e verifica che FastAPI sia avviato.",
+              sources: [],
+              sourceDetails: [],
+            },
             { animate: true },
           );
         } finally {
@@ -246,18 +299,174 @@
         }
       });
 
-      resetChatButton.addEventListener("click", function () {
+      newChatButton.addEventListener("click", function () {
         if (isRequestInFlight) return;
+        currentChatId = createMessageId();
+        localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
         chatHistory = [];
-        localStorage.removeItem(CHAT_STORAGE_KEY);
+        saveChatHistory();
         renderChat();
         inputField.value = "";
         inputField.focus();
       });
 
-      function initializeChat() {
-        chatHistory = loadChatHistory();
-        renderChat();
+      refreshHistoryButton.addEventListener("click", function () {
+        loadServerHistory();
+      });
+
+      toggleSimulatorButton.addEventListener("click", function () {
+        const willOpen = simulatorBody.hidden;
+        simulatorBody.hidden = !willOpen;
+        toggleSimulatorButton.textContent = willOpen ? "Chiudi" : "Apri";
+      });
+
+      simulatorForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        simulatorResult.innerHTML = "<p class='text-muted mb-0'>Calcolo in corso…</p>";
+        try {
+          const payload = {
+            regime_id: "forfettario",
+            ricavi: Number(document.getElementById("simRicavi").value),
+            ateco_code: document.getElementById("simAteco").value.trim() || null,
+            coefficiente_redditivita: toNullableNumber(document.getElementById("simCoeff").value),
+            aliquota_imposta: Number(document.getElementById("simAliquota").value),
+            gestione_previdenziale: document.getElementById("simGestione").value,
+            aliquota_contributiva: toNullableNumber(document.getElementById("simContributi").value),
+            riduzione_inps_35: document.getElementById("simRiduzione").checked,
+          };
+          const response = await fetch(`${getApiBaseUrl()}/simulate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || "Simulazione non disponibile");
+          simulatorResult.innerHTML = `
+            <div class="sim-result-grid">
+              ${data.breakdown
+                .map(
+                  (item) => `
+                    <div class="sim-result-item">
+                      <span>${item.label}</span>
+                      <strong>${formatCurrency(item.amount)}</strong>
+                    </div>`,
+                )
+                .join("")}
+            </div>
+            <div class="sim-note-list">
+              ${data.notes.map((note) => `<p>${note}</p>`).join("")}
+            </div>
+          `;
+        } catch (error) {
+          simulatorResult.innerHTML = `<p class="text-danger mb-0">${error.message}</p>`;
+        }
+      });
+
+      async function loadServerHistory() {
+        try {
+          const response = await fetch(`${getApiBaseUrl()}/chat-history`);
+          if (!response.ok) throw new Error("Cronologia non disponibile");
+          serverHistory = await response.json();
+          renderHistoryList();
+        } catch (error) {
+          historyList.innerHTML = "<p class='empty-history'>Cronologia server non disponibile.</p>";
+        }
+      }
+
+      async function persistTurn(userText, assistantMessage) {
+        try {
+          await fetch(`${getApiBaseUrl()}/chat-history`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: currentChatId,
+              regime_id: "forfettario",
+              user_message: userText,
+              assistant_message: assistantMessage.text,
+              assistant_sources: assistantMessage.sources,
+              confidence_label: assistantMessage.confidenceLabel,
+              confidence_score: assistantMessage.confidenceScore,
+              retrieval_mode: assistantMessage.retrievalMode,
+            }),
+          });
+        } catch (error) {
+          console.error("Persistenza chat fallita:", error);
+        }
+      }
+
+      async function openChat(chatId) {
+        try {
+          const response = await fetch(`${getApiBaseUrl()}/chat-history/${chatId}`);
+          if (!response.ok) throw new Error("Chat non disponibile");
+          const transcript = await response.json();
+          currentChatId = transcript.chat_id;
+          localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
+          chatHistory = transcript.messages.map((message) => ({
+            sender: message.role === "assistant" ? "ai" : "user",
+            text: message.text,
+            sources: normalizeSources(message.sources),
+            sourceDetails: [],
+          }));
+          saveChatHistory();
+          renderChat();
+        } catch (error) {
+          console.error("Apertura chat fallita:", error);
+        }
+      }
+
+      async function deleteChat(chatId) {
+        try {
+          const response = await fetch(`${getApiBaseUrl()}/chat-history/${chatId}`, {
+            method: "DELETE",
+          });
+          if (!response.ok) throw new Error("Eliminazione fallita");
+          if (chatId === currentChatId) {
+            currentChatId = createMessageId();
+            localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
+            chatHistory = [];
+            saveChatHistory();
+            renderChat();
+          }
+          await loadServerHistory();
+        } catch (error) {
+          console.error("Eliminazione chat fallita:", error);
+        }
+      }
+
+      function renderHistoryList() {
+        if (!serverHistory.length) {
+          historyList.innerHTML = "<p class='empty-history'>Nessuna chat salvata.</p>";
+          return;
+        }
+        historyList.innerHTML = serverHistory
+          .map(
+            (item) => `
+              <div class="history-item ${item.chat_id === currentChatId ? "is-active" : ""}">
+                <button class="history-open-btn" type="button" data-open-chat="${item.chat_id}">
+                  <strong>${escapeHtml(item.title)}</strong>
+                  <span>${item.message_count} msg</span>
+                </button>
+                <button class="history-delete-btn" type="button" data-delete-chat="${item.chat_id}">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>`,
+          )
+          .join("");
+
+        historyList.querySelectorAll("[data-open-chat]").forEach((button) => {
+          button.addEventListener("click", () => openChat(button.dataset.openChat));
+        });
+        historyList.querySelectorAll("[data-delete-chat]").forEach((button) => {
+          button.addEventListener("click", () => deleteChat(button.dataset.deleteChat));
+        });
+      }
+
+      function loadOrCreateChatId() {
+        const existing = localStorage.getItem(CURRENT_CHAT_ID_KEY);
+        if (existing) return existing;
+        const next = createMessageId();
+        localStorage.setItem(CURRENT_CHAT_ID_KEY, next);
+        return next;
       }
 
       function createMessageId() {
@@ -267,239 +476,233 @@
         return `msg-${Date.now()}-${Math.random().toString(16).slice(2)}`;
       }
 
+      function getApiBaseUrl() {
+        return DEFAULT_API_BASE;
+      }
+
       function normalizeSources(sources) {
         return Array.isArray(sources) ? sources.filter(Boolean) : [];
       }
 
-      function loadChatHistory() {
+      function normalizeSourceDetails(details) {
+        return Array.isArray(details)
+          ? details.filter((item) => item && item.source)
+          : [];
+      }
+
+      function restoreLocalChat() {
         try {
           const raw = localStorage.getItem(CHAT_STORAGE_KEY);
-          if (!raw) return [];
+          if (!raw) return;
           const parsed = JSON.parse(raw);
-          if (!Array.isArray(parsed)) return [];
-          return parsed
-            .filter((item) => item && item.sender && item.text)
-            .map((item) => ({
-              id: item.id || createMessageId(),
-              sender: item.sender,
-              text: item.text,
-              sources: normalizeSources(item.sources),
-            }));
+          if (Array.isArray(parsed)) {
+            chatHistory = parsed;
+          }
         } catch (error) {
-          console.error("Cronologia non leggibile:", error);
-          return [];
+          console.error("Cronologia locale non leggibile:", error);
         }
       }
 
       function saveChatHistory() {
-        try {
-          localStorage.setItem(
-            CHAT_STORAGE_KEY,
-            JSON.stringify(chatHistory.slice(-100)),
-          );
-        } catch (error) {
-          console.error("Cronologia non salvabile:", error);
-        }
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chatHistory.slice(-100)));
       }
 
-      function addMessage(sender, text, sources = [], options = {}) {
-        const message = {
+      function addMessage(message, options = {}) {
+        chatHistory.push({
           id: createMessageId(),
-          sender,
-          text,
-          sources: normalizeSources(sources),
-        };
-        chatHistory.push(message);
-        saveChatHistory();
-        renderMessage(message, {
-          animate: options.animate === true && sender === "ai",
+          sender: message.sender,
+          text: message.text,
+          sources: normalizeSources(message.sources),
+          sourceDetails: normalizeSourceDetails(message.sourceDetails),
+          confidenceLabel: message.confidenceLabel || null,
+          confidenceScore: message.confidenceScore || null,
+          retrievalMode: message.retrievalMode || null,
         });
+        saveChatHistory();
+        renderMessage(chatHistory[chatHistory.length - 1], options);
       }
 
       function renderChat() {
         chatBox.innerHTML = "";
-        renderIntroMessage();
-        chatHistory.forEach((message) =>
-          renderMessage(message, { animate: false }),
+        renderMessage(
+          {
+            id: "intro",
+            sender: "ai",
+            text: INTRO_MESSAGE,
+            sources: [],
+            sourceDetails: [],
+          },
+          { isIntro: true },
         );
+        chatHistory.forEach((message) => renderMessage(message));
         scrollChatToBottom();
-      }
-
-      function renderIntroMessage() {
-        const introMessage = {
-          id: "intro",
-          sender: "ai",
-          text: INTRO_MESSAGE,
-          sources: [],
-        };
-        renderMessage(introMessage, { animate: false, isIntro: true });
       }
 
       function renderMessage(message, options = {}) {
         const { animate = false, isIntro = false } = options;
         const msgDiv = document.createElement("div");
-        msgDiv.dataset.messageId = message.id;
         msgDiv.className =
           message.sender === "user"
             ? "message-user"
             : "message-ai d-flex align-items-end mb-3";
 
         if (message.sender === "user") {
-          const contentWrap = document.createElement("div");
-          contentWrap.className = "message-card message-card-user";
-
-          const bubble = document.createElement("div");
-          bubble.className = "bubble-user";
-          bubble.textContent = message.text;
-
-          const actions = createMessageActions(message, { isIntro });
-          contentWrap.appendChild(bubble);
-          contentWrap.appendChild(actions);
-          msgDiv.appendChild(contentWrap);
+          msgDiv.innerHTML = `
+            <div class="message-card message-card-user">
+              <div class="bubble-user">${escapeHtml(message.text)}</div>
+              <div class="message-actions message-actions-user">
+                <button class="message-action-btn" type="button" aria-label="Copia il messaggio">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          msgDiv.querySelector("button").addEventListener("click", () => copyText(message.text));
           chatBox.appendChild(msgDiv);
-          scrollChatToBottom();
           return;
         }
 
+        const confidenceChip = message.confidenceLabel
+          ? `<span class="confidence-chip confidence-${message.confidenceLabel}">Confidenza ${message.confidenceLabel}</span>`
+          : "";
+        const sourceMarkup = renderSourceMarkup(message);
         msgDiv.innerHTML = `
-          <img src="robot.png" alt="Robot" class="me-2 mb-1" style="width: 65px; height: 65px; object-fit: contain;">
+          <img src="robot.png" alt="Robot" class="chat-avatar" />
           <div class="message-card message-card-ai">
             <div class="bubble-ai">
+              ${confidenceChip}
               <p class="mb-2 ai-text-container"></p>
-              ${
-                message.sources.length > 0
-                  ? `
-              <div class="source-box" style="display: none;">
-                <i class="fas fa-book me-1"></i> <strong>Informazione:</strong><br>
-                <span class="source-link" style="color: #27ae60;">${message.sources.join("<br>")}</span>
-              </div>`
-                  : ""
-              }
+              ${sourceMarkup}
             </div>
+            <div class="message-actions message-actions-ai"></div>
           </div>
         `;
         chatBox.appendChild(msgDiv);
 
-        const card = msgDiv.querySelector(".message-card-ai");
         const textContainer = msgDiv.querySelector(".ai-text-container");
-        const sourceBox = msgDiv.querySelector(".source-box");
+        const actions = msgDiv.querySelector(".message-actions");
+        buildAiActions(actions, message, { isIntro });
 
         if (animate) {
           const words = message.text.split(" ");
           let index = 0;
-
           function typeWriter() {
             if (index < words.length) {
               textContainer.textContent += `${words[index]} `;
               scrollChatToBottom();
               index++;
-              setTimeout(typeWriter, 40);
+              setTimeout(typeWriter, 22);
               return;
             }
-            if (sourceBox) {
-              sourceBox.style.display = "block";
-            }
-            card.appendChild(createMessageActions(message, { isIntro }));
             scrollChatToBottom();
           }
-
           typeWriter();
           return;
         }
 
         textContainer.textContent = message.text;
-        if (sourceBox) {
-          sourceBox.style.display =
-            message.sources.length > 0 ? "block" : "none";
-        }
-        card.appendChild(createMessageActions(message, { isIntro }));
-        scrollChatToBottom();
       }
 
-      function createMessageActions(message, options = {}) {
+      function renderSourceMarkup(message) {
+        const items = message.sourceDetails.length
+          ? message.sourceDetails
+          : message.sources.map((source) => ({ source }));
+        if (!items.length) return "";
+        return `
+          <div class="source-grid">
+            ${items
+              .map((item) => {
+                const pageLabel =
+                  item.page_start && item.page_end && item.page_start !== item.page_end
+                    ? `Pagine ${item.page_start}-${item.page_end}`
+                    : item.page_start
+                      ? `Pagina ${item.page_start}`
+                      : "Pagina non disponibile";
+                const scoreLabel =
+                  typeof item.score === "number" ? `<span>Score ${item.score.toFixed(3)}</span>` : "";
+                return `
+                  <article class="source-card">
+                    <div class="source-card-head">
+                      <strong>${escapeHtml(item.source)}</strong>
+                      <span>${pageLabel}</span>
+                    </div>
+                    ${item.excerpt ? `<p>${escapeHtml(item.excerpt)}</p>` : ""}
+                    <div class="source-card-meta">${scoreLabel}</div>
+                  </article>
+                `;
+              })
+              .join("")}
+          </div>
+        `;
+      }
+
+      function buildAiActions(container, message, options = {}) {
         const { isIntro = false } = options;
-        const actions = document.createElement("div");
-        actions.className =
-          message.sender === "user"
-            ? "message-actions message-actions-user"
-            : "message-actions message-actions-ai";
+        if (isIntro) return;
 
-        if (!isIntro) {
-          // Tasto Copia
-          const copyButton = document.createElement("button");
-          copyButton.type = "button";
-          copyButton.className = "message-action-btn";
-          copyButton.innerHTML =
-            '<i class="fas fa-copy" aria-hidden="true"></i>';
-          copyButton.title = "Copia il messaggio";
-          copyButton.setAttribute("aria-label", "Copia il messaggio");
-          copyButton.addEventListener("click", () =>
-            copyMessage(message, copyButton),
-          );
-          actions.appendChild(copyButton);
+        const copyButton = createActionButton("fa-copy", "Copia risposta", () => {
+          copyText(buildExportText(message));
+          flashActionState(copyButton, "Copiato");
+        });
+        const exportButton = createActionButton("fa-file-arrow-down", "Esporta risposta", () => {
+          downloadTextFile(`flytax-${Date.now()}.txt`, buildExportText(message));
+          flashActionState(exportButton, "Esportato");
+        });
+        const upButton = createActionButton("fa-thumbs-up", "Feedback positivo", () => sendFeedback("up", message, upButton));
+        const downButton = createActionButton("fa-thumbs-down", "Feedback negativo", () => sendFeedback("down", message, downButton));
 
-          // Tasto Preferiti
-          const starButton = document.createElement("button");
-          starButton.type = "button";
-          starButton.className = "message-action-btn";
-          starButton.innerHTML =
-            '<i class="far fa-star" aria-hidden="true"></i>';
-          starButton.title = "Salva nei preferiti";
-          starButton.setAttribute("aria-label", "Salva nei preferiti");
-
-          starButton.addEventListener("click", function () {
-            const icon = this.querySelector("i");
-            if (icon.classList.contains("far")) {
-              icon.className = "fas fa-star text-warning";
-            } else {
-              icon.className = "far fa-star";
-            }
-          });
-          actions.appendChild(starButton);
-        }
-
-        if (message.sender === "user" && !isIntro) {
-          // Tasto Modifica
-          const editButton = document.createElement("button");
-          editButton.type = "button";
-          editButton.className = "message-action-btn";
-          editButton.innerHTML =
-            '<i class="fas fa-pen" aria-hidden="true"></i>';
-          editButton.title =
-            "Riapre il messaggio e rimuove le risposte successive";
-          editButton.setAttribute("aria-label", "Modifica il messaggio");
-          editButton.addEventListener("click", () =>
-            editUserMessage(message.id),
-          );
-          actions.appendChild(editButton);
-        }
-
-        return actions;
+        container.append(copyButton, exportButton, upButton, downButton);
       }
 
-      async function copyMessage(message, button) {
-        const textToCopy =
-          message.sender === "ai" && message.sources.length > 0
-            ? `${message.text}\n\nFonti:\n${message.sources.join("\n")}`
-            : message.text;
+      function createActionButton(iconClass, label, handler) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "message-action-btn";
+        button.title = label;
+        button.setAttribute("aria-label", label);
+        button.innerHTML = `<i class="fas ${iconClass}"></i>`;
+        button.addEventListener("click", handler);
+        return button;
+      }
 
+      async function sendFeedback(vote, message, button) {
         try {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(textToCopy);
-          } else {
-            fallbackCopyText(textToCopy);
-          }
-          flashActionState(button, "Copiato");
+          await fetch(`${getApiBaseUrl()}/feedback`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: currentChatId,
+              message: message.text,
+              vote,
+              regime_id: "forfettario",
+              assistant_sources: message.sources,
+            }),
+          });
+          flashActionState(button, "Salvato");
         } catch (error) {
-          console.error("Copia non riuscita:", error);
           flashActionState(button, "Errore");
         }
       }
 
-      function fallbackCopyText(text) {
+      function buildExportText(message) {
+        const sourceLines = message.sourceDetails.length
+          ? message.sourceDetails
+              .map((item) => {
+                const pagePart = item.page_start ? `, pagina ${item.page_start}` : "";
+                return `- ${item.source}${pagePart}`;
+              })
+              .join("\n")
+          : message.sources.map((source) => `- ${source}`).join("\n");
+        return `${message.text}\n\nFonti:\n${sourceLines || "- Nessuna fonte disponibile"}`;
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text);
+          return;
+        }
         const tempArea = document.createElement("textarea");
         tempArea.value = text;
-        tempArea.setAttribute("readonly", "");
         tempArea.style.position = "absolute";
         tempArea.style.left = "-9999px";
         document.body.appendChild(tempArea);
@@ -510,37 +713,23 @@
 
       function flashActionState(button, label) {
         const original = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i>';
-        button.setAttribute("aria-label", label);
+        button.innerHTML = '<i class="fas fa-check"></i>';
         button.disabled = true;
+        button.setAttribute("aria-label", label);
         setTimeout(() => {
           button.innerHTML = original;
-          button.setAttribute(
-            "aria-label",
-            original.includes("fa-pen")
-              ? "Modifica il messaggio"
-              : "Copia il messaggio",
-          );
           button.disabled = false;
         }, 1200);
       }
 
-      function editUserMessage(messageId) {
-        if (isRequestInFlight) return;
-        const targetIndex = chatHistory.findIndex(
-          (message) => message.id === messageId,
-        );
-        if (targetIndex === -1) return;
-
-        inputField.value = chatHistory[targetIndex].text;
-        chatHistory = chatHistory.slice(0, targetIndex);
-        saveChatHistory();
-        renderChat();
-        inputField.focus();
-        inputField.setSelectionRange(
-          inputField.value.length,
-          inputField.value.length,
-        );
+      function downloadTextFile(filename, content) {
+        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(url);
       }
 
       function createLoadingIndicator() {
@@ -548,7 +737,7 @@
         loadingDiv.className = "message-ai d-flex align-items-end mb-3";
         loadingDiv.id = "loadingIndicator";
         loadingDiv.innerHTML = `
-          <img src="robot.png" alt="Robot" class="me-2 mb-1" style="width: 65px; height: 65px; object-fit: contain;">
+          <img src="robot.png" alt="Robot" class="chat-avatar" />
           <div class="bubble-ai" style="padding: 12px 24px;">
             <div class="spinner-grow spinner-grow-sm text-primary opacity-50" role="status"></div>
             <div class="spinner-grow spinner-grow-sm text-primary opacity-75 mx-1" role="status"></div>
@@ -567,47 +756,29 @@
       function scrollChatToBottom() {
         chatBox.scrollTop = chatBox.scrollHeight;
       }
-    </script>
 
-    <script>
-      // DARK MODE
-      const toggleSwitch = document.querySelector(
-        '.theme-switch input[type="checkbox"]',
-      );
-      const currentTheme = localStorage.getItem("theme");
-
-      if (currentTheme) {
-        document.documentElement.setAttribute("data-bs-theme", currentTheme);
-        if (currentTheme === "dark") {
-          toggleSwitch.checked = true;
-          document.body.classList.add("dark-custom");
-        }
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
       }
 
-      toggleSwitch.addEventListener("change", function (e) {
-        if (e.target.checked) {
-          document.documentElement.setAttribute("data-bs-theme", "dark");
-          document.body.classList.add("dark-custom");
-          localStorage.setItem("theme", "dark");
-        } else {
-          document.documentElement.setAttribute("data-bs-theme", "light");
-          document.body.classList.remove("dark-custom");
-          localStorage.setItem("theme", "light");
-        }
-      });
+      function toNullableNumber(value) {
+        if (value === "" || value === null || typeof value === "undefined") return null;
+        const numericValue = Number(value);
+        return Number.isNaN(numericValue) ? null : numericValue;
+      }
 
-      //  SIDEBAR
-      const sidebar = document.getElementById("flytax-sidebar");
-      const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
-      const closeSidebarBtn = document.getElementById("closeSidebarBtn");
-
-      sidebarToggleBtn.addEventListener("click", () => {
-        sidebar.classList.add("open");
-      });
-
-      closeSidebarBtn.addEventListener("click", () => {
-        sidebar.classList.remove("open");
-      });
+      function formatCurrency(value) {
+        return new Intl.NumberFormat("it-IT", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 2,
+        }).format(value);
+      }
     </script>
   </body>
 </html>

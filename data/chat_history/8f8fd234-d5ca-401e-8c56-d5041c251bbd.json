@@ -1,0 +1,199 @@
+{
+  "chat_id": "8f8fd234-d5ca-401e-8c56-d5041c251bbd",
+  "title": "ciao",
+  "regime_id": "forfettario",
+  "created_at": "2026-04-03T13:29:23.391043+00:00",
+  "updated_at": "2026-04-03T14:36:22.018136+00:00",
+  "messages": [
+    {
+      "role": "user",
+      "text": "ciao",
+      "sources": [],
+      "created_at": "2026-04-03T13:29:23.391098+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "Posso aiutarti solo su temi fiscali e contributivi legati alla documentazione caricata per forfettario. Riformula la domanda in questo ambito.",
+      "sources": [],
+      "created_at": "2026-04-03T13:29:23.391098+00:00"
+    },
+    {
+      "role": "user",
+      "text": "Ho portato un cliente a cena fuori e ho speso 150€. Posso caricare la fattura nel software per scaricare l'IVA e abbassare le tasse del mio 15%",
+      "sources": [],
+      "created_at": "2026-04-03T14:27:25.460469+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "Nel regime forfetario non si applica l'IVA e non è possibile detrarre l'IVA sugli acquisti. La spesa per la cena non può essere scaricata per abbassare le tasse. Le uniche spese deducibili sono calcolate forfettariamente attraverso il coefficiente di redditività applicato ai ricavi.",
+      "sources": [
+        "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
+        "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+        "11_Guida_Riduzione_Contributiva_35_INPS.pdf",
+        "06_Circolare_INPS_8-2026_Aliquote_Gestione_Separata.pdf"
+      ],
+      "created_at": "2026-04-03T14:27:25.460469+00:00"
+    },
+    {
+      "role": "user",
+      "text": "Ho portato un cliente a cena fuori e ho speso 150€. Posso caricare la fattura nel software per scaricare l'IVA e abbassare le tasse del mio 15%",
+      "sources": [],
+      "created_at": "2026-04-03T14:30:03.652406+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "No, non puoi scaricare l'IVA. Nel regime forfetario non si applica l'IVA e non si detrae l'imposta sugli acquisti. Le spese come quella da te indicata non sono deducibili per determinare il reddito imponibile soggetto all'imposta sostitutiva.",
+      "sources": [
+        "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
+        "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+        "11_Guida_Riduzione_Contributiva_35_INPS.pdf",
+        "06_Circolare_INPS_8-2026_Aliquote_Gestione_Separata.pdf"
+      ],
+      "created_at": "2026-04-03T14:30:03.652406+00:00"
+    },
+    {
+      "role": "user",
+      "text": "Lavoro come dipendente e prendo 32.000€ lordi l'anno. Posso aprire la partita IVA forfettaria domani per arrotondare?",
+      "sources": [],
+      "created_at": "2026-04-03T14:30:33.555609+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "Sì, puoi aprire una partita IVA forfettaria mentre sei dipendente. I documenti disponibili non forniscono informazioni specifiche su eventuali limiti di reddito da dipendente per l'accesso al regime forfettario.",
+      "sources": [
+        "13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf",
+        "08b_Manuale_AdE_Imposta_Bollo_Fatture_Elettroniche.pdf",
+        "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
+        "14_NASPI, DISOCCUPAZIONE E INCENTIVI ALL'AUTOIMPRENDITORIALITÀ (2026).pdf"
+      ],
+      "created_at": "2026-04-03T14:30:33.555609+00:00"
+    },
+    {
+      "role": "user",
+      "text": "Mi sono licenziato ieri. Posso aprire la partita IVA forfettaria e fatturare tutto il mio lavoro alla mia ex azienda così risparmio sulle tasse?",
+      "sources": [],
+      "created_at": "2026-04-03T14:31:22.595796+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "Non posso rispondere alla tua domanda. I documenti disponibili non contengono informazioni specifiche sulle condizioni per aprire una partita IVA forfettaria dopo un licenziamento, né sulle regole per fatturare all'ex datore di lavoro.",
+      "sources": [
+        "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
+        "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+        "11_Guida_Riduzione_Contributiva_35_INPS.pdf",
+        "06_Circolare_INPS_8-2026_Aliquote_Gestione_Separata.pdf"
+      ],
+      "created_at": "2026-04-03T14:31:22.595796+00:00"
+    },
+    {
+      "role": "user",
+      "text": "Ho venduto il mio vecchio PC aziendale usato a un amico per 400€. Devo sommare questi soldi agli 85.000€ del limite annuale?",
+      "sources": [],
+      "created_at": "2026-04-03T14:32:48.049037+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "Posso aiutarti solo su temi fiscali e contributivi legati alla documentazione caricata per forfettario. Riformula la domanda in questo ambito.",
+      "sources": [],
+      "created_at": "2026-04-03T14:32:48.049037+00:00"
+    },
+    {
+      "role": "user",
+      "text": "Ho tre figli a carico e pago 2.000€ di asilo nido. Posso recuperare il 19% di queste spese dalle tasse della mia partita IVA?",
+      "sources": [],
+      "created_at": "2026-04-03T14:33:11.043836+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "I documenti disponibili non contengono informazioni specifiche sulla detrazione del 19% per spese di asilo nido per contribuenti con partita IVA forfettaria. Non sono menzionate detrazioni per figli a carico o per questo tipo di spesa.",
+      "sources": [
+        "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
+        "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+        "11_Guida_Riduzione_Contributiva_35_INPS.pdf",
+        "06_Circolare_INPS_8-2026_Aliquote_Gestione_Separata.pdf"
+      ],
+      "created_at": "2026-04-03T14:33:11.043836+00:00"
+    },
+    {
+      "role": "user",
+      "text": "A ottobre ho incassato una super fattura e sono arrivato a 105.000€ totali nell'anno. Resto forfettario fino a dicembre e poi cambio l'anno prossimo?",
+      "sources": [],
+      "created_at": "2026-04-03T14:34:20.540705+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "No, non resti forfettario fino a dicembre. Il superamento dei 100.000 euro di compensi percepiti nel corso dell'anno determina una fuoriuscita immediata dal regime forfetario. Da quel momento in poi, devi applicare il regime IVA ordinario. Potrai eventualmente rientrare nel forfettario negli anni successivi solo se rispetterai tutti i requisiti, incluso il limite di 85.000 euro di ricavi o compensi nell'anno precedente.",
+      "sources": [
+        "13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf",
+        "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
+        "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf"
+      ],
+      "created_at": "2026-04-03T14:34:20.540705+00:00"
+    },
+    {
+      "role": "user",
+      "text": "Ho comprato un software da un sito americano e ho pagato 100€. Non c'è l'IVA in fattura, quindi sono a posto così, giusto?",
+      "sources": [],
+      "created_at": "2026-04-03T14:34:50.406442+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "No, non sei a posto così. Se hai acquistato un servizio digitale (come un software) da un fornitore estero, devi integrare la fattura con un'autofattura applicando l'IVA italiana al 22%. Successivamente, devi versare questa IVA tramite modello F24 entro il giorno 16 del mese successivo.",
+      "sources": [
+        "09_Guida_Tecnica_Quadro_LM_Dichiarazione_Redditi.pdf",
+        "13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf",
+        "14_NASPI, DISOCCUPAZIONE E INCENTIVI ALL'AUTOIMPRENDITORIALITÀ (2026).pdf",
+        "08a_Guida_Pratica_Fatturazione_Elettronica_Forfettari_2026.pdf"
+      ],
+      "created_at": "2026-04-03T14:34:50.406442+00:00"
+    },
+    {
+      "role": "user",
+      "text": "Siamo a maggio, ho aperto la partita IVA come commerciante a gennaio ma ho pagato i contributi pieni. Posso chiedere ora lo sconto del 35% per quest'anno?",
+      "sources": [],
+      "created_at": "2026-04-03T14:35:14.029557+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "La riduzione INPS del 35% è riservata agli imprenditori individuali forfettari iscritti alla Gestione Artigiani e Commercianti; non si applica a Gestione Separata o Casse professionali. La domanda è telematica; per gli attivi va presentata entro il 28 febbraio, se tardiva decorre dal 1° gennaio dell'anno successivo. L'agevolazione si rinnova se restano i requisiti, ma riduce la contribuzione utile ai fini pensionistici.",
+      "sources": [
+        "11_Guida_Riduzione_Contributiva_35_INPS.pdf",
+        "10_Circolare_INPS_14-2026_Artigiani_e_Commercianti.pdf",
+        "06_Circolare_INPS_8-2026_Aliquote_Gestione_Separata.pdf"
+      ],
+      "created_at": "2026-04-03T14:35:14.029557+00:00"
+    },
+    {
+      "role": "user",
+      "text": "Ho il 20% di una SRL che si occupa di pulizie, io vorrei aprire P.IVA forfettaria per fare il consulente marketing. Posso?",
+      "sources": [],
+      "created_at": "2026-04-03T14:35:56.566496+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "Puoi aprire la partita IVA forfettaria per attività di consulente marketing. Tuttavia, devi verificare che non sussista un controllo sulla SRL e che non ci sia intreccio commerciale tra le due attività. La tua quota del 20% è inferiore alla soglia di controllo del 50%, ma è necessario che l'attività della SRL (pulizie) sia diversa dalla tua nuova attività (marketing) e che non vi siano fatturazioni tra di voi.",
+      "sources": [
+        "15_CASSE PROFESSIONALI AUTONOME E REGIME FORFETTARIO (2026).pdf",
+        "13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf",
+        "11_Guida_Riduzione_Contributiva_35_INPS.pdf",
+        "04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf"
+      ],
+      "created_at": "2026-04-03T14:35:56.566496+00:00"
+    },
+    {
+      "role": "user",
+      "text": "Ho fatto una fattura da 500€ e ci ho messo la marca da bollo da 2€. Il cliente mi ha rimborsato i 2€. Su quei due euro ci devo pagare le tasse?",
+      "sources": [],
+      "created_at": "2026-04-03T14:36:22.018136+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "Sì, se la fattura supera 77,47 euro si applica l'imposta di bollo da 2,00 euro, anche nelle fatture verso l'estero. In fattura va indicata la dicitura di assolvimento del bollo; il versamento è gestito con liquidazione periodica tramite i canali dell'Agenzia delle Entrate.",
+      "sources": [
+        "08b_Manuale_AdE_Imposta_Bollo_Fatture_Elettroniche.pdf",
+        "08a_Guida_Pratica_Fatturazione_Elettronica_Forfettari_2026.pdf"
+      ],
+      "created_at": "2026-04-03T14:36:22.018136+00:00"
+    }
+  ]
+}

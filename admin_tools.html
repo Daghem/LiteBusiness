@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlyTax - Area Admin</title>
+    <script>
+      (function () {
+        const savedTheme = localStorage.getItem("flytax-theme");
+        if (savedTheme === "dark") {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="dashboard-orbit orbit-a"></div>
+    <div class="dashboard-orbit orbit-b"></div>
+
+    <div class="dashboard-shell">
+      <header class="topbar">
+        <a class="brand-link" href="admin.html">
+          <img src="logo.png" alt="FlyTax Logo" />
+          <span>FlyTax Admin</span>
+        </a>
+        <div class="topbar-actions">
+          <button class="btn btn-light theme-toggle" id="themeToggle" type="button" aria-label="Attiva tema scuro">
+            <i class="fas fa-moon"></i>
+            <span>Tema scuro</span>
+          </button>
+          <a class="btn btn-light" href="admin.html">Dashboard</a>
+          <button class="btn btn-light" id="logoutButton" type="button" hidden>Esci area admin</button>
+        </div>
+      </header>
+
+      <main class="dashboard-grid admin-tools-grid">
+        <section class="hero-card">
+          <div class="hero-main">
+            <div>
+              <p class="eyebrow">Area protetta</p>
+              <h1>Documenti e reindicizzazione</h1>
+              <p class="hero-copy">
+                Questa pagina gestisce le operazioni sensibili del corpus forfettario:
+                caricamento documenti e rebuild dell'indice RAG. L'accesso è abilitato
+                solo dopo verifica admin sul backend.
+              </p>
+            </div>
+            <div class="hero-pills">
+              <span>Solo admin</span>
+              <span>Upload PDF/XML</span>
+              <span>Reindex RAG</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-card admin-auth-card" id="authCard">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Accesso</p>
+              <h2>Sblocca area admin</h2>
+            </div>
+          </div>
+          <p class="panel-copy">
+            Inserisci la chiave admin configurata sul server per accedere a upload e indicizzazione.
+          </p>
+          <form id="authForm" class="row g-3">
+            <div class="col-12">
+              <label class="form-label" for="adminKeyInput">Chiave admin</label>
+              <input class="form-control" id="adminKeyInput" type="password" placeholder="Inserisci la chiave admin" required />
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary" type="submit">Accedi</button>
+            </div>
+          </form>
+          <p class="status-line" id="authStatus"></p>
+        </section>
+
+        <section class="panel-card admin-session-card" id="sessionCard" hidden>
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Sessione</p>
+              <h2>Accesso attivo</h2>
+            </div>
+          </div>
+          <p class="panel-copy">
+            La sessione admin è attiva in questo browser. Puoi caricare documenti e avviare la reindicizzazione.
+          </p>
+          <p class="status-line" id="sessionStatus"></p>
+          <div class="admin-link-actions">
+            <button class="btn btn-light" id="logoutInlineButton" type="button">Disconnetti</button>
+          </div>
+        </section>
+
+        <section class="panel-card wide-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Endpoint API</p>
+              <h2>Connessione backend</h2>
+            </div>
+          </div>
+          <div class="api-config">
+            <label for="apiBaseInput" class="form-label">Endpoint API</label>
+            <div class="input-group">
+              <input class="form-control" id="apiBaseInput" type="text" placeholder="http://localhost:8000" />
+              <button class="btn btn-primary" id="saveApiBaseButton" type="button">Salva</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-card" id="uploadPanel" hidden>
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Upload</p>
+              <h2>Carica documento forfettario</h2>
+            </div>
+          </div>
+          <form id="uploadForm" class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Documento PDF/XML</label>
+              <input class="form-control" id="uploadFile" type="file" accept=".pdf,.xml" required />
+            </div>
+            <div class="col-12">
+              <p class="panel-copy mb-0">
+                Ogni file caricato da quest'area viene associato automaticamente al corpus del regime forfettario.
+              </p>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary" type="submit">Carica documento</button>
+            </div>
+          </form>
+          <p class="status-line" id="uploadStatus"></p>
+        </section>
+
+        <section class="panel-card" id="reindexPanel" hidden>
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Indicizzazione</p>
+              <h2>Ricalcola indice RAG</h2>
+            </div>
+          </div>
+          <p class="panel-copy">
+            Usa questa azione dopo aver caricato o sostituito documenti nei corpora `Normativo_*`.
+          </p>
+          <button class="btn btn-primary" id="reindexButton" type="button">Avvia reindicizzazione</button>
+          <p class="status-line" id="reindexStatus"></p>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const DEFAULT_API_BASE = "http://localhost:8000";
+      const API_BASE_KEY = "flytax-api-base-url";
+      const ADMIN_KEY_STORAGE = "flytax-admin-access-key";
+      const themeToggle = document.getElementById("themeToggle");
+      const logoutButton = document.getElementById("logoutButton");
+      const logoutInlineButton = document.getElementById("logoutInlineButton");
+      const authCard = document.getElementById("authCard");
+      const sessionCard = document.getElementById("sessionCard");
+      const authForm = document.getElementById("authForm");
+      const authStatus = document.getElementById("authStatus");
+      const sessionStatus = document.getElementById("sessionStatus");
+      const adminKeyInput = document.getElementById("adminKeyInput");
+      const apiBaseInput = document.getElementById("apiBaseInput");
+      const saveApiBaseButton = document.getElementById("saveApiBaseButton");
+      const uploadPanel = document.getElementById("uploadPanel");
+      const reindexPanel = document.getElementById("reindexPanel");
+      const uploadForm = document.getElementById("uploadForm");
+      const uploadStatus = document.getElementById("uploadStatus");
+      const reindexButton = document.getElementById("reindexButton");
+      const reindexStatus = document.getElementById("reindexStatus");
+
+      apiBaseInput.value = getApiBaseUrl();
+      syncThemeToggle();
+      restoreAdminSession();
+
+      themeToggle.addEventListener("click", function () {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        if (isDark) {
+          document.documentElement.removeAttribute("data-theme");
+          localStorage.setItem("flytax-theme", "light");
+        } else {
+          document.documentElement.setAttribute("data-theme", "dark");
+          localStorage.setItem("flytax-theme", "dark");
+        }
+        syncThemeToggle();
+      });
+
+      saveApiBaseButton.addEventListener("click", function () {
+        localStorage.setItem(API_BASE_KEY, (apiBaseInput.value.trim() || DEFAULT_API_BASE).replace(/\/$/, ""));
+        apiBaseInput.value = getApiBaseUrl();
+      });
+
+      authForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const adminKey = adminKeyInput.value.trim();
+        if (!adminKey) return;
+        authStatus.textContent = "Verifica credenziali admin…";
+        try {
+          await verifyAdminKey(adminKey);
+          localStorage.setItem(ADMIN_KEY_STORAGE, adminKey);
+          adminKeyInput.value = "";
+          setAdminUnlocked(true, "Accesso admin attivo.");
+        } catch (error) {
+          setAdminUnlocked(false);
+          authStatus.textContent = error.message;
+        }
+      });
+
+      logoutButton.addEventListener("click", clearAdminSession);
+      logoutInlineButton.addEventListener("click", clearAdminSession);
+
+      uploadForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        uploadStatus.textContent = "Upload in corso…";
+        try {
+          const formData = new FormData();
+          const file = document.getElementById("uploadFile").files[0];
+          formData.append("file", file);
+          formData.append("regime_id", "forfettario");
+          const response = await fetch(`${getApiBaseUrl()}/admin/upload`, {
+            method: "POST",
+            headers: adminHeaders(),
+            body: formData,
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            if (response.status === 401) clearAdminSession("Sessione admin scaduta o non valida.");
+            throw new Error(data.detail || "Upload fallito");
+          }
+          uploadStatus.textContent = `Documento caricato in ${data.path}`;
+          uploadForm.reset();
+        } catch (error) {
+          uploadStatus.textContent = error.message;
+        }
+      });
+
+      reindexButton.addEventListener("click", async function () {
+        reindexStatus.textContent = "Reindicizzazione in corso…";
+        reindexButton.disabled = true;
+        try {
+          const response = await fetch(`${getApiBaseUrl()}/admin/reindex`, {
+            method: "POST",
+            headers: adminHeaders(),
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            if (response.status === 401) clearAdminSession("Sessione admin scaduta o non valida.");
+            throw new Error(data.detail || "Reindicizzazione fallita");
+          }
+          reindexStatus.textContent = `Indicizzazione completata: ${data.total_chunks} chunk su ${data.regimes.join(", ")}`;
+        } catch (error) {
+          reindexStatus.textContent = error.message;
+        } finally {
+          reindexButton.disabled = false;
+        }
+      });
+
+      function syncThemeToggle() {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        themeToggle.innerHTML = isDark
+          ? '<i class="fas fa-sun"></i><span>Tema chiaro</span>'
+          : '<i class="fas fa-moon"></i><span>Tema scuro</span>';
+        themeToggle.setAttribute(
+          "aria-label",
+          isDark ? "Attiva tema chiaro" : "Attiva tema scuro",
+        );
+      }
+
+      function getApiBaseUrl() {
+        return (localStorage.getItem(API_BASE_KEY) || DEFAULT_API_BASE).replace(/\/$/, "");
+      }
+
+      function adminHeaders() {
+        const adminKey = localStorage.getItem(ADMIN_KEY_STORAGE) || "";
+        return { "X-Admin-Key": adminKey };
+      }
+
+      async function verifyAdminKey(adminKey) {
+        const response = await fetch(`${getApiBaseUrl()}/admin/auth/verify`, {
+          method: "POST",
+          headers: { "X-Admin-Key": adminKey },
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || "Accesso admin negato");
+      }
+
+      async function restoreAdminSession() {
+        const savedKey = localStorage.getItem(ADMIN_KEY_STORAGE);
+        if (!savedKey) {
+          setAdminUnlocked(false);
+          return;
+        }
+        authStatus.textContent = "Ripristino sessione admin…";
+        try {
+          await verifyAdminKey(savedKey);
+          setAdminUnlocked(true, "Sessione admin ripristinata.");
+        } catch (error) {
+          clearAdminSession(error.message);
+        }
+      }
+
+      function setAdminUnlocked(isUnlocked, message = "") {
+        authCard.hidden = isUnlocked;
+        sessionCard.hidden = !isUnlocked;
+        uploadPanel.hidden = !isUnlocked;
+        reindexPanel.hidden = !isUnlocked;
+        logoutButton.hidden = !isUnlocked;
+        authStatus.textContent = isUnlocked ? "" : message;
+        sessionStatus.textContent = isUnlocked ? message : "";
+        if (isUnlocked) {
+          uploadStatus.textContent = "";
+        }
+      }
+
+      function clearAdminSession(message = "") {
+        localStorage.removeItem(ADMIN_KEY_STORAGE);
+        authForm.reset();
+        authCard.hidden = false;
+        sessionCard.hidden = true;
+        uploadPanel.hidden = true;
+        reindexPanel.hidden = true;
+        logoutButton.hidden = true;
+        sessionStatus.textContent = "";
+        uploadStatus.textContent = "";
+        reindexStatus.textContent = "";
+        authStatus.textContent = message;
+      }
+    </script>
+  </body>
+</html>

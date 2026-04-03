@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import secrets
 import unicodedata
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -9,11 +10,26 @@ from pathlib import Path
 from typing import List
 
 import fastapi
+from app_models import (
+    ChatRequest,
+    ChatResponse,
+    ChatSummary,
+    ChatTranscript,
+    ChatTurnPayload,
+    FeedbackRequest,
+    FeedbackResponse,
+    RegimeOption,
+    SimulationRequest,
+    SimulationResponse,
+    SourceRef,
+)
 from dotenv import load_dotenv
+from fastapi import File, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 from openai import APIError, RateLimitError
-from pydantic import BaseModel
+from storage_services import ChatHistoryStore, EventStore, FeedbackStore, build_admin_stats
+from tax_simulator import simulate_forfettario
 
 from lexical_fallback import LexicalChunk, LexicalFallbackIndex
 from rag_qdrant import CorpusConfig, QdrantRAG, RetrievedChunk
@@ -55,9 +71,14 @@ HARD_CODED_CATEGORIES = {
     "critical": {"critical"},
 }
 ALLOWED_HARD_CODED = HARD_CODED_CATEGORIES.get(HARD_CODED_MODE, {"critical", "stable"})
+chat_store = ChatHistoryStore()
+feedback_store = FeedbackStore(Path("data/feedback/feedback.jsonl"))
+event_store = EventStore(Path("data/events/app_events.jsonl"))
+ADMIN_ACCESS_KEY = os.getenv("ADMIN_ACCESS_KEY", "").strip()
 
 
 def _log_rag_event(event: str, payload: dict) -> None:
+    event_store.append({"event": event, **payload})
     if not LOG_RAG_EVENTS:
         return
     LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -69,6 +90,16 @@ def _log_rag_event(event: str, payload: dict) -> None:
     log_path = LOG_DIR / "rag_events.jsonl"
     with log_path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+def _require_admin(admin_key: str | None) -> None:
+    if not ADMIN_ACCESS_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail="ADMIN_ACCESS_KEY non configurata sul server.",
+        )
+    if not admin_key or not secrets.compare_digest(admin_key, ADMIN_ACCESS_KEY):
+        raise HTTPException(status_code=401, detail="Credenziali admin non valide.")
 
 
 def _build_lexical_index(regime_ids: List[str]) -> LexicalFallbackIndex | None:
@@ -89,6 +120,12 @@ def _build_lexical_index(regime_ids: List[str]) -> LexicalFallbackIndex | None:
                     source=str(source),
                     chunk_id=int(chunk_id),
                     text=str(text),
+                    page_start=int(payload.get("page_start"))
+                    if payload.get("page_start") is not None
+                    else None,
+                    page_end=int(payload.get("page_end"))
+                    if payload.get("page_end") is not None
+                    else None,
                 )
             )
     except Exception:
@@ -96,19 +133,6 @@ def _build_lexical_index(regime_ids: List[str]) -> LexicalFallbackIndex | None:
     if not chunks:
         return None
     return LexicalFallbackIndex.from_chunks(chunks)
-
-
-
-
-class ChatRequest(BaseModel):
-    content: str
-
-
-class ChatResponse(BaseModel):
-    message: str
-    sources: List[str]
-
-
 @dataclass(frozen=True)
 class RegimeProfile:
     regime_id: str
@@ -199,11 +223,20 @@ def _build_regime_aliases(corpus: CorpusConfig) -> tuple[str, ...]:
     return tuple(sorted({alias.strip() for alias in aliases if alias.strip()}, key=len, reverse=True))
 
 
-REGIME_PROFILES = _build_regime_profiles()
-DEFAULT_REGIME_ID = next(
-    (profile.regime_id for profile in REGIME_PROFILES if profile.is_default),
-    REGIME_PROFILES[0].regime_id,
-)
+REGIME_PROFILES: List[RegimeProfile] = []
+DEFAULT_REGIME_ID = "forfettario"
+
+
+def _refresh_regime_profiles() -> None:
+    global REGIME_PROFILES, DEFAULT_REGIME_ID
+    REGIME_PROFILES = _build_regime_profiles()
+    DEFAULT_REGIME_ID = next(
+        (profile.regime_id for profile in REGIME_PROFILES if profile.is_default),
+        REGIME_PROFILES[0].regime_id,
+    )
+
+
+_refresh_regime_profiles()
 
 lexical_index: LexicalFallbackIndex | None = None
 if LEXICAL_FALLBACK_ENABLED:
@@ -213,6 +246,75 @@ if LEXICAL_FALLBACK_ENABLED:
         lexical_index = LexicalFallbackIndex.from_local_index(
             Path("rag_index/index.json")
         )
+
+
+def _compact_excerpt(text: str, max_length: int = 220) -> str:
+    normalized = re.sub(r"\s+", " ", text).strip()
+    if len(normalized) <= max_length:
+        return normalized
+    return normalized[: max_length - 1].rstrip() + "…"
+
+
+def _build_source_details(items: List[RetrievedChunk]) -> List[SourceRef]:
+    details: List[SourceRef] = []
+    seen = set()
+    for item in items:
+        key = (item.source, item.chunk_id)
+        if key in seen:
+            continue
+        details.append(
+            SourceRef(
+                source=item.source,
+                excerpt=_compact_excerpt(item.text),
+                chunk_id=item.chunk_id,
+                page_start=getattr(item, "page_start", None),
+                page_end=getattr(item, "page_end", None),
+                score=round(item.score, 4),
+            )
+        )
+        seen.add(key)
+    return details[:4]
+
+
+def _confidence_from_results(
+    retrieved: List[RetrievedChunk],
+    retrieval_mode: str,
+) -> tuple[str | None, float | None]:
+    if not retrieved:
+        return None, None
+    top_score = max(item.score for item in retrieved)
+    if retrieval_mode == "lexical":
+        if top_score >= 0.18:
+            return "media", round(top_score, 4)
+        return "bassa", round(top_score, 4)
+    if top_score >= 0.3:
+        return "alta", round(top_score, 4)
+    if top_score >= 0.18:
+        return "media", round(top_score, 4)
+    return "bassa", round(top_score, 4)
+
+
+def _respond(
+    message: str,
+    sources: List[str] | None = None,
+    *,
+    source_details: List[SourceRef] | None = None,
+    confidence_label: str | None = None,
+    confidence_score: float | None = None,
+    retrieval_mode: str | None = None,
+    regime_id: str | None = None,
+    chat_id: str | None = None,
+) -> ChatResponse:
+    return ChatResponse(
+        message=message,
+        sources=sources or [],
+        source_details=source_details or [],
+        confidence_label=confidence_label,
+        confidence_score=confidence_score,
+        retrieval_mode=retrieval_mode,
+        regime_id=regime_id,
+        chat_id=chat_id,
+    )
 
 
 def _normalize_match_text(text: str) -> str:
@@ -1375,6 +1477,22 @@ def _search_with_intent(query: str, regime_id: str) -> tuple[List[RetrievedChunk
     if query.strip() and normalized_query != query.strip().lower():
         primary_queries.append(query.strip())
 
+    lexical_results: List[RetrievedChunk] = []
+    if lexical_index is not None:
+        lexical_hits = lexical_index.search(normalized_query, top_k=6, regime_id=regime_id)
+        lexical_results = [
+            RetrievedChunk(
+                regime=chunk.regime,
+                source=chunk.source,
+                chunk_id=chunk.chunk_id,
+                text=chunk.text,
+                score=min(score + 0.04, 1.0),
+                page_start=chunk.page_start,
+                page_end=chunk.page_end,
+            )
+            for chunk, score in lexical_hits
+        ]
+
     thresholds = _dynamic_score_thresholds(normalized_query)
     for threshold in thresholds:
         primary_results: List[RetrievedChunk] = []
@@ -1398,56 +1516,255 @@ def _search_with_intent(query: str, regime_id: str) -> tuple[List[RetrievedChunk
                     regime_ids=[regime_id],
                 )
             )
-        merged = _merge_results(primary_results, extra_results, top_k=8)
+        merged = _merge_results(primary_results, extra_results + lexical_results, top_k=8)
         if merged:
-            return merged, "semantic"
+            mode = "hybrid" if lexical_results else "semantic"
+            return merged, mode
 
-    if lexical_index is None:
+    if not lexical_results:
         return [], "none"
+    return lexical_results, "lexical"
 
-    lexical_hits = lexical_index.search(normalized_query, top_k=8, regime_id=regime_id)
-    if not lexical_hits:
-        return [], "none"
+
+def _resolve_requested_regime(regime_id: str | None) -> RegimeProfile | None:
+    if not regime_id:
+        return None
+    normalized = QdrantRAG.normalize_regime_id(regime_id)
+    return next((item for item in REGIME_PROFILES if item.regime_id == normalized), None)
+
+
+def _reload_runtime_indexes() -> None:
+    global rag, rag_load_error, lexical_index
+    _refresh_regime_profiles()
+    rag = QdrantRAG.from_env()
+    rag.load()
+    rag_load_error = None
+    if LEXICAL_FALLBACK_ENABLED:
+        regime_ids = [profile.regime_id for profile in REGIME_PROFILES]
+        lexical_index = _build_lexical_index(regime_ids)
+    else:
+        lexical_index = None
+
+
+@app.get("/regimes", response_model=List[RegimeOption])
+async def list_regimes():
+    _refresh_regime_profiles()
     return [
-        RetrievedChunk(
-            regime=chunk.regime,
-            source=chunk.source,
-            chunk_id=chunk.chunk_id,
-            text=chunk.text,
-            score=score,
+        RegimeOption(
+            regime_id=profile.regime_id,
+            label=profile.label,
+            is_default=profile.is_default,
         )
-        for chunk, score in lexical_hits
-    ], "lexical"
+        for profile in REGIME_PROFILES
+    ]
+
+
+@app.post("/simulate", response_model=SimulationResponse)
+async def simulate(payload: SimulationRequest):
+    if payload.regime_id != "forfettario":
+        raise HTTPException(
+            status_code=400,
+            detail="Il simulatore disponibile in questa versione copre il regime forfettario.",
+        )
+    try:
+        return simulate_forfettario(payload)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
+
+@app.post("/chat-history", response_model=ChatTranscript)
+async def persist_chat_turn(payload: ChatTurnPayload):
+    chat = chat_store.save_turn(
+        chat_id=payload.chat_id,
+        regime_id=payload.regime_id,
+        user_message=payload.user_message,
+        assistant_message=payload.assistant_message,
+        assistant_sources=payload.assistant_sources,
+    )
+    event_store.append(
+        {
+            "event": "chat_turn_saved",
+            "chat_id": payload.chat_id,
+            "regime_id": payload.regime_id,
+            "confidence_label": payload.confidence_label,
+            "confidence_score": payload.confidence_score,
+            "retrieval_mode": payload.retrieval_mode,
+        }
+    )
+    return ChatTranscript(
+        chat_id=chat["chat_id"],
+        title=chat["title"],
+        regime_id=chat.get("regime_id"),
+        created_at=chat.get("created_at", ""),
+        updated_at=chat.get("updated_at", ""),
+        messages=chat["messages"],
+    )
+
+
+@app.get("/chat-history", response_model=List[ChatSummary])
+async def list_chat_history():
+    return chat_store.list_chats()
+
+
+@app.get("/chat-history/{chat_id}", response_model=ChatTranscript)
+async def get_chat_history(chat_id: str):
+    transcript = chat_store.get_chat(chat_id)
+    if transcript is None:
+        raise HTTPException(status_code=404, detail="Chat non trovata.")
+    return transcript
+
+
+@app.delete("/chat-history/{chat_id}", response_model=FeedbackResponse)
+async def delete_chat_history(chat_id: str):
+    deleted = chat_store.delete_chat(chat_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Chat non trovata.")
+    return FeedbackResponse(status="deleted")
+
+
+@app.post("/feedback", response_model=FeedbackResponse)
+async def save_feedback(payload: FeedbackRequest):
+    vote = payload.vote.strip().lower()
+    if vote not in {"up", "down"}:
+        raise HTTPException(status_code=400, detail="Vote non valido.")
+    feedback_store.append(payload.model_dump())
+    return FeedbackResponse(status="saved")
+
+
+@app.get("/admin/overview")
+async def admin_overview():
+    stats = build_admin_stats(chat_store, feedback_store, event_store)
+    recent_feedback = feedback_store.read_all()[-10:]
+    return {
+        "stats": stats.model_dump(),
+        "recent_feedback": recent_feedback,
+        "recent_chats": [item.model_dump() for item in chat_store.list_chats(limit=10)],
+    }
+
+
+@app.post("/admin/auth/verify")
+async def admin_auth_verify(x_admin_key: str | None = Header(default=None)):
+    _require_admin(x_admin_key)
+    return {"status": "authorized"}
+
+
+@app.post("/admin/upload")
+async def admin_upload_document(
+    file: UploadFile = File(...),
+    regime_id: str | None = None,
+    x_admin_key: str | None = Header(default=None),
+):
+    _require_admin(x_admin_key)
+    filename = file.filename or ""
+    suffix = Path(filename).suffix.lower()
+    if suffix not in {".pdf", ".xml"}:
+        raise HTTPException(status_code=400, detail="Sono supportati solo PDF e XML.")
+    target_regime = QdrantRAG.normalize_regime_id(regime_id or DEFAULT_REGIME_ID)
+    existing_corpus = next(
+        (profile for profile in REGIME_PROFILES if profile.regime_id == target_regime),
+        None,
+    )
+    if existing_corpus is not None:
+        target_dir = next(
+            (
+                corpus.path
+                for corpus in QdrantRAG.discover_pdf_corpora(Path("."))
+                if corpus.regime_id == target_regime
+            ),
+            Path("Normativo_Forfettari_Agg_2026")
+            if target_regime == "forfettario"
+            else Path(f"Normativo_{target_regime.title()}_Agg_2026"),
+        )
+    else:
+        target_dir = (
+            Path("Normativo_Forfettari_Agg_2026")
+            if target_regime == "forfettario"
+            else Path(f"Normativo_{target_regime.title()}_Agg_2026")
+        )
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target_path = target_dir / Path(filename).name
+    target_path.write_bytes(await file.read())
+    _refresh_regime_profiles()
+    return {"status": "uploaded", "path": str(target_path), "regime_id": target_regime}
+
+
+@app.post("/admin/reindex")
+async def admin_reindex(x_admin_key: str | None = Header(default=None)):
+    _require_admin(x_admin_key)
+    corpora = QdrantRAG.discover_pdf_corpora(Path("."))
+    if not corpora:
+        raise HTTPException(status_code=400, detail="Nessuna cartella Normativo_* trovata.")
+    total_chunks = rag.build_from_pdf_directories(
+        corpora=corpora,
+        chunk_size=1200,
+        overlap=200,
+        embed_batch_size=32,
+        recreate_collection=True,
+    )
+    _reload_runtime_indexes()
+    event_store.append(
+        {
+            "event": "reindex_completed",
+            "total_chunks": total_chunks,
+            "regimes": [corpus.regime_id for corpus in corpora],
+        }
+    )
+    return {
+        "status": "reindexed",
+        "total_chunks": total_chunks,
+        "regimes": [corpus.regime_id for corpus in corpora],
+    }
 
 
 @app.post("/", response_model=ChatResponse)
 async def read_root(payload: ChatRequest):
     if rag_load_error:
-        return ChatResponse(
+        return _respond(
             message=(
                 "Indice RAG su Qdrant non disponibile. Esegui prima: "
                 "`python3 build_rag_index.py`."
             ),
             sources=[],
+            chat_id=payload.chat_id,
         )
 
     raw_contenuto = payload.content.strip()
     if not raw_contenuto:
-        return ChatResponse(message="Inserisci una domanda valida.", sources=[])
+        return _respond(
+            message="Inserisci una domanda valida.",
+            sources=[],
+            chat_id=payload.chat_id,
+        )
     contenuto = _normalize_tax_query(raw_contenuto)
 
-    active_regime, regime_explicit, regime_ambiguous = _resolve_regime(contenuto)
+    requested_regime = _resolve_requested_regime(payload.regime_id)
+    if payload.regime_id and requested_regime is None:
+        return _respond(
+            message="Il regime selezionato non e' disponibile tra i corpora caricati.",
+            sources=[],
+            chat_id=payload.chat_id,
+        )
+
+    if requested_regime is not None:
+        active_regime, regime_explicit, regime_ambiguous = requested_regime, True, False
+    else:
+        active_regime, regime_explicit, regime_ambiguous = _resolve_regime(contenuto)
     if regime_ambiguous:
         available = ", ".join(profile.label for profile in REGIME_PROFILES)
-        return ChatResponse(
+        return _respond(
             message=(
                 "La domanda sembra riferirsi a piu' regimi. Specifica meglio il regime fiscale da usare "
                 f"tra quelli caricati: {available}."
             ),
             sources=[],
+            chat_id=payload.chat_id,
         )
     if active_regime is None:
-        return ChatResponse(message=_regime_scope_message(), sources=[])
+        return _respond(
+            message=_regime_scope_message(),
+            sources=[],
+            chat_id=payload.chat_id,
+        )
 
     is_forfettario_regime = active_regime.regime_id == "forfettario"
     allow_critical = _allow_hardcoded("critical")
@@ -1987,20 +2304,24 @@ async def read_root(payload: ChatRequest):
                     "sources": list(dict.fromkeys(chunk.source for chunk in term_mentions))[:4],
                 },
             )
-            return ChatResponse(
+            return _respond(
                 message=_definition_fallback_message(definition_term),
                 sources=list(dict.fromkeys(chunk.source for chunk in term_mentions))[:4],
+                regime_id=active_regime.regime_id,
+                chat_id=payload.chat_id,
             )
         _log_rag_event(
             "rag_no_results",
             {"query": raw_contenuto, "regime": active_regime.regime_id},
         )
-        return ChatResponse(
+        return _respond(
             message=(
                 f"Non trovo informazioni pertinenti nei documenti caricati per {active_regime.label.lower()}. "
                 "Riformula la domanda o aggiungi documentazione."
             ),
             sources=[],
+            regime_id=active_regime.regime_id,
+            chat_id=payload.chat_id,
         )
 
     if definition_term:
@@ -2022,9 +2343,11 @@ async def read_root(payload: ChatRequest):
                     "sources": sources,
                 },
             )
-            return ChatResponse(
+            return _respond(
                 message=_definition_fallback_message(definition_term),
                 sources=sources,
+                regime_id=active_regime.regime_id,
+                chat_id=payload.chat_id,
             )
         if not has_term_in_context and term_mentions:
             _log_rag_event(
@@ -2036,9 +2359,11 @@ async def read_root(payload: ChatRequest):
                     "sources": list(dict.fromkeys(chunk.source for chunk in term_mentions))[:4],
                 },
             )
-            return ChatResponse(
+            return _respond(
                 message=_definition_fallback_message(definition_term),
                 sources=list(dict.fromkeys(chunk.source for chunk in term_mentions))[:4],
+                regime_id=active_regime.regime_id,
+                chat_id=payload.chat_id,
             )
 
     top_score = max(item.score for item in retrieved)
@@ -2095,19 +2420,37 @@ async def read_root(payload: ChatRequest):
             stream=False,
         )
     except RateLimitError:
-        return ChatResponse(
+        return _respond(
             message=(
                 "Quota DeepSeek esaurita o limite raggiunto (errore 429). "
                 "Controlla piano e billing del provider selezionato."
             ),
             sources=[],
+            regime_id=active_regime.regime_id,
+            chat_id=payload.chat_id,
         )
     except APIError as error:
-        return ChatResponse(
+        return _respond(
             message=f"Errore API DeepSeek: {error}",
             sources=[],
+            regime_id=active_regime.regime_id,
+            chat_id=payload.chat_id,
         )
 
     answer = _clean_model_answer(response.choices[0].message.content or "")
     sources = list(dict.fromkeys(item.source for item in retrieved))[:4]
-    return ChatResponse(message=answer, sources=sources)
+    source_details = _build_source_details(retrieved)
+    confidence_label, confidence_score = _confidence_from_results(
+        retrieved,
+        retrieval_mode,
+    )
+    return _respond(
+        message=answer,
+        sources=sources,
+        source_details=source_details,
+        confidence_label=confidence_label,
+        confidence_score=confidence_score,
+        retrieval_mode=retrieval_mode,
+        regime_id=active_regime.regime_id,
+        chat_id=payload.chat_id,
+    )

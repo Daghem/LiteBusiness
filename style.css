@@ -391,3 +391,74 @@ body.dark-custom .form-control {
 body.dark-custom .form-control::placeholder {
   color: #888 !important;
 }
+
+/* =========================================
+   LA NUOVA SIDEBAR FLUTTUANTE
+   ========================================= */
+.flytax-sidebar {
+  position: fixed;
+  top: 20px;
+  bottom: 20px;
+  left: -350px; /* Nascosta fuori dallo schermo all'inizio */
+  width: 300px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  z-index: 1050;
+  transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.flytax-sidebar.open {
+  left: 20px; /* Scivola dentro lo schermo quando è aperta */
+}
+
+.sidebar-link {
+  text-decoration: none;
+  color: #2d3436;
+  padding: 10px 15px;
+  border-radius: 12px;
+  display: block;
+  transition:
+    background 0.2s,
+    color 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.sidebar-link:hover {
+  background: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+}
+
+.sidebar-account {
+  color: #2d3436;
+  transition: opacity 0.2s;
+}
+
+.sidebar-account:hover {
+  opacity: 0.7;
+}
+
+/* Colori della Sidebar in Modalità Scura */
+body.dark-custom .flytax-sidebar {
+  background: rgba(30, 30, 30, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-custom .sidebar-link,
+body.dark-custom .sidebar-account {
+  color: #e0e0e0 !important;
+}
+
+body.dark-custom .sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+body.dark-custom .border-secondary-subtle {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}

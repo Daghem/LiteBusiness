@@ -3,7 +3,7 @@
   "title": "ciao",
   "regime_id": "forfettario",
   "created_at": "2026-04-03T13:29:23.391043+00:00",
-  "updated_at": "2026-04-03T14:36:22.018136+00:00",
+  "updated_at": "2026-04-03T15:35:57.161280+00:00",
   "messages": [
     {
       "role": "user",
@@ -194,6 +194,23 @@
         "08a_Guida_Pratica_Fatturazione_Elettronica_Forfettari_2026.pdf"
       ],
       "created_at": "2026-04-03T14:36:22.018136+00:00"
+    },
+    {
+      "role": "user",
+      "text": "ho due figli che studiano e sto pagando le loro tasse e cose varie scolastiche, posso detrarre il 19%?",
+      "sources": [],
+      "created_at": "2026-04-03T15:35:57.161280+00:00"
+    },
+    {
+      "role": "assistant",
+      "text": "I documenti disponibili non contengono informazioni specifiche sulla detrazione del 19% per le spese scolastiche dei figli. Pertanto, non è possibile fornire una risposta basata sulle fonti a disposizione.",
+      "sources": [
+        "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
+        "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+        "11_Guida_Riduzione_Contributiva_35_INPS.pdf",
+        "06_Circolare_INPS_8-2026_Aliquote_Gestione_Separata.pdf"
+      ],
+      "created_at": "2026-04-03T15:35:57.161280+00:00"
     }
   ]
 }

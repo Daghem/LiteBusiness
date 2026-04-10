@@ -1,9 +1,11 @@
 import asyncio
 import importlib
+import json
 import os
 import sys
 import types
 import unittest
+from pathlib import Path
 from unittest import mock
 
 class FakeRag:
@@ -101,6 +103,7 @@ class ApiDeepseekRoutingTests(unittest.TestCase):
 
         fake_fastapi.FastAPI = FakeFastAPI
         fake_fastapi.File = lambda *args, **kwargs: None
+        fake_fastapi.Header = lambda *args, **kwargs: None
 
         class FakeHTTPException(Exception):
             def __init__(self, status_code=400, detail=""):
@@ -435,6 +438,76 @@ class ApiDeepseekRoutingTests(unittest.TestCase):
             "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
             response.sources,
         )
+
+    def test_critical_questions_are_answered_correctly(self):
+        module = self.load_module()
+        cases = [
+            (
+                "Ho portato un cliente a cena fuori e ho speso 150€. Posso caricare la fattura nel software per scaricare l'IVA e abbassare le tasse del mio 15%?",
+                ("non detrai", "non deduci"),
+            ),
+            (
+                "Lavoro come dipendente e prendo 32.000€ lordi l'anno. Posso aprire la partita IVA forfettaria domani per arrotondare?",
+                ("non puoi", "30.000 euro"),
+            ),
+            (
+                "Mi sono licenziato ieri. Posso aprire la partita IVA forfettaria e fatturare tutto il mio lavoro alla mia ex azienda cosi risparmio sulle tasse?",
+                ("ex datore", "anno successivo"),
+            ),
+            (
+                "Ho venduto il mio vecchio PC aziendale usato a un amico per 400€. Devo sommare questi soldi agli 85.000€ del limite annuale?",
+                ("non si somma", "85.000"),
+            ),
+            (
+                "Ho tre figli a carico e pago 2.000€ di asilo nido. Posso recuperare il 19% di queste spese dalle tasse della mia partita IVA?",
+                ("no", "imposta sostitutiva"),
+            ),
+            (
+                "A ottobre ho incassato una super fattura e sono arrivato a 105.000€ totali nell'anno. Resto forfettario fino a dicembre e poi cambio l'anno prossimo?",
+                ("uscita dal regime", "iva ordinario"),
+            ),
+            (
+                "Ho comprato un software da un sito americano e ho pagato 100€. Non c'e l'IVA in fattura, quindi sono a posto cosi, giusto?",
+                ("td17", "16 del mese successivo"),
+            ),
+            (
+                "Ho il 20% di una SRL che si occupa di pulizie, io vorrei aprire P.IVA forfettaria per fare il consulente marketing. Posso?",
+                ("sì", "20%"),
+            ),
+            (
+                "Ho fatto una fattura da 500€ e ci ho messo la marca da bollo da 2€. Il cliente mi ha rimborsato i 2€. Su quei due euro ci devo pagare le tasse?",
+                ("non costituisce un ricavo", "85.000"),
+            ),
+        ]
+
+        for question, expected_terms in cases:
+            with self.subTest(question=question):
+                response = self.ask(module, question)
+                message = response.message.lower()
+                for term in expected_terms:
+                    self.assertIn(term.lower(), message)
+
+    def test_may_request_for_inps_discount_is_not_valid_for_same_year(self):
+        module = self.load_module()
+        response = self.ask(
+            module,
+            "Siamo a maggio, ho aperto la partita IVA come commerciante a gennaio ma ho pagato i contributi pieni. Posso chiedere ora lo sconto del 35% per quest'anno?",
+        )
+        self.assertIn("28 febbraio", response.message.lower())
+        self.assertIn("anno successivo", response.message.lower())
+
+    def test_forfettario_regression_bank(self):
+        module = self.load_module()
+        bank_path = Path(__file__).with_name("fixtures") / "forfettario_regression_cases.json"
+        cases = json.loads(bank_path.read_text(encoding="utf-8"))
+        for case in cases:
+            question = case["question"]
+            expected_all = case["expected_all"]
+            with self.subTest(question=question):
+                response = self.ask(module, question)
+                message = response.message.lower()
+                for term in expected_all:
+                    self.assertIn(term.lower(), message)
 
 
 if __name__ == "__main__":

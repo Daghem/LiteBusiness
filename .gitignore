@@ -1,8 +1,15 @@
 .env
 .vscode
+.codex
+.codex/
 __pycache__/
 *.pyc
 run_chat_ui_tests.py
 chat_test_questions.txt
 chat_ui_test_results.jsonl
+chat_test_questions_bastarde.txt
+chat_test_results_bastarde.json
+api_regression_report.json
+data/chat_history/*.json
+data/events/*.jsonl
 FlyTax_spiegazione_progetto.pdf

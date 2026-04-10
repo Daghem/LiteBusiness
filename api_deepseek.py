@@ -435,6 +435,11 @@ CANONICAL_QUERY_TOKENS = (
     "riduzione",
     "ateco",
     "forfettari",
+    "naspi",
+    "residenza",
+    "cassa",
+    "integrativo",
+    "detrazioni",
 )
 
 
@@ -710,7 +715,7 @@ def _is_limit_query(query: str) -> bool:
 
 def _is_tax_query(query: str) -> bool:
     q = _normalize_tax_query(query)
-    return any(term in q for term in ("quanto vengo tass", "tassat", "imposta", "aliquota", "sostitutiva"))
+    return any(term in q for term in ("quanto vengo tass", "tassat", "imposta", "aliquota", "sostitutiva", "tasse"))
 
 
 def _is_forfettario_query(query: str) -> bool:
@@ -974,6 +979,9 @@ def _is_employment_income_threshold_query(query: str) -> bool:
             "reddito da lavoro dipendente",
             "redditi da lavoro dipendente",
             "reddito dipendente",
+            "come dipendente",
+            "sono dipendente",
+            "faccio il dipendente",
         )
     )
     has_threshold_or_access_intent = any(
@@ -1000,6 +1008,7 @@ def _is_employment_income_under_threshold_query(query: str) -> bool:
             "reddito da lavoro dipendente",
             "redditi da lavoro dipendente",
             "reddito dipendente",
+            "dipendente",
         )
     )
     has_under_threshold = any(
@@ -1007,6 +1016,7 @@ def _is_employment_income_under_threshold_query(query: str) -> bool:
         for term in (
             "29.000",
             "29000",
+            "29mila",
             "sotto 30.000",
             "inferiore a 30.000",
         )
@@ -1017,11 +1027,12 @@ def _is_employment_income_under_threshold_query(query: str) -> bool:
 
 def _is_employment_cessation_query(query: str) -> bool:
     q = _normalize_tax_query(query)
-    return (
-        "rapporto di lavoro" in q
-        and "cessat" in q
-        and any(term in q for term in ("cambia", "rileva", "forfettario", "soglia"))
+    has_cessation = "cessat" in q
+    has_employment_context = any(
+        term in q for term in ("rapporto di lavoro", "lavoro dipendente", "dipendente")
     )
+    has_effect_intent = any(term in q for term in ("cambia", "rileva", "forfettario", "soglia", "conta"))
+    return has_cessation and has_employment_context and has_effect_intent
 
 
 def _is_inps_35_general_query(query: str) -> bool:
@@ -1031,12 +1042,8 @@ def _is_inps_35_general_query(query: str) -> bool:
         "riduzione inps",
         "riduzione del 35",
         "riduzione 35",
-        "35%",
-        "gestione separata",
-        "cassa professionale",
-        "professionisti con cassa",
-        "artigiani",
-        "commercianti",
+        "sconto del 35",
+        "sconto inps",
     )
     follow_up_terms = (
         "domanda",
@@ -1056,6 +1063,7 @@ def _is_inps_35_general_query(query: str) -> bool:
         "di nuovo",
         "riattiv",
         "chi può",
+        "vale anche",
     )
     context_anchor_terms = (
         "inps",
@@ -1111,6 +1119,7 @@ def _is_forfettario_domain_query(query: str) -> bool:
         "aliquota",
         "sostitutiva",
         "soglia",
+        "limite",
         "quadro lm",
         "artigiani",
         "commercianti",
@@ -1147,6 +1156,25 @@ def _is_forfettario_domain_query(query: str) -> bool:
         "uscita",
         "esco",
         "presentata",
+        "detraz",
+        "dedu",
+        "figli a carico",
+        "asilo nido",
+        "bene strumentale",
+        "beni strumentali",
+        "plusvalenza",
+        "rimborso",
+        "730",
+        "modello 730",
+        "naspi",
+        "residenza",
+        "regimi speciali",
+        "agricoltura",
+        "editoria",
+        "cassa professionale",
+        "cassa forense",
+        "inarcassa",
+        "contributo integrativo",
     )
     return any(term in q for term in domain_terms)
 
@@ -1236,7 +1264,9 @@ def _is_inps_35_renewal_query(query: str) -> bool:
 
 def _is_inps_35_cassa_query(query: str) -> bool:
     q = _normalize_tax_query(query)
-    has_35 = _has_inps_35_context(q)
+    has_35 = _contains_percent_reference(q, "35") or any(
+        term in q for term in ("riduzione inps", "riduzione contributiva", "sconto inps", "sconto del 35")
+    )
     has_cassa = "cassa" in q or "professionist" in q
     return has_35 and has_cassa
 
@@ -1273,7 +1303,10 @@ def _is_inps_35_new_activity_query(query: str) -> bool:
             "inizio attività",
         )
     )
-    has_request_intent = "domanda" in q or "richiesta" in q or "quando va fatta" in q
+    has_request_intent = any(
+        term in q
+        for term in ("domanda", "richiesta", "quando va fatta", "quando chiedo", "quando la chiedo", "quando richiedo")
+    )
     generic_follow_up = not _has_non_inps_domain_context(q)
     return has_new_activity and has_request_intent and (
         _has_inps_35_context(q) or generic_follow_up
@@ -1341,6 +1374,396 @@ def _is_ex_datore_after_two_years_query(query: str) -> bool:
         )
     )
     return has_ex_datore and has_time_reference
+
+
+def _is_business_meal_cost_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_meal_context = any(
+        term in q
+        for term in (
+            "cena",
+            "pranzo",
+            "ristorante",
+            "cliente a cena",
+            "portato un cliente",
+        )
+    )
+    has_tax_intent = any(
+        term in q
+        for term in (
+            "scaricare l'iva",
+            "scaricare iva",
+            "scaricare l iva",
+            "dedurre",
+            "deduc",
+            "abbassare le tasse",
+            "15%",
+        )
+    )
+    return has_meal_context and has_tax_intent
+
+
+def _is_employee_above_threshold_access_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_employee_context = any(
+        term in q
+        for term in (
+            "dipendente",
+            "lavoro come dipendente",
+            "lavoro dipendente",
+            "reddito da lavoro dipendente",
+        )
+    )
+    has_threshold = any(term in q for term in ("32.000", "32000", "30.000", "30000"))
+    has_access_intent = any(
+        term in q
+        for term in (
+            "aprire la partita iva",
+            "aprire p.iva",
+            "aprire partita iva",
+            "posso aprire",
+            "arrotondare",
+            "forfettari",
+            "forfettario",
+        )
+    )
+    return has_employee_context and has_threshold and has_access_intent
+
+
+def _is_ex_employer_prevalence_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_previous_employer = any(
+        term in q
+        for term in (
+            "ex datore",
+            "datore di lavoro",
+            "ex azienda",
+            "mia ex azienda",
+            "mi sono licenziato",
+            "licenziato",
+        )
+    )
+    has_invoicing_intent = any(
+        term in q
+        for term in (
+            "fatturare tutto",
+            "fatturare",
+            "prevalent",
+            "tutto il mio lavoro",
+            "risparmio sulle tasse",
+        )
+    )
+    return has_previous_employer and has_invoicing_intent
+
+
+def _is_strumental_asset_sale_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_asset_context = any(
+        term in q
+        for term in (
+            "pc aziendale",
+            "vecchio pc",
+            "computer aziendale",
+            "bene strumentale",
+            "beni strumentali",
+        )
+    ) or ("venduto" in q and "pc" in q)
+    has_threshold_intent = any(
+        term in q
+        for term in (
+            "85.000",
+            "85000",
+            "85mila",
+            "limite annuale",
+            "limite dei ricavi",
+            "sommare",
+            "concorre",
+        )
+    )
+    return has_asset_context and has_threshold_intent
+
+
+def _is_family_detraction_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_family_context = any(
+        term in q
+        for term in (
+            "figli a carico",
+            "carico",
+            "asilo nido",
+            "spese d'istruzione",
+            "spese di istruzione",
+        )
+    )
+    has_detraction_intent = any(
+        term in q
+        for term in (
+            "19%",
+            "19 per cento",
+            "detraz",
+            "recuperare",
+            "tasse della mia partita iva",
+        )
+    )
+    return has_family_context and has_detraction_intent
+
+
+def _is_exit_100k_example_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_superamento = any(term in q for term in ("105.000", "105000", "oltre 100.000", "oltre 100000"))
+    has_timing_intent = any(
+        term in q
+        for term in (
+            "resto forfettario fino a dicembre",
+            "cambio l'anno prossimo",
+            "anno prossimo",
+            "fino a dicembre",
+        )
+    )
+    return has_superamento and has_timing_intent
+
+
+def _is_foreign_software_reverse_charge_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_software_context = any(
+        term in q
+        for term in (
+            "software",
+            "abbonamento software",
+            "sito americano",
+            "sito estero",
+            "americano",
+            "estero",
+        )
+    )
+    has_vat_doubt = any(
+        term in q
+        for term in (
+            "non c'e l'iva",
+            "non c'è l'iva",
+            "senza iva",
+            "sono a posto",
+            "a posto cosi",
+            "a posto così",
+        )
+    )
+    return has_software_context and has_vat_doubt
+
+
+def _is_srl_non_reconducible_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_srl_context = "srl" in q and any(
+        term in q for term in ("20%", "20 per cento", "20 %", "socio")
+    )
+    has_non_reconducible_example = any(
+        term in q
+        for term in (
+            "pulizie",
+            "marketing",
+            "consulente marketing",
+            "attivita diverse",
+            "attivita non riconducibili",
+        )
+    )
+    has_forfettario_intent = any(
+        term in q
+        for term in (
+            "posso",
+            "aprire",
+            "forfettari",
+            "forfettaria",
+            "forfettario",
+        )
+    )
+    return has_srl_context and has_non_reconducible_example and has_forfettario_intent
+
+
+def _is_bollo_reimbursement_tax_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_bollo_context = "bollo" in q and any(
+        term in q
+        for term in (
+            "rimborsato",
+            "rimborso",
+            "2 euro",
+            "2€",
+            "marca da bollo",
+        )
+    )
+    has_tax_intent = any(
+        term in q
+        for term in (
+            "pagare le tasse",
+            "ci devo pagare le tasse",
+            "tassabile",
+            "tassato",
+            "ricavo",
+            "85.000",
+            "85000",
+        )
+    )
+    return has_bollo_context and has_tax_intent
+
+
+def _is_residency_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_residency = any(
+        term in q
+        for term in (
+            "residenza fiscale",
+            "residente all'estero",
+            "residente estero",
+            "vivo all'estero",
+            "vivo all estero",
+            "all estero",
+            "non residente",
+            "residenza",
+        )
+    )
+    has_forfettario_intent = any(
+        term in q
+        for term in ("forfettario", "forfettaria", "forfettari", "posso", "accedere", "applicare")
+    )
+    return has_residency and has_forfettario_intent
+
+
+def _is_special_vat_regime_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_special_context = any(
+        term in q
+        for term in (
+            "regimi speciali iva",
+            "regime speciale iva",
+            "agricoltura",
+            "editoria",
+            "agenzia di viaggio",
+            "tabacchi",
+            "sali e tabacchi",
+        )
+    )
+    has_access_intent = any(
+        term in q
+        for term in ("forfettario", "compatibile", "posso", "accedere", "incompatibile")
+    )
+    return has_special_context and has_access_intent
+
+
+def _is_730_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    return "730" in query or "modello 730" in q
+
+
+def _is_730_only_forfettario_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_730 = _is_730_query(query)
+    has_forfettario = _is_forfettario_query(q) or "partita iva" in q
+    has_declare_intent = any(
+        term in q
+        for term in (
+            "posso presentare",
+            "posso fare",
+            "posso usare",
+            "dichiarare",
+            "mettere",
+            "quadro e",
+            "detrazioni",
+            "scaricare",
+        )
+    )
+    return has_730 and has_forfettario and has_declare_intent
+
+
+def _is_cassa_integrativo_threshold_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_cassa = any(
+        term in q
+        for term in (
+            "cassa forense",
+            "inarcassa",
+            "enpam",
+            "cipag",
+            "cassa professionale",
+            "contributo integrativo",
+        )
+    ) or _contains_percent_reference(q, "4") or _contains_percent_reference(q, "2") or _contains_percent_reference(q, "5")
+    has_threshold_intent = any(
+        term in q
+        for term in (
+            "85.000",
+            "85000",
+            "limite",
+            "conta",
+            "concorre",
+            "in fattura",
+        )
+    )
+    return has_cassa and has_threshold_intent
+
+
+def _is_cassa_integrativo_deduction_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_integrativo = (
+        "contributo integrativo" in q
+        or _contains_percent_reference(q, "4")
+        or _contains_percent_reference(q, "2")
+        or _contains_percent_reference(q, "5")
+    ) and any(term in q for term in ("cassa", "inarcassa", "forense", "enpam", "cipag", "professionale"))
+    has_deduction_intent = any(
+        term in q
+        for term in (
+            "deducibile",
+            "dedurre",
+            "rigo lm35",
+            "ci pago le tasse",
+            "tass",
+        )
+    )
+    return has_integrativo and has_deduction_intent
+
+
+def _is_naspi_anticipation_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_naspi = "naspi" in q
+    has_anticipation = any(
+        term in q
+        for term in (
+            "anticipo",
+            "anticipata",
+            "unica soluzione",
+            "30 giorni",
+            "apertura della partita iva",
+        )
+    )
+    return has_naspi and has_anticipation
+
+
+def _is_naspi_monthly_compatibility_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_naspi = "naspi" in q
+    has_monthly_context = any(
+        term in q
+        for term in (
+            "mensile",
+            "compatibile",
+            "continuare a ricevere",
+            "ridotta",
+            "naspi-com",
+            "5500",
+            "8500",
+        )
+    )
+    return has_naspi and has_monthly_context
+
+
+def _is_general_forfettario_tax_query(query: str) -> bool:
+    q = _normalize_tax_query(query)
+    has_forfettario = _is_forfettario_query(q)
+    has_tax_intent = any(
+        term in q
+        for term in ("che tasse pago", "quali tasse", "imposta sostitutiva", "aliquota", "quanto pago")
+    )
+    has_limit_terms = any(term in q for term in ("soglia", "limite", "85.000", "100.000", "ricavi", "compensi"))
+    return has_forfettario and has_tax_intent and not has_limit_terms
 
 
 def _clean_model_answer(answer: str) -> str:
@@ -1903,6 +2326,18 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
+    if allow_stable and is_forfettario_regime and _is_general_forfettario_tax_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Nel regime forfettario paghi un'imposta sostitutiva che in via ordinaria e' del 15%. "
+                "Per le nuove attivita', se rispetti i requisiti, l'aliquota scende al 5% per i primi 5 anni."
+            ),
+            sources=[
+                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+                "09_Guida_Tecnica_Quadro_LM_Dichiarazione_Redditi.pdf",
+            ],
+        )
+
     if allow_stable and is_forfettario_regime and _is_forfettario_exit_100k_query(contenuto):
         return ChatResponse(
             message=(
@@ -2138,6 +2573,111 @@ async def read_root(payload: ChatRequest):
             ],
         )
 
+    if allow_stable and is_forfettario_regime and _is_bollo_reimbursement_tax_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No. Il rimborso dei 2 euro del bollo da parte del cliente non costituisce un ricavo "
+                "aggiuntivo da tassare separatamente e non si somma al limite degli 85.000 euro. Il bollo "
+                "resta solo un riaddebito dell'imposta assolta in fattura."
+            ),
+            sources=[
+                "08b_Manuale_AdE_Imposta_Bollo_Fatture_Elettroniche.pdf",
+                "08a_Guida_Pratica_Fatturazione_Elettronica_Forfettari_2026.pdf",
+                "13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_residency_query(contenuto):
+        return ChatResponse(
+            message=(
+                "In via generale il regime forfettario e' riservato ai residenti in Italia. Fanno eccezione "
+                "i residenti in uno Stato UE o SEE con adeguato scambio di informazioni, ma solo se producono "
+                "in Italia almeno il 75% del reddito complessivo."
+            ),
+            sources=[
+                "04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf",
+                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_special_vat_regime_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No, i regimi speciali IVA sono incompatibili con il regime forfettario. Se ti avvali di "
+                "regimi speciali come agricoltura, editoria, agenzie di viaggio o sali e tabacchi, non puoi "
+                "accedere o permanere nel forfettario."
+            ),
+            sources=[
+                "04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf",
+                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_730_only_forfettario_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Il reddito della partita IVA forfettaria non si dichiara nel 730 ma nel Modello Redditi PF, "
+                "quadro LM. Il 730 puoi usarlo solo per eventuali altri redditi soggetti a IRPEF, come lavoro "
+                "dipendente, pensione, terreni o fabbricati; se hai solo reddito forfettario, il 730 non basta "
+                "e le detrazioni si usano solo se hai capienza IRPEF su altri redditi."
+            ),
+            sources=[
+                "16_IL MODELLO 730 E IL CONTRIBUENTE FORFETTARIO (2026).pdf",
+                "09_Guida_Tecnica_Quadro_LM_Dichiarazione_Redditi.pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_cassa_integrativo_threshold_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No. Il contributo integrativo addebitato in fattura dagli iscritti a una Cassa professionale "
+                "(per esempio 2%, 4% o 5%) non concorre al reddito forfettario e non conta nel limite degli "
+                "85.000 euro."
+            ),
+            sources=[
+                "15_CASSE PROFESSIONALI AUTONOME E REGIME FORFETTARIO (2026).pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_cassa_integrativo_deduction_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No. Il contributo integrativo non e' deducibile e non va trattato come costo del professionista, "
+                "perche' e' un importo addebitato al cliente e poi riversato alla Cassa. In deduzione, nel rigo "
+                "LM35, rilevano invece i contributi soggettivi e maternita' effettivamente versati."
+            ),
+            sources=[
+                "15_CASSE PROFESSIONALI AUTONOME E REGIME FORFETTARIO (2026).pdf",
+                "09_Guida_Tecnica_Quadro_LM_Dichiarazione_Redditi.pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_naspi_anticipation_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Sì, chi apre una partita IVA forfettaria puo' chiedere l'anticipazione della NASPI in un'unica "
+                "soluzione, ma la domanda va inviata all'INPS entro 30 giorni dall'apertura della partita IVA o "
+                "dall'inizio attivita'. L'importo anticipato e' tassato ordinariamente IRPEF, non rientra nel "
+                "forfettario e non concorre al limite degli 85.000 euro."
+            ),
+            sources=[
+                "14_NASPI, DISOCCUPAZIONE E INCENTIVI ALL'AUTOIMPRENDITORIALITÀ (2026).pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_naspi_monthly_compatibility_query(contenuto):
+        return ChatResponse(
+            message=(
+                "La NASPI mensile puo' essere compatibile con la partita IVA forfettaria, ma non resta intera: "
+                "va comunicato il reddito presunto all'INPS con NASPI-COM entro un mese e l'assegno viene ridotto. "
+                "Nei documenti la compatibilita' e' indicata entro 5.500 euro per attivita' d'impresa/commercio e "
+                "8.500 euro per lavoro autonomo o professionale."
+            ),
+            sources=[
+                "14_NASPI, DISOCCUPAZIONE E INCENTIVI ALL'AUTOIMPRENDITORIALITÀ (2026).pdf",
+            ],
+        )
+
     if allow_stable and is_forfettario_regime and _is_bollo_exact_threshold_query(contenuto):
         return ChatResponse(
             message=(
@@ -2264,6 +2804,119 @@ async def read_root(payload: ChatRequest):
             sources=[
                 "04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf",
                 "05_Circolare_9E-2019_Approfondimento_Cause_Ostative.pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_business_meal_cost_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No. Nel regime forfettario non detrai l'IVA sugli acquisti e non deduci analiticamente "
+                "spese come una cena con cliente. Il vantaggio fiscale e' gia' forfettizzato tramite il "
+                "coefficiente di redditivita', quindi quella fattura non ti abbassa separatamente l'imposta del 15%."
+            ),
+            sources=[
+                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+                "08a_Guida_Pratica_Fatturazione_Elettronica_Forfettari_2026.pdf",
+                "13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_employee_above_threshold_access_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No, in via generale non puoi applicare il regime forfettario se hai redditi da lavoro "
+                "dipendente o assimilati superiori a 30.000 euro. La soglia diventa irrilevante solo se il "
+                "rapporto di lavoro e' cessato; altrimenti questa e' una causa ostativa."
+            ),
+            sources=[
+                "04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf",
+                "05_Circolare_9E-2019_Approfondimento_Cause_Ostative.pdf",
+                "16_IL MODELLO 730 E IL CONTRIBUENTE FORFETTARIO (2026).pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_ex_employer_prevalence_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Puoi aprire la partita IVA, ma c'e' un rischio forte di causa ostativa se fatturi "
+                "prevalentemente all'ex datore di lavoro o alla ex azienda con cui il rapporto e' in corso "
+                "o e' cessato nei due precedenti periodi d'imposta. Se oltre il 50% dei compensi arriva da "
+                "quel soggetto, perdi il forfettario dall'anno successivo."
+            ),
+            sources=[
+                "04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf",
+                "05_Circolare_9E-2019_Approfondimento_Cause_Ostative.pdf",
+                "13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_strumental_asset_sale_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No. La cessione di un bene strumentale usato, come un vecchio PC aziendale, non si somma "
+                "ai ricavi o compensi che contano per la soglia degli 85.000 euro. In questi casi il "
+                "forfettario non tassa la plusvalenza come ricavo ordinario del regime."
+            ),
+            sources=[
+                "13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf",
+                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_family_detraction_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No. L'imposta sostitutiva del regime forfettario non consente di recuperare dal carico "
+                "fiscale della partita IVA le detrazioni per figli a carico o spese come l'asilo nido. "
+                "Quelle agevolazioni non riducono l'imposta sostitutiva del forfettario; restano solo gli "
+                "eventuali strumenti dedicati, come l'Assegno Unico, se spettanti."
+            ),
+            sources=[
+                "16_IL MODELLO 730 E IL CONTRIBUENTE FORFETTARIO (2026).pdf",
+                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_exit_100k_example_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No, non resti forfettario fino a dicembre. Se superi 100.000 euro di compensi o ricavi "
+                "percepiti nell'anno, l'uscita dal regime e' immediata dal momento del superamento e "
+                "sull'operazione che fa superare la soglia devi applicare subito il regime IVA ordinario."
+            ),
+            sources=[
+                "02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf",
+                "13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf",
+                "01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_foreign_software_reverse_charge_query(contenuto):
+        return ChatResponse(
+            message=(
+                "No, non sei a posto cosi'. Se acquisti un software o un servizio digitale da un fornitore "
+                "estero senza IVA, devi emettere autofattura/integrazione TD17 con IVA italiana al 22% e "
+                "versarla con F24 entro il giorno 16 del mese successivo. Nel forfettario quell'IVA resta "
+                "un costo e non e' detraibile."
+            ),
+            sources=[
+                "12_Operazioni_Estere_VIES_Reverse_Charge_e_Dogane.pdf",
+                "08a_Guida_Pratica_Fatturazione_Elettronica_Forfettari_2026.pdf",
+            ],
+        )
+
+    if allow_stable and is_forfettario_regime and _is_srl_non_reconducible_query(contenuto):
+        return ChatResponse(
+            message=(
+                "Sì, in linea di principio puoi applicare il forfettario se hai solo il 20% della SRL, "
+                "quindi senza controllo, e l'attivita' individuale non e' riconducibile a quella della "
+                "societa'. Nel tuo esempio pulizie e consulenza marketing sono attivita' diverse, quindi "
+                "la sola partecipazione del 20% non integra di per se' la causa ostativa."
+            ),
+            sources=[
+                "04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf",
+                "05_Circolare_9E-2019_Approfondimento_Cause_Ostative.pdf",
+                "13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf",
             ],
         )
 

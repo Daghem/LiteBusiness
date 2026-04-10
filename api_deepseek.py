@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import List
 
 import fastapi
+from app_paths import DATA_ROOT, DOCUMENT_ROOTS, FRONTEND_ROOT, LOG_DIR, RAG_INDEX_PATH, UPLOADS_ROOT
 from app_models import (
     ChatRequest,
     ChatResponse,
@@ -26,6 +27,7 @@ from app_models import (
 from dotenv import load_dotenv
 from fastapi import File, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from openai import OpenAI
 from openai import APIError, RateLimitError
 from storage_services import ChatHistoryStore, EventStore, FeedbackStore, build_admin_stats
@@ -63,7 +65,6 @@ except Exception as error:  # pragma: no cover
 
 LEXICAL_FALLBACK_ENABLED = os.getenv("LEXICAL_FALLBACK_ENABLED", "1") != "0"
 LOG_RAG_EVENTS = os.getenv("LOG_RAG_EVENTS", "0") == "1"
-LOG_DIR = Path(os.getenv("LOG_DIR", "logs"))
 HARD_CODED_MODE = os.getenv("HARD_CODED_MODE", "all").strip().lower()
 HARD_CODED_CATEGORIES = {
     "all": {"critical", "stable", "optional"},
@@ -71,10 +72,19 @@ HARD_CODED_CATEGORIES = {
     "critical": {"critical"},
 }
 ALLOWED_HARD_CODED = HARD_CODED_CATEGORIES.get(HARD_CODED_MODE, {"critical", "stable"})
-chat_store = ChatHistoryStore()
-feedback_store = FeedbackStore(Path("data/feedback/feedback.jsonl"))
-event_store = EventStore(Path("data/events/app_events.jsonl"))
+chat_store = ChatHistoryStore(DATA_ROOT / "chat_history")
+feedback_store = FeedbackStore(DATA_ROOT / "feedback" / "feedback.jsonl")
+event_store = EventStore(DATA_ROOT / "events" / "app_events.jsonl")
 ADMIN_ACCESS_KEY = os.getenv("ADMIN_ACCESS_KEY", "").strip()
+FRONTEND_PAGES = {"index.html", "chat.html", "admin.html", "admin_tools.html"}
+FRONTEND_ASSETS = {"admin.css", "style.css", "style_home.css", "logo.png", "robot.png"}
+
+
+def _discover_corpora() -> List[CorpusConfig]:
+    corpora: List[CorpusConfig] = []
+    for root in DOCUMENT_ROOTS:
+        corpora.extend(QdrantRAG.discover_pdf_corpora(root))
+    return corpora
 
 
 def _log_rag_event(event: str, payload: dict) -> None:
@@ -171,7 +181,7 @@ ATECO_GROUPS = [
 
 
 def _build_regime_profiles() -> List[RegimeProfile]:
-    corpora = QdrantRAG.discover_pdf_corpora(Path("."))
+    corpora = _discover_corpora()
     if not corpora:
         return [
             RegimeProfile(
@@ -182,19 +192,29 @@ def _build_regime_profiles() -> List[RegimeProfile]:
             )
         ]
 
-    profiles: List[RegimeProfile] = []
+    profiles_by_regime: dict[str, RegimeProfile] = {}
     for corpus in corpora:
         aliases = _build_regime_aliases(corpus)
         is_default = corpus.regime_id == "forfettario"
-        profiles.append(
-            RegimeProfile(
+        current = profiles_by_regime.get(corpus.regime_id)
+        if current is None:
+            profiles_by_regime[corpus.regime_id] = RegimeProfile(
                 regime_id=corpus.regime_id,
                 label=corpus.label,
                 aliases=aliases,
                 is_default=is_default,
             )
+            continue
+        profiles_by_regime[corpus.regime_id] = RegimeProfile(
+            regime_id=current.regime_id,
+            label=current.label,
+            aliases=tuple(
+                sorted(set(current.aliases).union(aliases), key=len, reverse=True)
+            ),
+            is_default=current.is_default or is_default,
         )
 
+    profiles = list(profiles_by_regime.values())
     if not any(profile.is_default for profile in profiles):
         profiles[0] = RegimeProfile(
             regime_id=profiles[0].regime_id,
@@ -243,9 +263,7 @@ if LEXICAL_FALLBACK_ENABLED:
     regime_ids = [profile.regime_id for profile in REGIME_PROFILES]
     lexical_index = _build_lexical_index(regime_ids)
     if lexical_index is None:
-        lexical_index = LexicalFallbackIndex.from_local_index(
-            Path("rag_index/index.json")
-        )
+        lexical_index = LexicalFallbackIndex.from_local_index(RAG_INDEX_PATH)
 
 
 def _compact_excerpt(text: str, max_length: int = 220) -> str:
@@ -2083,27 +2101,12 @@ async def admin_upload_document(
     if suffix not in {".pdf", ".xml"}:
         raise HTTPException(status_code=400, detail="Sono supportati solo PDF e XML.")
     target_regime = QdrantRAG.normalize_regime_id(regime_id or DEFAULT_REGIME_ID)
-    existing_corpus = next(
-        (profile for profile in REGIME_PROFILES if profile.regime_id == target_regime),
-        None,
+    target_dir_name = (
+        "Normativo_Forfettari_Agg_2026"
+        if target_regime == "forfettario"
+        else f"Normativo_{target_regime.title()}_Agg_2026"
     )
-    if existing_corpus is not None:
-        target_dir = next(
-            (
-                corpus.path
-                for corpus in QdrantRAG.discover_pdf_corpora(Path("."))
-                if corpus.regime_id == target_regime
-            ),
-            Path("Normativo_Forfettari_Agg_2026")
-            if target_regime == "forfettario"
-            else Path(f"Normativo_{target_regime.title()}_Agg_2026"),
-        )
-    else:
-        target_dir = (
-            Path("Normativo_Forfettari_Agg_2026")
-            if target_regime == "forfettario"
-            else Path(f"Normativo_{target_regime.title()}_Agg_2026")
-        )
+    target_dir = UPLOADS_ROOT / target_dir_name
     target_dir.mkdir(parents=True, exist_ok=True)
     target_path = target_dir / Path(filename).name
     target_path.write_bytes(await file.read())
@@ -2114,7 +2117,7 @@ async def admin_upload_document(
 @app.post("/admin/reindex")
 async def admin_reindex(x_admin_key: str | None = Header(default=None)):
     _require_admin(x_admin_key)
-    corpora = QdrantRAG.discover_pdf_corpora(Path("."))
+    corpora = _discover_corpora()
     if not corpora:
         raise HTTPException(status_code=400, detail="Nessuna cartella Normativo_* trovata.")
     total_chunks = rag.build_from_pdf_directories(
@@ -2137,6 +2140,16 @@ async def admin_reindex(x_admin_key: str | None = Header(default=None)):
         "total_chunks": total_chunks,
         "regimes": [corpus.regime_id for corpus in corpora],
     }
+
+
+@app.get("/", include_in_schema=False, response_class=FileResponse)
+async def serve_home():
+    return FileResponse(FRONTEND_ROOT / "index.html")
+
+
+@app.get("/healthz", include_in_schema=False)
+async def healthcheck():
+    return {"status": "ok"}
 
 
 @app.post("/", response_model=ChatResponse)
@@ -3107,3 +3120,13 @@ async def read_root(payload: ChatRequest):
         regime_id=active_regime.regime_id,
         chat_id=payload.chat_id,
     )
+
+
+@app.get("/{asset_name}", include_in_schema=False, response_class=FileResponse)
+async def serve_frontend_asset(asset_name: str):
+    if asset_name not in FRONTEND_PAGES | FRONTEND_ASSETS:
+        raise HTTPException(status_code=404, detail="Risorsa non trovata.")
+    target_path = FRONTEND_ROOT / asset_name
+    if not target_path.exists():
+        raise HTTPException(status_code=404, detail="Risorsa non trovata.")
+    return FileResponse(target_path)

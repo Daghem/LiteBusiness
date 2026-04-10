@@ -193,7 +193,7 @@
       const simulatorResult = document.getElementById("simulatorResult");
       const CHAT_STORAGE_KEY = "flytax-chat-history-v2";
       const CURRENT_CHAT_ID_KEY = "flytax-current-chat-id";
-      const DEFAULT_API_BASE = "http://localhost:8000";
+      const DEFAULT_API_BASE = window.location.origin;
       const INTRO_MESSAGE =
         "Benvenuto nel workspace FlyTax. Qui lavori solo sul regime forfettario: puoi interrogare la normativa, consultare le fonti con estratti e pagine, salvare la cronologia e usare il simulatore senza uscire dalla stessa interfaccia.";
 
@@ -477,7 +477,7 @@
       }
 
       function getApiBaseUrl() {
-        return DEFAULT_API_BASE;
+        return DEFAULT_API_BASE.replace(/\/$/, "");
       }
 
       function normalizeSources(sources) {

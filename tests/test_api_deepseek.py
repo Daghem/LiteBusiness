@@ -124,6 +124,11 @@ class ApiDeepseekRoutingTests(unittest.TestCase):
         fake_fastapi_middleware = types.ModuleType("fastapi.middleware")
         fake_fastapi_cors = types.ModuleType("fastapi.middleware.cors")
         fake_fastapi_cors.CORSMiddleware = object
+        fake_fastapi_responses = types.ModuleType("fastapi.responses")
+        fake_fastapi_responses.FileResponse = lambda *args, **kwargs: {
+            "path": str(args[0]) if args else "",
+            "kwargs": kwargs,
+        }
 
         fake_app_models = types.ModuleType("app_models")
         for class_name in (
@@ -232,6 +237,7 @@ class ApiDeepseekRoutingTests(unittest.TestCase):
                     "fastapi": fake_fastapi,
                     "fastapi.middleware": fake_fastapi_middleware,
                     "fastapi.middleware.cors": fake_fastapi_cors,
+                    "fastapi.responses": fake_fastapi_responses,
                     "openai": fake_openai,
                     "pydantic": fake_pydantic,
                     "app_models": fake_app_models,

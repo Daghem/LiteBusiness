@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: flytax
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api_deepseek:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: API_KEY_DEEPSEEK
+        sync: false
+      - key: ADMIN_ACCESS_KEY
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: QDRANT_COLLECTION
+        value: flytax_normativa_2026
+      - key: EMBEDDING_MODEL
+        value: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+      - key: LEXICAL_FALLBACK_ENABLED
+        value: "1"
+      - key: HARD_CODED_MODE
+        value: balanced
+      - key: LOG_RAG_EVENTS
+        value: "0"
+      - key: DATA_ROOT
+        value: data
+      - key: DOCUMENT_ROOTS
+        value: .
+      - key: UPLOADS_ROOT
+        value: .
+      - key: LOG_DIR
+        value: logs
+      - key: RAG_INDEX_PATH
+        value: rag_index/index.json

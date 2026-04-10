@@ -116,7 +116,7 @@
           <div class="api-config">
             <label for="apiBaseInput" class="form-label">Endpoint API</label>
             <div class="input-group">
-              <input class="form-control" id="apiBaseInput" type="text" placeholder="http://localhost:8000" />
+              <input class="form-control" id="apiBaseInput" type="text" placeholder="https://tuo-servizio.onrender.com" />
               <button class="btn btn-primary" id="saveApiBaseButton" type="button">Salva</button>
             </div>
           </div>
@@ -163,7 +163,7 @@
     </div>
 
     <script>
-      const DEFAULT_API_BASE = "http://localhost:8000";
+      const DEFAULT_API_BASE = window.location.origin;
       const API_BASE_KEY = "flytax-api-base-url";
       const ADMIN_KEY_STORAGE = "flytax-admin-access-key";
       const themeToggle = document.getElementById("themeToggle");

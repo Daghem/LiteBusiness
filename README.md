@@ -28,6 +28,11 @@ LEXICAL_FALLBACK_ENABLED=1
 HARD_CODED_MODE=all
 LOG_RAG_EVENTS=0
 LOG_DIR=logs
+DATA_ROOT=data
+DOCUMENT_ROOTS=.
+UPLOADS_ROOT=.
+RAG_INDEX_PATH=rag_index/index.json
+ADMIN_ACCESS_KEY=...
 ```
 
 ## Avvio rapido
@@ -40,8 +45,28 @@ LOG_DIR=logs
    `python3 build_rag_index.py`
 4. Avvia API:
    `uvicorn api_deepseek:app --reload`
-5. Apri `chat.html` dal browser.
-6. Apri `admin.html` per dashboard, upload documenti e reindex.
+5. Apri `http://127.0.0.1:8000/` dal browser.
+6. Dashboard utente: `http://127.0.0.1:8000/admin.html`
+7. Area admin tecnica: `http://127.0.0.1:8000/admin_tools.html`
+
+## Deploy su Render
+
+Il repository include `render.yaml`, quindi puo' essere importato come Blueprint.
+
+Configurazione minima:
+
+1. Crea un servizio Qdrant raggiungibile da Render.
+2. Su Render importa il repo con `render.yaml`.
+3. Imposta almeno queste variabili:
+   `API_KEY_DEEPSEEK`, `QDRANT_URL`, `QDRANT_API_KEY` (se serve), `ADMIN_ACCESS_KEY`.
+4. Avvia il servizio web.
+
+Note pratiche per Render:
+
+- L'app espone sia API sia frontend dallo stesso processo FastAPI.
+- La root `GET /` serve `index.html`, mentre `POST /` resta l'endpoint chat.
+- Se vuoi usare la stessa origin per il frontend deployato, non serve modificare i file HTML: usano automaticamente `window.location.origin`.
+- Per avere persistenza reale su chat, feedback, log e documenti caricati, conviene montare un disco Render e puntare gli env `DATA_ROOT`, `UPLOADS_ROOT`, `LOG_DIR` e, se necessario, `DOCUMENT_ROOTS` verso quel mount path.
 
 ## Funzionalita' aggiunte
 
@@ -74,6 +99,7 @@ LOG_DIR=logs
 - L'indice non usa piu' `testi_estratti_2026` per la ricerca runtime.
 - I chunk testuali vengono salvati come payload su Qdrant e recuperati on-demand.
 - Le cartelle `Normativo_*` vengono indicizzate automaticamente come corpora distinti (supporta `.pdf` e `.xml`, anche in sottocartelle).
+- `DOCUMENT_ROOTS` accetta piu' percorsi separati da virgola, utile per combinare documenti inclusi nel repo e documenti caricati su un disco persistente.
 - Ogni corpus viene associato a un `regime` nel payload Qdrant, cosi' il chatbot puo' filtrare i risultati per regime.
 - Le regole hardcoded attuali restano specializzate sul regime forfettario; per altri regimi il chatbot usa il flusso RAG/LLM sui documenti caricati.
 - E' attivo un fallback lessicale opzionale per evitare falsi "non menzionato" in caso di retrieval debole.

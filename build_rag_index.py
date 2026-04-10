@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from app_paths import DOCUMENT_ROOTS
 from dotenv import load_dotenv
 
 from rag_qdrant import QdrantRAG
@@ -8,7 +9,9 @@ from rag_qdrant import QdrantRAG
 def main() -> None:
     load_dotenv()
     rag = QdrantRAG.from_env()
-    corpora = QdrantRAG.discover_pdf_corpora(Path("."))
+    corpora = []
+    for root in DOCUMENT_ROOTS:
+        corpora.extend(QdrantRAG.discover_pdf_corpora(Path(root)))
     if not corpora:
         raise FileNotFoundError("Nessuna cartella Normativo_* con PDF trovata.")
 

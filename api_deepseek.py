@@ -74,10 +74,7 @@ app.add_middleware(
 
 rag = QdrantRAG.from_env()
 rag_load_error = None
-try:
-    rag.load()
-except Exception as error:  # pragma: no cover
-    rag_load_error = str(error)
+rag_ready = False
 
 LEXICAL_FALLBACK_ENABLED = os.getenv("LEXICAL_FALLBACK_ENABLED", "1") != "0"
 LOG_RAG_EVENTS = os.getenv("LOG_RAG_EVENTS", "0") == "1"
@@ -129,7 +126,7 @@ def _require_admin(admin_key: str | None) -> None:
 
 
 def _build_lexical_index(regime_ids: List[str]) -> LexicalFallbackIndex | None:
-    if rag_load_error:
+    if rag_load_error or not rag_ready:
         return None
     chunks: List[LexicalChunk] = []
     try:
@@ -276,10 +273,21 @@ _refresh_regime_profiles()
 
 lexical_index: LexicalFallbackIndex | None = None
 if LEXICAL_FALLBACK_ENABLED:
-    regime_ids = [profile.regime_id for profile in REGIME_PROFILES]
-    lexical_index = _build_lexical_index(regime_ids)
-    if lexical_index is None:
-        lexical_index = LexicalFallbackIndex.from_local_index(RAG_INDEX_PATH)
+    lexical_index = LexicalFallbackIndex.from_local_index(RAG_INDEX_PATH)
+
+
+def _ensure_rag_ready() -> bool:
+    global rag_ready, rag_load_error
+    if rag_ready:
+        return True
+    try:
+        rag.load()
+    except Exception as error:  # pragma: no cover
+        rag_load_error = str(error)
+        return False
+    rag_load_error = None
+    rag_ready = True
+    return True
 
 
 def _compact_excerpt(text: str, max_length: int = 220) -> str:
@@ -1991,11 +1999,12 @@ def _resolve_requested_regime(regime_id: str | None) -> RegimeProfile | None:
 
 
 def _reload_runtime_indexes() -> None:
-    global rag, rag_load_error, lexical_index
+    global rag, rag_load_error, rag_ready, lexical_index
     _refresh_regime_profiles()
     rag = QdrantRAG.from_env()
     rag.load()
     rag_load_error = None
+    rag_ready = True
     if LEXICAL_FALLBACK_ENABLED:
         regime_ids = [profile.regime_id for profile in REGIME_PROFILES]
         lexical_index = _build_lexical_index(regime_ids)
@@ -2165,16 +2174,21 @@ async def serve_home():
 
 @app.get("/healthz", include_in_schema=False)
 async def healthcheck():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "rag_ready": rag_ready,
+        "rag_load_error": rag_load_error,
+    }
 
 
 @app.post("/", response_model=ChatResponse)
 async def read_root(payload: ChatRequest):
-    if rag_load_error:
+    if not _ensure_rag_ready():
         return _respond(
             message=(
-                "Indice RAG su Qdrant non disponibile. Esegui prima: "
-                "`python3 build_rag_index.py`."
+                "Indice RAG su Qdrant non disponibile. Verifica `QDRANT_URL` e la "
+                "collection configurata, oppure esegui `python3 build_rag_index.py` "
+                "prima del deploy."
             ),
             sources=[],
             chat_id=payload.chat_id,

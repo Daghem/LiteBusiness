@@ -1,9 +1,11 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 fastapi
 python-dotenv
 openai
-httpx
-uvicorn[standard]
+uvicorn
 pymupdf
 qdrant-client
 sentence-transformers
+torch==2.3.1+cpu
 python-multipart

@@ -2,13 +2,15 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 import re
-from typing import Iterable, List
+from typing import TYPE_CHECKING, Iterable, List
 
 import fitz  # PyMuPDF
 import xml.etree.ElementTree as ElementTree
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
-from sentence_transformers import SentenceTransformer
+
+if TYPE_CHECKING:
+    from sentence_transformers import SentenceTransformer
 
 
 @dataclass
@@ -32,10 +34,12 @@ class CorpusConfig:
 class SentenceTransformerEmbedder:
     def __init__(self, model_name: str) -> None:
         self.model_name = model_name
-        self._model: SentenceTransformer | None = None
+        self._model: "SentenceTransformer | None" = None
 
-    def _get_model(self) -> SentenceTransformer:
+    def _get_model(self) -> "SentenceTransformer":
         if self._model is None:
+            from sentence_transformers import SentenceTransformer
+
             self._model = SentenceTransformer(self.model_name)
         return self._model
 

@@ -77,6 +77,7 @@ rag_load_error = None
 rag_ready = False
 
 LEXICAL_FALLBACK_ENABLED = os.getenv("LEXICAL_FALLBACK_ENABLED", "1") != "0"
+SEMANTIC_SEARCH_ENABLED = os.getenv("SEMANTIC_SEARCH_ENABLED", "1") != "0"
 LOG_RAG_EVENTS = os.getenv("LOG_RAG_EVENTS", "0") == "1"
 HARD_CODED_MODE = os.getenv("HARD_CODED_MODE", "all").strip().lower()
 HARD_CODED_CATEGORIES = {
@@ -1958,6 +1959,11 @@ def _search_with_intent(query: str, regime_id: str) -> tuple[List[RetrievedChunk
             for chunk, score in lexical_hits
         ]
 
+    if not SEMANTIC_SEARCH_ENABLED:
+        if lexical_results:
+            return lexical_results, "lexical"
+        return [], "none"
+
     thresholds = _dynamic_score_thresholds(normalized_query)
     for threshold in thresholds:
         primary_results: List[RetrievedChunk] = []
@@ -2178,12 +2184,13 @@ async def healthcheck():
         "status": "ok",
         "rag_ready": rag_ready,
         "rag_load_error": rag_load_error,
+        "semantic_search_enabled": SEMANTIC_SEARCH_ENABLED,
     }
 
 
 @app.post("/", response_model=ChatResponse)
 async def read_root(payload: ChatRequest):
-    if not _ensure_rag_ready():
+    if SEMANTIC_SEARCH_ENABLED and not _ensure_rag_ready():
         return _respond(
             message=(
                 "Indice RAG su Qdrant non disponibile. Verifica `QDRANT_URL` e la "

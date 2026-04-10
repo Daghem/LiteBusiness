@@ -429,6 +429,16 @@ class ApiDeepseekRoutingTests(unittest.TestCase):
         response = self.ask(module, "Qual e' il limite del regime forfettario?")
         self.assertIn("API_KEY_DEEPSEEK", response.message)
 
+    def test_semantic_search_can_be_disabled_without_loading_rag(self):
+        module = self.load_module(extra_env={"SEMANTIC_SEARCH_ENABLED": "0"})
+
+        def fail_load():
+            raise AssertionError("rag.load should not be called when semantic search is disabled")
+
+        module.rag.load = fail_load
+        response = self.ask(module, "Cos'è il regime forfettario?")
+        self.assertIn("regime fiscale agevolato", response.message.lower())
+
     def test_definition_query_returns_cited_not_defined(self):
         module = self.load_module(
             rag_results=[],

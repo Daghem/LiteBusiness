@@ -424,6 +424,11 @@ class ApiDeepseekRoutingTests(unittest.TestCase):
         self.assertIn("regime fiscale agevolato", response.message.lower())
         self.assertNotIn("regime naturale delle persone fisiche", response.message.lower())
 
+    def test_missing_api_key_returns_configuration_error_without_import_crash(self):
+        module = self.load_module(extra_env={"API_KEY_DEEPSEEK": ""})
+        response = self.ask(module, "Qual e' il limite del regime forfettario?")
+        self.assertIn("API_KEY_DEEPSEEK", response.message)
+
     def test_definition_query_returns_cited_not_defined(self):
         module = self.load_module(
             rag_results=[],

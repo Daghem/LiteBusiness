@@ -37,15 +37,31 @@ from lexical_fallback import LexicalChunk, LexicalFallbackIndex
 from rag_qdrant import CorpusConfig, QdrantRAG, RetrievedChunk
 
 load_dotenv()  # Carica le variabili dal file .env
-chiave_api = os.getenv("API_KEY_DEEPSEEK")
-if not chiave_api:
-    raise ValueError("Manca API_KEY_DEEPSEEK nel file .env")
+chiave_api = os.getenv("API_KEY_DEEPSEEK", "").strip()
 
 llm_model = "deepseek-chat"
-client = OpenAI(
-    api_key=chiave_api,
-    base_url="https://api.deepseek.com",
-)
+client: OpenAI | None = None
+client_init_error: str | None = None
+
+
+def _get_llm_client() -> OpenAI | None:
+    global client, client_init_error
+    if client is not None:
+        return client
+    if client_init_error is not None:
+        return None
+    if not chiave_api:
+        client_init_error = "API_KEY_DEEPSEEK non configurata sul server."
+        return None
+    try:
+        client = OpenAI(
+            api_key=chiave_api,
+            base_url="https://api.deepseek.com",
+        )
+    except Exception as error:  # pragma: no cover
+        client_init_error = f"Impossibile inizializzare DeepSeek: {error}"
+        return None
+    return client
 
 app = fastapi.FastAPI()
 app.add_middleware(
@@ -2181,6 +2197,15 @@ async def read_root(payload: ChatRequest):
             chat_id=payload.chat_id,
         )
 
+    llm_client = _get_llm_client()
+    if llm_client is None:
+        return _respond(
+            message=client_init_error or "Client DeepSeek non disponibile.",
+            sources=[],
+            regime_id=requested_regime.regime_id if requested_regime else None,
+            chat_id=payload.chat_id,
+        )
+
     if requested_regime is not None:
         active_regime, regime_explicit, regime_ambiguous = requested_regime, True, False
     else:
@@ -3067,7 +3092,7 @@ async def read_root(payload: ChatRequest):
     )
 
     try:
-        response = client.chat.completions.create(
+        response = llm_client.chat.completions.create(
             model=llm_model,
             messages=[
                 {"role": "system", "content": system_prompt},

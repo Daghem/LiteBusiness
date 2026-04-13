@@ -798,3 +798,9 @@ html[data-theme="dark"] .footer-links a {
     padding: 22px;
   }
 }
+html {
+    /* Crea uno spazio in alto durante lo scroll pari all'altezza della navbar */
+    /* Regola 80px in base all'altezza reale della tua barra + un po' di margine */
+    scroll-padding-top: 100px; 
+    scroll-behavior: smooth;
+}

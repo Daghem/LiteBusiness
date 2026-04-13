@@ -212,6 +212,10 @@ class ApiDeepseekRoutingTests(unittest.TestCase):
                     payload_chunks=payload_chunks,
                 )
 
+            @staticmethod
+            def normalize_regime_id(value):
+                return str(value).strip().lower()
+
             @classmethod
             def discover_pdf_corpora(cls, base_dir=None):
                 if corpora is not None:
@@ -335,25 +339,18 @@ class ApiDeepseekRoutingTests(unittest.TestCase):
         self.assertNotIn("CONTEXT", response.message)
         self.assertIn("documenti disponibili", response.message.lower())
 
-    def test_explicit_other_regime_uses_generic_rag_path(self):
-        module = self.load_module(
-            llm_answer="Il CONTEXT fornito contiene una risposta sul regime ordinario.",
-            corpora=[
-                types.SimpleNamespace(
-                    regime_id="forfettario",
-                    label="Regime Forfettario",
-                    path="Normativo_Forfettari_Agg_2026",
-                ),
-                types.SimpleNamespace(
+    def test_explicit_other_regime_is_rejected(self):
+        module = self.load_module()
+        response = asyncio.run(
+            module.read_root(
+                module.ChatRequest(
+                    content="Nel regime ordinario come funziona l'IVA?",
                     regime_id="ordinario",
-                    label="Regime Ordinario",
-                    path="Normativo_Ordinario_Agg_2026",
-                ),
-            ],
+                    chat_id=None,
+                )
+            )
         )
-        response = self.ask(module, "Nel regime ordinario come funziona l'IVA?")
-        self.assertNotIn("regime forfettario", response.message.lower())
-        self.assertNotIn("riformula la domanda", response.message.lower())
+        self.assertIn("regime selezionato non e' disponibile", response.message.lower())
 
     def test_forfettario_typos_resolve_to_default_regime(self):
         module = self.load_module()

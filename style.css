@@ -95,6 +95,7 @@ html[data-theme="dark"] body {
   top: 0;
   z-index: 1000;
   background: rgba(251, 247, 239, 0.72);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(23, 34, 53, 0.07);
 }
@@ -175,6 +176,7 @@ html[data-theme="dark"] body {
   border: 1px solid var(--line);
   border-radius: 26px;
   box-shadow: var(--shadow-md);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -182,11 +184,17 @@ html[data-theme="dark"] body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  position: sticky;
+  top: 100px;
+  align-self: start;
+  max-height: calc(100vh - 118px);
 }
 
 .history-card {
-  position: sticky;
-  top: 100px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 16px;
   background: linear-gradient(180deg, rgba(19, 35, 63, 0.97), rgba(24, 48, 86, 0.95));
   border-color: rgba(255, 255, 255, 0.06);
@@ -195,6 +203,7 @@ html[data-theme="dark"] body {
 }
 
 .history-panel .sidebar-tool {
+  flex: 0 0 auto;
   padding: 14px;
   background: rgba(255, 250, 243, 0.76);
 }
@@ -240,8 +249,22 @@ html[data-theme="dark"] body {
 .history-list {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
   gap: 8px;
   margin-top: 14px;
+  overflow-y: auto;
+  padding-right: 4px;
+  overscroll-behavior: contain;
+}
+
+.history-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
 }
 
 .history-item {
@@ -588,6 +611,7 @@ html[data-theme="dark"] body {
   background: rgba(255, 250, 243, 0.92);
   border: 1px solid rgba(23, 34, 53, 0.08);
   box-shadow: var(--shadow-xl);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
 }
 
@@ -770,6 +794,26 @@ html[data-theme="dark"] .disclaimer-text {
   color: var(--muted) !important;
 }
 
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .chat-header {
+    background: rgba(251, 247, 239, 0.94);
+  }
+
+  html[data-theme="dark"] .chat-header {
+    background: rgba(8, 16, 29, 0.94);
+  }
+
+  .panel-card,
+  .composer-frame {
+    background: rgba(255, 250, 243, 0.96);
+  }
+
+  html[data-theme="dark"] .panel-card,
+  html[data-theme="dark"] .composer-frame {
+    background: rgba(17, 27, 46, 0.94);
+  }
+}
+
 @keyframes riseIn {
   from {
     opacity: 0;
@@ -786,8 +830,10 @@ html[data-theme="dark"] .disclaimer-text {
     grid-template-columns: 1fr;
   }
 
+  .history-panel,
   .history-card {
     position: static;
+    max-height: none;
   }
 
   .input-area {

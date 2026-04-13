@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FlyTax - Dashboard</title>
+    <title>FlyTax - Workspace</title>
     <script>
       (function () {
         const savedTheme = localStorage.getItem("flytax-theme");
@@ -19,7 +19,7 @@
       rel="stylesheet"
     />
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <link
@@ -36,7 +36,7 @@
       <header class="topbar">
         <a class="brand-link" href="index.html">
           <img src="logo.png" alt="FlyTax Logo" />
-          <span>FlyTax Dashboard</span>
+          <span>FlyTax Workspace</span>
         </a>
         <div class="topbar-actions">
           <button class="btn btn-light theme-toggle" id="themeToggle" type="button" aria-label="Attiva tema scuro">
@@ -51,73 +51,90 @@
         <section class="hero-card">
           <div class="hero-main">
             <div>
-              <p class="eyebrow">Panoramica workspace</p>
-              <h1>Dashboard del workspace forfettario</h1>
+              <p class="eyebrow">Vista utente</p>
+              <h1>Centro di lavoro del workspace forfettario</h1>
               <p class="hero-copy">
-                Monitora l'uso del workspace, le domande più frequenti,
-                i feedback recenti e le conversazioni salvate del regime
-                forfettario in un'unica vista.
+                Questa pagina raccoglie solo le funzioni utili all'utente finale:
+                accesso rapido alla chat, simulazione orientativa e indicazioni
+                sul perimetro del workspace. Le metriche operative e i dati
+                aggregati stanno nell'area admin tecnica.
               </p>
             </div>
             <div class="hero-pills">
               <span>Regime forfettario</span>
-              <span>Metriche workspace</span>
-              <span>Cronologia e feedback</span>
+              <span>Chat normativa</span>
+              <span>Simulatore orientativo</span>
             </div>
           </div>
           <div class="hero-tools">
             <div class="hero-side-note">
               <strong>Vista utente</strong>
-              <span>Questa dashboard mostra solo dati di utilizzo e contenuti del workspace. Le funzioni tecniche e documentali restano nell'area admin separata.</span>
+              <span>Qui non mostriamo query aggregate, feedback globali o segnali di retrieval. Questi elementi servono alla manutenzione del sistema e restano nell'area admin separata.</span>
             </div>
           </div>
-        </section>
-
-        <section class="stats-grid" id="statsGrid"></section>
-
-        <section class="panel-card">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Query frequenti</p>
-              <h2>Domande top</h2>
-            </div>
-          </div>
-          <div class="list-stack" id="topQuestions"></div>
         </section>
 
         <section class="panel-card">
           <div class="panel-head">
             <div>
-              <p class="eyebrow">Feedback</p>
-              <h2>Ultimi segnali utenti</h2>
+              <p class="eyebrow">Accesso rapido</p>
+              <h2>Apri la chat normativa</h2>
             </div>
           </div>
-          <div class="list-stack" id="recentFeedback"></div>
+          <p class="panel-copy">
+            Il workspace principale resta la chat: qui puoi fare domande sul regime forfettario,
+            consultare le fonti e usare la cronologia personale del browser.
+          </p>
+          <div class="admin-link-actions">
+            <a class="btn btn-primary" href="chat.html">Apri workspace chat</a>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Simulatore</p>
+              <h2>Stima rapida del forfettario</h2>
+            </div>
+          </div>
+          <p class="panel-copy">
+            Il simulatore e' integrato direttamente nella sidebar della chat e serve solo come
+            supporto orientativo su ricavi, ATECO, imposta e previdenza.
+          </p>
+          <div class="list-stack">
+            <div class="list-row">
+              <strong>Utile per una prima stima</strong>
+              <span>Non sostituisce il calcolo fiscale o previdenziale definitivo.</span>
+            </div>
+            <div class="list-row">
+              <strong>Disponibile dentro la chat</strong>
+              <span>Non serve cambiare pagina per usarlo.</span>
+            </div>
+          </div>
         </section>
 
         <section class="panel-card wide-panel">
           <div class="panel-head">
             <div>
-              <p class="eyebrow">Cronologia</p>
-              <h2>Chat recenti</h2>
+              <p class="eyebrow">Area tecnica</p>
+              <h2>Operazioni admin separate</h2>
             </div>
           </div>
-          <div class="list-stack" id="recentChats"></div>
+          <p class="panel-copy">
+            Upload documenti, reindicizzazione, feedback globali, query frequenti e metriche di
+            retrieval sono stati spostati nell'area admin protetta.
+          </p>
+          <div class="admin-link-actions">
+            <a class="btn btn-light" href="admin_tools.html">Apri area admin</a>
+          </div>
         </section>
       </main>
     </div>
 
     <script>
-      const DEFAULT_API_BASE = window.location.origin;
-      const API_BASE_KEY = "flytax-api-base-url";
       const themeToggle = document.getElementById("themeToggle");
-      const statsGrid = document.getElementById("statsGrid");
-      const topQuestions = document.getElementById("topQuestions");
-      const recentFeedback = document.getElementById("recentFeedback");
-      const recentChats = document.getElementById("recentChats");
 
       syncThemeToggle();
-      loadOverview();
 
       themeToggle.addEventListener("click", function () {
         const isDark = document.documentElement.getAttribute("data-theme") === "dark";
@@ -140,94 +157,6 @@
           "aria-label",
           isDark ? "Attiva tema chiaro" : "Attiva tema scuro",
         );
-      }
-
-      async function loadOverview() {
-        try {
-          const response = await fetch(`${getApiBaseUrl()}/admin/overview`);
-          const data = await response.json();
-          if (!response.ok) throw new Error("Panoramica non disponibile");
-          renderStats(data.stats);
-          renderSimpleList(topQuestions, data.stats.top_questions, "Nessuna domanda registrata.");
-          renderFeedback(data.recent_feedback || []);
-          renderChats(data.recent_chats || []);
-        } catch (error) {
-          statsGrid.innerHTML = `<p class="text-danger mb-0">${error.message}</p>`;
-        }
-      }
-
-      function renderStats(stats) {
-        const cards = [
-          ["Chat salvate", stats.total_chats],
-          ["Messaggi totali", stats.total_messages],
-          ["Feedback positivi", stats.positive_feedback],
-          ["Feedback negativi", stats.negative_feedback],
-          ["No results", stats.no_result_events],
-          ["Bassa confidenza", stats.low_confidence_events],
-        ];
-        statsGrid.innerHTML = cards
-          .map(
-            ([label, value]) => `
-              <article class="stat-card">
-                <span>${label}</span>
-                <strong>${value}</strong>
-              </article>`,
-          )
-          .join("");
-      }
-
-      function renderSimpleList(container, items, emptyMessage) {
-        if (!items.length) {
-          container.innerHTML = `<p class="empty-line">${emptyMessage}</p>`;
-          return;
-        }
-        container.innerHTML = items.map((item) => `<div class="list-row">${escapeHtml(item)}</div>`).join("");
-      }
-
-      function renderFeedback(items) {
-        if (!items.length) {
-          recentFeedback.innerHTML = "<p class='empty-line'>Nessun feedback registrato.</p>";
-          return;
-        }
-        recentFeedback.innerHTML = items
-          .reverse()
-          .map(
-            (item) => `
-              <div class="list-row">
-                <strong>${item.vote === "up" ? "Positivo" : "Negativo"}</strong>
-                <span>${escapeHtml(item.message || "")}</span>
-              </div>`,
-          )
-          .join("");
-      }
-
-      function renderChats(items) {
-        if (!items.length) {
-          recentChats.innerHTML = "<p class='empty-line'>Nessuna chat disponibile.</p>";
-          return;
-        }
-        recentChats.innerHTML = items
-          .map(
-            (item) => `
-              <div class="list-row">
-                <strong>${escapeHtml(item.title)}</strong>
-                <span>${item.message_count} messaggi</span>
-              </div>`,
-          )
-          .join("");
-      }
-
-      function getApiBaseUrl() {
-        return (localStorage.getItem(API_BASE_KEY) || DEFAULT_API_BASE).replace(/\/$/, "");
-      }
-
-      function escapeHtml(value) {
-        return String(value)
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("'", "&#39;");
       }
     </script>
   </body>

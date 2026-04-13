@@ -115,6 +115,7 @@ html[data-theme="dark"] body {
   border: 1px solid var(--line);
   border-radius: 30px;
   box-shadow: var(--shadow-md);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -374,6 +375,24 @@ html[data-theme="dark"] .hero-card {
 
 html[data-theme="dark"] .hero-side-note {
   background: linear-gradient(135deg, rgba(8, 16, 29, 0.98), rgba(14, 25, 44, 0.95));
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .hero-card,
+  .panel-card,
+  .stat-card,
+  .list-row,
+  .form-control {
+    background: rgba(255, 250, 243, 0.96);
+  }
+
+  html[data-theme="dark"] .hero-card,
+  html[data-theme="dark"] .panel-card,
+  html[data-theme="dark"] .stat-card,
+  html[data-theme="dark"] .list-row,
+  html[data-theme="dark"] .form-control {
+    background: rgba(17, 27, 46, 0.94);
+  }
 }
 
 @media (max-width: 1100px) {

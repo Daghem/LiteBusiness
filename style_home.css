@@ -83,6 +83,7 @@ html[data-theme="dark"] body {
 .navbar {
   padding: 18px 0;
   background: rgba(252, 247, 239, 0.72);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(23, 34, 53, 0.06);
 }
@@ -326,6 +327,7 @@ html[data-theme="dark"] .theme-toggle {
   padding: 20px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -476,6 +478,7 @@ html[data-theme="dark"] .theme-toggle {
 }
 
 .glass-card {
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 
@@ -673,6 +676,24 @@ html[data-theme="dark"] .navbar {
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
+html[data-theme="dark"] .nav-link {
+  color: rgba(237, 243, 255, 0.82);
+}
+
+html[data-theme="dark"] .nav-link:hover,
+html[data-theme="dark"] .nav-link:focus {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(17, 27, 46, 0.82);
+}
+
+html[data-theme="dark"] .navbar-toggler-icon {
+  filter: invert(1) brightness(1.2);
+}
+
 html[data-theme="dark"] .btn-secondary,
 html[data-theme="dark"] .proof-card,
 html[data-theme="dark"] .spotlight-card,
@@ -704,6 +725,26 @@ html[data-theme="dark"] .form-control {
 
 html[data-theme="dark"] .footer-links a {
   color: var(--ink);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .navbar {
+    background: rgba(252, 247, 239, 0.94);
+  }
+
+  html[data-theme="dark"] .navbar {
+    background: rgba(8, 16, 29, 0.94);
+  }
+
+  .visual-panel,
+  .glass-card {
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  html[data-theme="dark"] .visual-panel,
+  html[data-theme="dark"] .glass-card {
+    background: rgba(17, 27, 46, 0.94);
+  }
 }
 
 .footer-shell {

@@ -19,7 +19,7 @@
       rel="stylesheet"
     />
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <link
@@ -154,10 +154,42 @@
             </div>
           </div>
           <p class="panel-copy">
-            Usa questa azione dopo aver caricato o sostituito documenti nei corpora `Normativo_*`.
+            Usa questa azione dopo aver caricato o sostituito documenti nel corpus `Normativo_Forfettari_Agg_2026`.
           </p>
           <button class="btn btn-primary" id="reindexButton" type="button">Avvia reindicizzazione</button>
           <p class="status-line" id="reindexStatus"></p>
+        </section>
+
+        <section class="stats-grid" id="statsGrid" hidden></section>
+
+        <section class="panel-card" id="topQuestionsPanel" hidden>
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Query frequenti</p>
+              <h2>Domande top</h2>
+            </div>
+          </div>
+          <div class="list-stack" id="topQuestions"></div>
+        </section>
+
+        <section class="panel-card" id="recentFeedbackPanel" hidden>
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Feedback</p>
+              <h2>Ultimi segnali utenti</h2>
+            </div>
+          </div>
+          <div class="list-stack" id="recentFeedback"></div>
+        </section>
+
+        <section class="panel-card wide-panel" id="recentChatsPanel" hidden>
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Cronologia globale</p>
+              <h2>Chat recenti</h2>
+            </div>
+          </div>
+          <div class="list-stack" id="recentChats"></div>
         </section>
       </main>
     </div>
@@ -183,6 +215,13 @@
       const uploadStatus = document.getElementById("uploadStatus");
       const reindexButton = document.getElementById("reindexButton");
       const reindexStatus = document.getElementById("reindexStatus");
+      const statsGrid = document.getElementById("statsGrid");
+      const topQuestionsPanel = document.getElementById("topQuestionsPanel");
+      const recentFeedbackPanel = document.getElementById("recentFeedbackPanel");
+      const recentChatsPanel = document.getElementById("recentChatsPanel");
+      const topQuestions = document.getElementById("topQuestions");
+      const recentFeedback = document.getElementById("recentFeedback");
+      const recentChats = document.getElementById("recentChats");
 
       apiBaseInput.value = getApiBaseUrl();
       syncThemeToggle();
@@ -215,9 +254,9 @@
           localStorage.setItem(ADMIN_KEY_STORAGE, adminKey);
           adminKeyInput.value = "";
           setAdminUnlocked(true, "Accesso admin attivo.");
+          await loadOverview();
         } catch (error) {
-          setAdminUnlocked(false);
-          authStatus.textContent = error.message;
+          clearAdminSession(error.message);
         }
       });
 
@@ -262,7 +301,8 @@
             if (response.status === 401) clearAdminSession("Sessione admin scaduta o non valida.");
             throw new Error(data.detail || "Reindicizzazione fallita");
           }
-          reindexStatus.textContent = `Indicizzazione completata: ${data.total_chunks} chunk su ${data.regimes.join(", ")}`;
+          reindexStatus.textContent = `Indicizzazione completata: ${data.total_chunks} chunk sul corpus ${data.regime_id}`;
+          await loadOverview();
         } catch (error) {
           reindexStatus.textContent = error.message;
         } finally {
@@ -309,6 +349,7 @@
         try {
           await verifyAdminKey(savedKey);
           setAdminUnlocked(true, "Sessione admin ripristinata.");
+          await loadOverview();
         } catch (error) {
           clearAdminSession(error.message);
         }
@@ -335,10 +376,109 @@
         uploadPanel.hidden = true;
         reindexPanel.hidden = true;
         logoutButton.hidden = true;
+        statsGrid.hidden = true;
+        topQuestionsPanel.hidden = true;
+        recentFeedbackPanel.hidden = true;
+        recentChatsPanel.hidden = true;
+        statsGrid.innerHTML = "";
+        topQuestions.innerHTML = "";
+        recentFeedback.innerHTML = "";
+        recentChats.innerHTML = "";
         sessionStatus.textContent = "";
         uploadStatus.textContent = "";
         reindexStatus.textContent = "";
         authStatus.textContent = message;
+      }
+
+      async function loadOverview() {
+        try {
+          const response = await fetch(`${getApiBaseUrl()}/admin/overview`, {
+            headers: adminHeaders(),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || "Panoramica non disponibile");
+          renderStats(data.stats);
+          renderSimpleList(topQuestions, data.stats.top_questions, "Nessuna domanda registrata.");
+          renderFeedback(data.recent_feedback || []);
+          renderChats(data.recent_chats || []);
+          statsGrid.hidden = false;
+          topQuestionsPanel.hidden = false;
+          recentFeedbackPanel.hidden = false;
+          recentChatsPanel.hidden = false;
+        } catch (error) {
+          statsGrid.hidden = false;
+          statsGrid.innerHTML = `<p class="text-danger mb-0">${error.message}</p>`;
+        }
+      }
+
+      function renderStats(stats) {
+        const cards = [
+          ["Chat salvate", stats.total_chats],
+          ["Messaggi totali", stats.total_messages],
+          ["Feedback positivi", stats.positive_feedback],
+          ["Feedback negativi", stats.negative_feedback],
+          ["No results", stats.no_result_events],
+          ["Bassa confidenza", stats.low_confidence_events],
+        ];
+        statsGrid.innerHTML = cards
+          .map(
+            ([label, value]) => `
+              <article class="stat-card">
+                <span>${label}</span>
+                <strong>${value}</strong>
+              </article>`,
+          )
+          .join("");
+      }
+
+      function renderSimpleList(container, items, emptyMessage) {
+        if (!items.length) {
+          container.innerHTML = `<p class="empty-line">${emptyMessage}</p>`;
+          return;
+        }
+        container.innerHTML = items.map((item) => `<div class="list-row">${escapeHtml(item)}</div>`).join("");
+      }
+
+      function renderFeedback(items) {
+        if (!items.length) {
+          recentFeedback.innerHTML = "<p class='empty-line'>Nessun feedback registrato.</p>";
+          return;
+        }
+        recentFeedback.innerHTML = items
+          .reverse()
+          .map(
+            (item) => `
+              <div class="list-row">
+                <strong>${item.vote === "up" ? "Positivo" : "Negativo"}</strong>
+                <span>${escapeHtml(item.message || "")}</span>
+              </div>`,
+          )
+          .join("");
+      }
+
+      function renderChats(items) {
+        if (!items.length) {
+          recentChats.innerHTML = "<p class='empty-line'>Nessuna chat disponibile.</p>";
+          return;
+        }
+        recentChats.innerHTML = items
+          .map(
+            (item) => `
+              <div class="list-row">
+                <strong>${escapeHtml(item.title)}</strong>
+                <span>${item.message_count} messaggi</span>
+              </div>`,
+          )
+          .join("");
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
       }
     </script>
   </body>

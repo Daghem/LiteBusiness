@@ -21,7 +21,7 @@
     />
 
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <link
@@ -177,7 +177,7 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       const chatForm = document.getElementById("chatForm");
       const chatBox = document.getElementById("chatBox");
@@ -617,14 +617,14 @@
                     ? `Pagine ${item.page_start}-${item.page_end}`
                     : item.page_start
                       ? `Pagina ${item.page_start}`
-                      : "Pagina non disponibile";
+                      : "";
                 const scoreLabel =
                   typeof item.score === "number" ? `<span>Score ${item.score.toFixed(3)}</span>` : "";
                 return `
                   <article class="source-card">
                     <div class="source-card-head">
                       <strong>${escapeHtml(item.source)}</strong>
-                      <span>${pageLabel}</span>
+                      ${pageLabel ? `<span>${pageLabel}</span>` : ""}
                     </div>
                     ${item.excerpt ? `<p>${escapeHtml(item.excerpt)}</p>` : ""}
                     <div class="source-card-meta">${scoreLabel}</div>

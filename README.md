@@ -1,9 +1,21 @@
+---
+title: FlyTax
+emoji: "🧾"
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+fullWidth: true
+header: default
+short_description: Assistente AI e simulatore per il regime forfettario.
+---
+
 # FlyTax
 
 ## Progetto ITS
 
-Applicazione web con assistente AI per regimi fiscali italiani.
-Il retrieval documentale usa Qdrant (database vettoriale) con indicizzazione diretta dai PDF normativi.
+Applicazione web con assistente AI focalizzata sul regime forfettario italiano.
+Il retrieval documentale usa Qdrant (database vettoriale) con indicizzazione diretta dai PDF normativi del corpus forfettario.
 
 ## Stack
 
@@ -49,6 +61,31 @@ ADMIN_ACCESS_KEY=...
 6. Dashboard utente: `http://127.0.0.1:8000/admin.html`
 7. Area admin tecnica: `http://127.0.0.1:8000/admin_tools.html`
 
+## Deploy su Hugging Face Spaces
+
+Il repository ora include i file minimi per un deploy come Docker Space:
+
+- `Dockerfile`
+- `.dockerignore`
+- `space_server.py`
+- front matter Spaces in questo `README.md`
+
+Procedura:
+
+1. Crea uno Space su Hugging Face scegliendo `Docker` come SDK.
+2. Pusha questo repository nello Space.
+3. Nelle `Settings` dello Space configura come `Variables / Secrets` almeno:
+   `API_KEY_DEEPSEEK`, `QDRANT_URL`, `QDRANT_API_KEY` se serve, `ADMIN_ACCESS_KEY`.
+4. Avvia il build automatico dello Space.
+
+Note importanti per Hugging Face Spaces:
+
+- Lo Space esporra' l'app su porta `7860`, configurata nel front matter con `app_port: 7860`.
+- Spaces permette traffico in uscita solo su `80`, `443` e `8080`, quindi `QDRANT_URL` deve puntare a un endpoint raggiungibile su una di queste porte. Un classico `http://host:6333` non e' adatto a Spaces.
+- Se usi Qdrant Cloud, preferisci un endpoint `https://...` sulla porta `443`.
+- Il filesystem dello Space non e' persistente per default: chat, feedback, log e upload ripartono vuoti a ogni rebuild/restart.
+- La root `GET /` continua a servire `index.html`, mentre `POST /` resta l'endpoint chat.
+
 ## Deploy su Render
 
 Il repository include `render.yaml`, quindi puo' essere importato come Blueprint.
@@ -71,7 +108,6 @@ Note pratiche per Render:
 ## Funzionalita' aggiunte
 
 - Chat con cronologia persistita lato server e lista chat recenti
-- Selettore esplicito del regime da interrogare
 - Fonti arricchite con estratti, score e pagina quando disponibile
 - Indicatore di confidenza della risposta (`alta`, `media`, `bassa`)
 - Export delle risposte e feedback `utile / non utile`
@@ -83,7 +119,7 @@ Note pratiche per Render:
 ## Endpoint principali
 
 - `POST /` chat AI
-- `GET /regimes` lista corpora/regimi disponibili
+- `GET /regimes` restituisce il solo regime supportato (`forfettario`)
 - `POST /simulate` simulatore forfettario
 - `GET /chat-history` lista chat salvate
 - `POST /chat-history` salva un turno chat
@@ -98,10 +134,10 @@ Note pratiche per Render:
 
 - L'indice non usa piu' `testi_estratti_2026` per la ricerca runtime.
 - I chunk testuali vengono salvati come payload su Qdrant e recuperati on-demand.
-- Le cartelle `Normativo_*` vengono indicizzate automaticamente come corpora distinti (supporta `.pdf` e `.xml`, anche in sottocartelle).
+- Il corpus indicizzato e' `Normativo_Forfettari_Agg_2026` (supporta `.pdf` e `.xml`, anche in sottocartelle).
 - `DOCUMENT_ROOTS` accetta piu' percorsi separati da virgola, utile per combinare documenti inclusi nel repo e documenti caricati su un disco persistente.
-- Ogni corpus viene associato a un `regime` nel payload Qdrant, cosi' il chatbot puo' filtrare i risultati per regime.
-- Le regole hardcoded attuali restano specializzate sul regime forfettario; per altri regimi il chatbot usa il flusso RAG/LLM sui documenti caricati.
+- Tutti i chunk vengono gestiti come documentazione del regime forfettario.
+- Le regole hardcoded e il flusso RAG/LLM sono entrambi limitati al regime forfettario.
 - E' attivo un fallback lessicale opzionale per evitare falsi "non menzionato" in caso di retrieval debole.
 - `HARD_CODED_MODE`: `all`, `balanced`, `critical` per limitare le risposte hardcoded.
 - Per domande definitorie (es. "cos'è il codice ATECO") e' consigliato aggiungere una fonte ufficiale (ISTAT/AdE) che includa la definizione.

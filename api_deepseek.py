@@ -92,13 +92,25 @@ event_store = EventStore(DATA_ROOT / "events" / "app_events.jsonl")
 ADMIN_ACCESS_KEY = os.getenv("ADMIN_ACCESS_KEY", "").strip()
 FRONTEND_PAGES = {"index.html", "chat.html", "admin.html", "admin_tools.html"}
 FRONTEND_ASSETS = {"admin.css", "style.css", "style_home.css", "logo.png", "robot.png"}
+FORFETTARIO_REGIME_ID = "forfettario"
+FORFETTARIO_LABEL = "Regime Forfettario"
+FORFETTARIO_ALIASES = (
+    "forfettario",
+    "forfettari",
+    "regime forfettario",
+    "regime dei forfettari",
+)
+FORFETTARIO_CORPUS_DIRNAME = "Normativo_Forfettari_Agg_2026"
 
 
 def _discover_corpora() -> List[CorpusConfig]:
-    corpora: List[CorpusConfig] = []
     for root in DOCUMENT_ROOTS:
-        corpora.extend(QdrantRAG.discover_pdf_corpora(root))
-    return corpora
+        candidate = root / FORFETTARIO_CORPUS_DIRNAME
+        if not candidate.is_dir():
+            continue
+        if any(candidate.rglob("*.pdf")) or any(candidate.rglob("*.xml")):
+            return [QdrantRAG.derive_corpus_config(candidate)]
+    return []
 
 
 def _log_rag_event(event: str, payload: dict) -> None:
@@ -195,48 +207,14 @@ ATECO_GROUPS = [
 
 
 def _build_regime_profiles() -> List[RegimeProfile]:
-    corpora = _discover_corpora()
-    if not corpora:
-        return [
-            RegimeProfile(
-                regime_id="forfettario",
-                label="Regime Forfettario",
-                aliases=("forfettario", "forfettari", "regime forfettario", "regime dei forfettari"),
-                is_default=True,
-            )
-        ]
-
-    profiles_by_regime: dict[str, RegimeProfile] = {}
-    for corpus in corpora:
-        aliases = _build_regime_aliases(corpus)
-        is_default = corpus.regime_id == "forfettario"
-        current = profiles_by_regime.get(corpus.regime_id)
-        if current is None:
-            profiles_by_regime[corpus.regime_id] = RegimeProfile(
-                regime_id=corpus.regime_id,
-                label=corpus.label,
-                aliases=aliases,
-                is_default=is_default,
-            )
-            continue
-        profiles_by_regime[corpus.regime_id] = RegimeProfile(
-            regime_id=current.regime_id,
-            label=current.label,
-            aliases=tuple(
-                sorted(set(current.aliases).union(aliases), key=len, reverse=True)
-            ),
-            is_default=current.is_default or is_default,
-        )
-
-    profiles = list(profiles_by_regime.values())
-    if not any(profile.is_default for profile in profiles):
-        profiles[0] = RegimeProfile(
-            regime_id=profiles[0].regime_id,
-            label=profiles[0].label,
-            aliases=profiles[0].aliases,
+    return [
+        RegimeProfile(
+            regime_id=FORFETTARIO_REGIME_ID,
+            label=FORFETTARIO_LABEL,
+            aliases=FORFETTARIO_ALIASES,
             is_default=True,
         )
-    return profiles
+    ]
 
 
 def _build_regime_aliases(corpus: CorpusConfig) -> tuple[str, ...]:
@@ -258,7 +236,7 @@ def _build_regime_aliases(corpus: CorpusConfig) -> tuple[str, ...]:
 
 
 REGIME_PROFILES: List[RegimeProfile] = []
-DEFAULT_REGIME_ID = "forfettario"
+DEFAULT_REGIME_ID = FORFETTARIO_REGIME_ID
 
 
 def _refresh_regime_profiles() -> None:
@@ -872,14 +850,12 @@ def _resolve_regime(query: str) -> tuple[RegimeProfile | None, bool, bool]:
         return default_profile, False, False
 
     unique_matches = {profile.regime_id: profile for profile in matches}
-    if len(unique_matches) > 1:
-        return None, True, True
     return next(iter(unique_matches.values())), True, False
 
 
 def _regime_scope_message(active_regime: RegimeProfile | None = None) -> str:
     if active_regime is None:
-        return "Posso aiutarti solo sui regimi fiscali per cui hai caricato documentazione."
+        return "Posso aiutarti solo sul regime forfettario."
     return (
         "Posso aiutarti solo su temi fiscali e contributivi legati alla documentazione caricata"
         f" per {active_regime.label.lower()}."
@@ -2033,10 +2009,10 @@ async def list_regimes():
 
 @app.post("/simulate", response_model=SimulationResponse)
 async def simulate(payload: SimulationRequest):
-    if payload.regime_id != "forfettario":
+    if payload.regime_id != FORFETTARIO_REGIME_ID:
         raise HTTPException(
             status_code=400,
-            detail="Il simulatore disponibile in questa versione copre il regime forfettario.",
+            detail="Il simulatore disponibile in questa versione copre solo il regime forfettario.",
         )
     try:
         return simulate_forfettario(payload)
@@ -2104,7 +2080,8 @@ async def save_feedback(payload: FeedbackRequest):
 
 
 @app.get("/admin/overview")
-async def admin_overview():
+async def admin_overview(x_admin_key: str | None = Header(default=None)):
+    _require_admin(x_admin_key)
     stats = build_admin_stats(chat_store, feedback_store, event_store)
     recent_feedback = feedback_store.read_all()[-10:]
     return {
@@ -2132,12 +2109,12 @@ async def admin_upload_document(
     if suffix not in {".pdf", ".xml"}:
         raise HTTPException(status_code=400, detail="Sono supportati solo PDF e XML.")
     target_regime = QdrantRAG.normalize_regime_id(regime_id or DEFAULT_REGIME_ID)
-    target_dir_name = (
-        "Normativo_Forfettari_Agg_2026"
-        if target_regime == "forfettario"
-        else f"Normativo_{target_regime.title()}_Agg_2026"
-    )
-    target_dir = UPLOADS_ROOT / target_dir_name
+    if target_regime != FORFETTARIO_REGIME_ID:
+        raise HTTPException(
+            status_code=400,
+            detail="FlyTax supporta solo il regime forfettario.",
+        )
+    target_dir = UPLOADS_ROOT / FORFETTARIO_CORPUS_DIRNAME
     target_dir.mkdir(parents=True, exist_ok=True)
     target_path = target_dir / Path(filename).name
     target_path.write_bytes(await file.read())
@@ -2150,7 +2127,10 @@ async def admin_reindex(x_admin_key: str | None = Header(default=None)):
     _require_admin(x_admin_key)
     corpora = _discover_corpora()
     if not corpora:
-        raise HTTPException(status_code=400, detail="Nessuna cartella Normativo_* trovata.")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Nessuna cartella {FORFETTARIO_CORPUS_DIRNAME} con PDF/XML trovata.",
+        )
     total_chunks = rag.build_from_pdf_directories(
         corpora=corpora,
         chunk_size=1200,
@@ -2163,13 +2143,13 @@ async def admin_reindex(x_admin_key: str | None = Header(default=None)):
         {
             "event": "reindex_completed",
             "total_chunks": total_chunks,
-            "regimes": [corpus.regime_id for corpus in corpora],
+            "regime_id": FORFETTARIO_REGIME_ID,
         }
     )
     return {
         "status": "reindexed",
         "total_chunks": total_chunks,
-        "regimes": [corpus.regime_id for corpus in corpora],
+        "regime_id": FORFETTARIO_REGIME_ID,
     }
 
 

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlyTax - Dashboard</title>
+    <script>
+      (function () {
+        const savedTheme = localStorage.getItem("flytax-theme");
+        if (savedTheme === "dark") {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="icon" type="image/png" href="logo.png" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="dashboard-orbit orbit-a"></div>
+    <div class="dashboard-orbit orbit-b"></div>
+
+    <div class="dashboard-shell">
+      <header class="topbar">
+        <a class="brand-link" href="index.html">
+          <img src="logo.png" alt="FlyTax Logo" />
+          <span>FlyTax Dashboard</span>
+        </a>
+        <div class="topbar-actions">
+          <button class="btn btn-light theme-toggle" id="themeToggle" type="button" aria-label="Attiva tema scuro">
+            <i class="fas fa-moon"></i>
+            <span>Tema scuro</span>
+          </button>
+          <a class="btn btn-light" href="chat.html">Apri chat</a>
+        </div>
+      </header>
+
+      <main class="dashboard-grid">
+        <section class="hero-card">
+          <div class="hero-main">
+            <div>
+              <p class="eyebrow">Dashboard utente</p>
+              <h1>Un punto di accesso semplice al workspace</h1>
+              <p class="hero-copy">
+                Questa pagina serve a orientarti nel prodotto: apri la chat normativa,
+                usa il simulatore orientativo e capisci subito dove trovare le funzioni
+                tecniche. La manutenzione del corpus e le metriche di sistema restano
+                separate nell'area admin.
+              </p>
+            </div>
+            <div class="hero-pills">
+              <span>Chat normativa</span>
+              <span>Simulatore</span>
+              <span>Area admin separata</span>
+            </div>
+          </div>
+          <div class="hero-tools">
+            <div class="hero-side-note">
+              <strong>Perimetro chiaro</strong>
+              <span>La dashboard utente non mostra dati globali, query aggregate o segnali interni di retrieval. Qui restano solo accessi rapidi e spiegazioni utili al lavoro quotidiano.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Strumento principale</p>
+              <h2>Chat con fonti e cronologia</h2>
+            </div>
+          </div>
+          <p class="panel-copy">
+            La chat e' il cuore del workspace: fai domande sul regime forfettario,
+            consulta le fonti richiamate dalla risposta e usa il simulatore senza uscire
+            dalla stessa schermata.
+          </p>
+          <div class="admin-link-actions">
+            <a class="btn btn-primary" href="chat.html">Apri workspace chat</a>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Come usare il simulatore</p>
+              <h2>Stima orientativa, non calcolo definitivo</h2>
+            </div>
+          </div>
+          <div class="list-stack">
+            <div class="list-row">
+              <strong>Compila ricavi, ATECO e previdenza</strong>
+              <span>Il risultato ti aiuta a fare una prima valutazione economica del caso.</span>
+            </div>
+            <div class="list-row">
+              <strong>Verifica sempre le fonti</strong>
+              <span>Il simulatore non sostituisce la consulenza fiscale o previdenziale definitiva.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-card wide-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Funzioni tecniche</p>
+              <h2>Area admin separata e protetta</h2>
+            </div>
+          </div>
+          <p class="panel-copy">
+            Upload documenti, reindicizzazione del corpus, feedback globali e metriche
+            operative non appartengono alla dashboard utente. Se devi gestire il sistema,
+            usa l'area admin dedicata.
+          </p>
+          <div class="admin-link-actions">
+            <a class="btn btn-light" href="admin_tools.html">Apri area admin</a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const themeToggle = document.getElementById("themeToggle");
+
+      syncThemeToggle();
+
+      themeToggle.addEventListener("click", function () {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        if (isDark) {
+          document.documentElement.removeAttribute("data-theme");
+          localStorage.setItem("flytax-theme", "light");
+        } else {
+          document.documentElement.setAttribute("data-theme", "dark");
+          localStorage.setItem("flytax-theme", "dark");
+        }
+        syncThemeToggle();
+      });
+
+      function syncThemeToggle() {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        themeToggle.innerHTML = isDark
+          ? '<i class="fas fa-sun"></i><span>Tema chiaro</span>'
+          : '<i class="fas fa-moon"></i><span>Tema scuro</span>';
+        themeToggle.setAttribute(
+          "aria-label",
+          isDark ? "Attiva tema chiaro" : "Attiva tema scuro",
+        );
+      }
+    </script>
+  </body>
+</html>

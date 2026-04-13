@@ -20,7 +20,7 @@ Il retrieval documentale usa Qdrant (database vettoriale) con indicizzazione dir
 ## Stack
 
 - Frontend statico: `index.html`, `chat.html`
-- Dashboard operativa: `admin.html`
+- Dashboard utente: `dashboard.html`
 - Backend: FastAPI (`api_deepseek.py`)
 - LLM: DeepSeek via API compatibile OpenAI
 - Vector DB: Qdrant
@@ -58,7 +58,7 @@ ADMIN_ACCESS_KEY=...
 4. Avvia API:
    `uvicorn api_deepseek:app --reload`
 5. Apri `http://127.0.0.1:8000/` dal browser.
-6. Dashboard utente: `http://127.0.0.1:8000/admin.html`
+6. Dashboard utente: `http://127.0.0.1:8000/dashboard.html`
 7. Area admin tecnica: `http://127.0.0.1:8000/admin_tools.html`
 
 ## Deploy su Hugging Face Spaces

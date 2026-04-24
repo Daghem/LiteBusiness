@@ -33,18 +33,78 @@
     <div class="dashboard-orbit orbit-a"></div>
     <div class="dashboard-orbit orbit-b"></div>
 
+    <style>
+      .history-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+      }
+      .history-item-card {
+        padding: 18px;
+        border-radius: 18px;
+        background: rgba(39, 100, 235, 0.04);
+        border: 1px solid rgba(39, 100, 235, 0.08);
+        transition: all 0.24s ease;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .history-item-card:hover {
+        transform: translateY(-4px);
+        background: rgba(39, 100, 235, 0.08);
+        box-shadow: 0 10px 24px rgba(39, 100, 235, 0.1);
+      }
+      .history-item-title {
+        font-weight: 700;
+        font-size: 1.05rem;
+      }
+      .history-item-meta {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      html[data-theme="dark"] .history-item-card {
+        background: rgba(39, 100, 235, 0.08);
+        border-color: rgba(255, 255, 255, 0.05);
+      }
+      html[data-theme="dark"] .history-item-card:hover {
+        background: rgba(39, 100, 235, 0.15);
+      }
+      .empty-state {
+        padding: 32px;
+        text-align: center;
+        color: var(--muted);
+        background: rgba(255, 250, 243, 0.4);
+        border-radius: 18px;
+        border: 1px dashed var(--line);
+      }
+      html[data-theme="dark"] .empty-state {
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .quick-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 24px;
+      }
+      .btn-lg {
+        padding: 12px 24px;
+        font-size: 1.1rem;
+      }
+    </style>
+
     <div class="dashboard-shell">
       <header class="topbar">
         <a class="brand-link" href="index.html">
           <img src="logo.png" alt="FlyTax Logo" />
-          <span>FlyTax Dashboard</span>
+          <span>FlyTax Workspace</span>
         </a>
         <div class="topbar-actions">
           <button class="btn btn-light theme-toggle" id="themeToggle" type="button" aria-label="Attiva tema scuro">
             <i class="fas fa-moon"></i>
             <span>Tema scuro</span>
           </button>
-          <a class="btn btn-light" href="chat.html">Apri chat</a>
         </div>
       </header>
 
@@ -52,81 +112,36 @@
         <section class="hero-card">
           <div class="hero-main">
             <div>
-              <p class="eyebrow">Dashboard utente</p>
-              <h1>Un punto di accesso semplice al workspace</h1>
+              <p class="eyebrow">Benvenuto</p>
+              <h1>Il tuo Workspace Fiscale</h1>
               <p class="hero-copy">
-                Questa pagina serve a orientarti nel prodotto: apri la chat normativa,
-                usa il simulatore orientativo e capisci subito dove trovare le funzioni
-                tecniche. La manutenzione del corpus e le metriche di sistema restano
-                separate nell'area admin.
+                Consulta rapidamente la normativa sul regime forfettario supportato dall'Intelligenza Artificiale, analizza le fonti e stima il tuo carico fiscale in pochi click.
               </p>
-            </div>
-            <div class="hero-pills">
-              <span>Chat normativa</span>
-              <span>Simulatore</span>
-              <span>Area admin separata</span>
-            </div>
-          </div>
-          <div class="hero-tools">
-            <div class="hero-side-note">
-              <strong>Perimetro chiaro</strong>
-              <span>La dashboard utente non mostra dati globali, query aggregate o segnali interni di retrieval. Qui restano solo accessi rapidi e spiegazioni utili al lavoro quotidiano.</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel-card">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Strumento principale</p>
-              <h2>Chat con fonti e cronologia</h2>
-            </div>
-          </div>
-          <p class="panel-copy">
-            La chat e' il cuore del workspace: fai domande sul regime forfettario,
-            consulta le fonti richiamate dalla risposta e usa il simulatore senza uscire
-            dalla stessa schermata.
-          </p>
-          <div class="admin-link-actions">
-            <a class="btn btn-primary" href="chat.html">Apri workspace chat</a>
-          </div>
-        </section>
-
-        <section class="panel-card">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Come usare il simulatore</p>
-              <h2>Stima orientativa, non calcolo definitivo</h2>
-            </div>
-          </div>
-          <div class="list-stack">
-            <div class="list-row">
-              <strong>Compila ricavi, ATECO e previdenza</strong>
-              <span>Il risultato ti aiuta a fare una prima valutazione economica del caso.</span>
-            </div>
-            <div class="list-row">
-              <strong>Verifica sempre le fonti</strong>
-              <span>Il simulatore non sostituisce la consulenza fiscale o previdenziale definitiva.</span>
+              <div class="quick-actions">
+                <a class="btn btn-primary btn-lg" href="chat.html">
+                  <i class="fas fa-plus"></i> Nuova Chat
+                </a>
+                <a class="btn btn-light btn-lg" href="chat.html">
+                  <i class="fas fa-calculator"></i> Apri Simulatore
+                </a>
+              </div>
             </div>
           </div>
         </section>
 
         <section class="panel-card wide-panel">
-          <div class="panel-head">
+          <div class="panel-head d-flex justify-content-between align-items-center">
             <div>
-              <p class="eyebrow">Funzioni tecniche</p>
-              <h2>Area admin separata e protetta</h2>
+              <p class="eyebrow">Le tue attività</p>
+              <h2>Chat Recenti</h2>
             </div>
+            <a href="chat.html" class="btn btn-sm btn-light">Tutte le chat</a>
           </div>
-          <p class="panel-copy">
-            Upload documenti, reindicizzazione del corpus, feedback globali e metriche
-            operative non appartengono alla dashboard utente. Se devi gestire il sistema,
-            usa l'area admin dedicata.
-          </p>
-          <div class="admin-link-actions">
-            <a class="btn btn-light" href="admin_tools.html">Apri area admin</a>
+          <div id="recentChatsContainer">
+            <div class="empty-state">Caricamento chat recenti in corso...</div>
           </div>
         </section>
+
       </main>
     </div>
 
@@ -157,6 +172,45 @@
           isDark ? "Attiva tema chiaro" : "Attiva tema scuro",
         );
       }
+
+      // Load Recent Chats
+      async function loadRecentChats() {
+        const container = document.getElementById("recentChatsContainer");
+        try {
+          const response = await fetch(window.location.origin + '/chat-history');
+          if (!response.ok) throw new Error("Errore nel recupero della cronologia");
+          
+          const history = await response.json();
+          if (!history || history.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox fa-2x mb-2"></i><br>Nessuna chat salvata. Inizia una nuova conversazione!</div>';
+            return;
+          }
+
+          const recent = history.slice(0, 4); // Mostra le ultime 4
+          const gridHtml = recent.map(chat => `
+            <a href="chat.html" class="history-item-card" onclick="localStorage.setItem('flytax-current-chat-id', '${chat.chat_id}')">
+              <div class="history-item-title">${escapeHtml(chat.title)}</div>
+              <div class="history-item-meta"><i class="fas fa-message"></i> ${chat.message_count} messaggi</div>
+            </a>
+          `).join("");
+
+          container.innerHTML = `<div class="history-grid">${gridHtml}</div>`;
+        } catch (error) {
+          container.innerHTML = '<div class="empty-state text-danger"><i class="fas fa-triangle-exclamation mb-2"></i><br>Impossibile caricare le chat recenti.</div>';
+        }
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", loadRecentChats);
     </script>
   </body>
 </html>

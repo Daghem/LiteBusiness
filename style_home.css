@@ -833,7 +833,7 @@ html[data-theme="dark"] .form-control {
 }
 
 html[data-theme="dark"] .form-control::placeholder {
-  color: #9CA9C0;
+  color: #9CA9C0 !important;
 }
 
 html[data-theme="dark"] .form-control:focus {

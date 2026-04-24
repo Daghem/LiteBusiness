@@ -41,8 +41,10 @@
     <link rel="stylesheet" href="style_home.css" />
   </head>
   <body>
-    <div class="page-orbit orbit-one"></div>
-    <div class="page-orbit orbit-two"></div>
+    <div id="orbitWrapper" class="page-orbit-wrapper">
+      <div class="page-orbit orbit-one"></div>
+      <div class="page-orbit orbit-two"></div>
+    </div>
 
     <nav class="navbar navbar-expand-lg sticky-top">
       <div class="container site-shell">
@@ -346,27 +348,29 @@
               <form id="contactForm">
                 <div class="row g-3">
                   <div class="col-md-6">
-                    <label class="form-label">Nome e cognome</label>
+                    <label class="form-label" for="name">Nome e cognome</label>
                     <input
                       class="form-control"
                       id="name"
                       type="text"
+                      autocomplete="name"
                       placeholder="Mario Rossi"
                       required
                     />
                   </div>
                   <div class="col-md-6">
-                    <label class="form-label">Email</label>
+                    <label class="form-label" for="email">Email</label>
                     <input
                       class="form-control"
                       id="email"
                       type="email"
+                      autocomplete="email"
                       placeholder="mario@studio.it"
                       required
                     />
                   </div>
                   <div class="col-12">
-                    <label class="form-label">Richiesta</label>
+                    <label class="form-label" for="message">Richiesta</label>
                     <textarea
                       class="form-control"
                       id="message"
@@ -450,6 +454,16 @@
           alert("Messaggio inviato! Ti ricontatteremo a breve.");
           this.reset();
         });
+
+      // Mouse tracking for dynamic aurora orbits
+      const orbitWrapper = document.getElementById("orbitWrapper");
+      if (orbitWrapper) {
+        document.addEventListener("mousemove", (e) => {
+          const x = e.clientX - window.innerWidth / 2;
+          const y = e.clientY - window.innerHeight / 2;
+          orbitWrapper.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+        });
+      }
     </script>
   </body>
 </html>

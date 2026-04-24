@@ -404,10 +404,14 @@
           currentChatId = transcript.chat_id;
           localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
           chatHistory = transcript.messages.map((message) => ({
+            id: createMessageId(),
             sender: message.role === "assistant" ? "ai" : "user",
             text: message.text,
             sources: normalizeSources(message.sources),
             sourceDetails: [],
+            confidenceLabel: message.confidence_label || null,
+            confidenceScore: typeof message.confidence_score === "number" ? message.confidence_score : null,
+            retrievalMode: message.retrieval_mode || null,
           }));
           saveChatHistory();
           renderChat();

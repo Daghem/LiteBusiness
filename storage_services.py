@@ -31,6 +31,9 @@ class ChatHistoryStore:
         user_message: str,
         assistant_message: str,
         assistant_sources: list[str],
+        confidence_label: str | None = None,
+        confidence_score: float | None = None,
+        retrieval_mode: str | None = None,
     ) -> dict:
         chat = self._load_raw(chat_id) or {
             "chat_id": chat_id,
@@ -56,6 +59,9 @@ class ChatHistoryStore:
                     "text": assistant_message,
                     "sources": assistant_sources,
                     "created_at": timestamp,
+                    "confidence_label": confidence_label,
+                    "confidence_score": confidence_score,
+                    "retrieval_mode": retrieval_mode,
                 },
             ]
         )

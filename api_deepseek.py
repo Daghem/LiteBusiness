@@ -2028,6 +2028,9 @@ async def persist_chat_turn(payload: ChatTurnPayload):
         user_message=payload.user_message,
         assistant_message=payload.assistant_message,
         assistant_sources=payload.assistant_sources,
+        confidence_label=payload.confidence_label,
+        confidence_score=payload.confidence_score,
+        retrieval_mode=payload.retrieval_mode,
     )
     event_store.append(
         {

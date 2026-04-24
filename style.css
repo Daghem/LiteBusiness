@@ -776,6 +776,14 @@ html[data-theme="dark"] .form-control {
   color: var(--ink);
 }
 
+html[data-theme="dark"] .form-control::placeholder {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .form-control:focus {
+  background: rgba(17, 27, 46, 0.95);
+}
+
 html[data-theme="dark"] .composer-frame {
   background: rgba(10, 18, 32, 0.92);
   border-color: rgba(255, 255, 255, 0.08);

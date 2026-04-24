@@ -53,6 +53,9 @@ class ChatMessage(BaseModel):
     text: str
     sources: List[str] = Field(default_factory=list)
     created_at: str
+    confidence_label: str | None = None
+    confidence_score: float | None = None
+    retrieval_mode: str | None = None
 
 
 class ChatSummary(BaseModel):

@@ -833,7 +833,7 @@ html[data-theme="dark"] .form-control {
 }
 
 html[data-theme="dark"] .form-control::placeholder {
-  color: var(--muted);
+  color: #9CA9C0;
 }
 
 html[data-theme="dark"] .form-control:focus {
@@ -842,6 +842,10 @@ html[data-theme="dark"] .form-control:focus {
 
 html[data-theme="dark"] .footer-links a {
   color: var(--ink);
+}
+
+html[data-theme="dark"] .text-muted {
+  color: var(--muted) !important;
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {

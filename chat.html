@@ -253,8 +253,21 @@
         chatBox.appendChild(loadingDiv);
         scrollChatToBottom();
 
+        // Create streaming AI message container
+        const streamingMsgId = createMessageId();
+        let streamingMessage = {
+          id: streamingMsgId,
+          sender: "ai",
+          text: "",
+          sources: [],
+          sourceDetails: [],
+          confidenceLabel: null,
+          confidenceScore: null,
+          retrievalMode: null,
+        };
+
         try {
-          const response = await fetch(`${getApiBaseUrl()}/`, {
+          const response = await fetch(`${getApiBaseUrl()}/chat-stream`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -265,25 +278,73 @@
           });
 
           if (!response.ok) throw new Error("Errore dal server");
+          if (!response.body) throw new Error("Stream non disponibile");
 
-          const data = await response.json();
           removeLoadingIndicator(loadingDiv);
 
-          const assistantMessage = {
-            sender: "ai",
-            text: data.message,
-            sources: normalizeSources(data.sources),
-            sourceDetails: normalizeSourceDetails(data.source_details || []),
-            confidenceLabel: data.confidence_label || null,
-            confidenceScore: typeof data.confidence_score === "number" ? data.confidence_score : null,
-            retrievalMode: data.retrieval_mode || null,
-          };
-          addMessage(assistantMessage, { animate: true });
-          await persistTurn(userText, assistantMessage);
-          await loadServerHistory();
+          // Render empty AI message that will be filled progressively
+          renderStreamingMessage(streamingMessage);
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
+          let streamingComplete = false;
+
+          while (!streamingComplete) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || ""; // Keep incomplete line in buffer
+
+            for (const line of lines) {
+              if (!line.startsWith("data: ")) continue;
+              const jsonStr = line.slice(6).trim();
+              if (!jsonStr) continue;
+
+              try {
+                const data = JSON.parse(jsonStr);
+
+                if (data.error) {
+                  streamingMessage.text = data.error;
+                  streamingMessage.sources = [];
+                  streamingMessage.sourceDetails = [];
+                  finalizeStreamingMessage(streamingMsgId, streamingMessage);
+                  await persistTurn(userText, streamingMessage);
+                  streamingComplete = true;
+                  break; // Exit inner loop
+                }
+
+                if (data.chunk) {
+                  streamingMessage.text += data.chunk;
+                  updateStreamingMessage(streamingMsgId, streamingMessage);
+                  scrollChatToBottom();
+                }
+
+                if (data.done) {
+                  // Final message with all metadata
+                  streamingMessage.text = data.text || streamingMessage.text;
+                  streamingMessage.sources = normalizeSources(data.sources);
+                  streamingMessage.sourceDetails = normalizeSourceDetails(data.source_details || []);
+                  streamingMessage.confidenceLabel = data.confidence_label || null;
+                  streamingMessage.confidenceScore = typeof data.confidence_score === "number" ? data.confidence_score : null;
+                  streamingMessage.retrievalMode = data.retrieval_mode || null;
+                  finalizeStreamingMessage(streamingMsgId, streamingMessage);
+                  await persistTurn(userText, streamingMessage);
+                  await loadServerHistory();
+                  streamingComplete = true;
+                  break; // Exit inner loop - streaming complete
+                }
+              } catch (parseError) {
+                console.error("Parse error:", parseError, jsonStr);
+              }
+            }
+          }
         } catch (error) {
           console.error("Errore:", error);
           removeLoadingIndicator(loadingDiv);
+          removeStreamingMessage(streamingMsgId);
           addMessage(
             {
               sender: "ai",
@@ -658,6 +719,96 @@
         const downButton = createActionButton("fa-thumbs-down", "Feedback negativo", () => sendFeedback("down", message, downButton));
 
         container.append(copyButton, exportButton, upButton, downButton);
+      }
+
+      // Streaming message helpers
+      const streamingMessages = new Map();
+
+      function renderStreamingMessage(message) {
+        const msgDiv = document.createElement("div");
+        msgDiv.className = "message-ai d-flex align-items-end mb-3 streaming-message";
+        msgDiv.dataset.msgId = message.id;
+        msgDiv.innerHTML = `
+          <img src="robot.png" alt="Robot" class="chat-avatar" />
+          <div class="message-card message-card-ai">
+            <div class="bubble-ai">
+              <p class="mb-2 ai-text-container streaming-text"></p>
+              <div class="streaming-sources" style="display:none;"></div>
+            </div>
+            <div class="message-actions message-actions-ai streaming-actions" style="display:none;"></div>
+          </div>
+        `;
+        chatBox.appendChild(msgDiv);
+        streamingMessages.set(message.id, {
+          element: msgDiv,
+          textContainer: msgDiv.querySelector(".streaming-text"),
+          sourcesContainer: msgDiv.querySelector(".streaming-sources"),
+          actionsContainer: msgDiv.querySelector(".streaming-actions"),
+        });
+        scrollChatToBottom();
+        return msgDiv;
+      }
+
+      function updateStreamingMessage(msgId, message) {
+        const cached = streamingMessages.get(msgId);
+        if (!cached) return;
+        cached.textContainer.textContent = message.text;
+      }
+
+      function finalizeStreamingMessage(msgId, message) {
+        const cached = streamingMessages.get(msgId);
+        if (!cached) return;
+
+        // Update final text with HTML escaping
+        cached.textContainer.innerHTML = escapeHtml(message.text).replace(/\n/g, "<br>");
+
+        // Show confidence chip if present
+        if (message.confidenceLabel) {
+          const chip = document.createElement("span");
+          chip.className = `confidence-chip confidence-${message.confidenceLabel}`;
+          chip.textContent = `Confidenza ${message.confidenceLabel}`;
+          cached.textContainer.parentNode.insertBefore(chip, cached.textContainer);
+        }
+
+        // Show sources
+        if (message.sourceDetails && message.sourceDetails.length > 0) {
+          const sourceMarkup = renderSourceMarkup(message);
+          cached.sourcesContainer.innerHTML = sourceMarkup;
+          cached.sourcesContainer.style.display = "block";
+        }
+
+        // Show actions
+        buildAiActions(cached.actionsContainer, message, { isIntro: false });
+        cached.actionsContainer.style.display = "flex";
+
+        // Remove streaming identifier classes
+        cached.element.classList.remove("streaming-message");
+        cached.textContainer.classList.remove("streaming-text");
+        cached.sourcesContainer.classList.remove("streaming-sources");
+        cached.actionsContainer.classList.remove("streaming-actions");
+
+        // Persist to chatHistory for local storage
+        chatHistory.push({
+          id: message.id,
+          sender: message.sender,
+          text: message.text,
+          sources: normalizeSources(message.sources),
+          sourceDetails: normalizeSourceDetails(message.sourceDetails),
+          confidenceLabel: message.confidenceLabel || null,
+          confidenceScore: message.confidenceScore || null,
+          retrievalMode: message.retrievalMode || null,
+        });
+        saveChatHistory();
+
+        streamingMessages.delete(msgId);
+      }
+
+      function removeStreamingMessage(msgId) {
+        const cached = streamingMessages.get(msgId);
+        if (cached && cached.element.parentNode) {
+          cached.element.remove();
+        }
+        streamingMessages.delete(msgId);
       }
 
       function createActionButton(iconClass, label, handler) {

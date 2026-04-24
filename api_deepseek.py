@@ -27,7 +27,7 @@ from app_models import (
 from dotenv import load_dotenv
 from fastapi import File, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from openai import OpenAI
 from openai import APIError, RateLimitError
 from storage_services import ChatHistoryStore, EventStore, FeedbackStore, build_admin_stats
@@ -3149,6 +3149,542 @@ async def read_root(payload: ChatRequest):
         regime_id=active_regime.regime_id,
         chat_id=payload.chat_id,
     )
+
+
+@app.post("/chat-stream")
+async def chat_stream(payload: ChatRequest):
+    """Streaming chat endpoint that returns Server-Sent Events."""
+    import asyncio
+
+    if SEMANTIC_SEARCH_ENABLED and not _ensure_rag_ready():
+        async def error_gen():
+            yield f"data: {json.dumps({'error': 'RAG non disponibile'}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(error_gen(), media_type="text/event-stream")
+
+    raw_contenuto = (payload.content or "").strip()
+    if not raw_contenuto:
+        async def empty_gen():
+            yield f"data: {json.dumps({'error': 'Messaggio vuoto'}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(empty_gen(), media_type="text/event-stream")
+
+    # Resolve regime (same logic as main endpoint)
+    requested_regime = _resolve_requested_regime(payload.regime_id)
+    if payload.regime_id and requested_regime is None:
+        async def regime_notfound_gen():
+            msg = "Il regime selezionato non e' disponibile tra i corpora caricati."
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': []}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(regime_notfound_gen(), media_type="text/event-stream")
+
+    contenuto = _normalize_tax_query(raw_contenuto)
+
+    if requested_regime is not None:
+        active_regime, regime_explicit, regime_ambiguous = requested_regime, True, False
+    else:
+        active_regime, regime_explicit, regime_ambiguous = _resolve_regime(contenuto)
+
+    if regime_ambiguous:
+        available = ", ".join(profile.label for profile in REGIME_PROFILES)
+        async def ambiguous_gen():
+            msg = f"La domanda sembra riferirsi a piu' regimi. Specifica meglio il regime fiscale tra: {available}."
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': []}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(ambiguous_gen(), media_type="text/event-stream")
+
+    if active_regime is None:
+        async def noregime_gen():
+            yield f"data: {json.dumps({'text': _regime_scope_message(), 'done': True, 'sources': []}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(noregime_gen(), media_type="text/event-stream")
+
+    # Handle off-topic with immediate response
+    if _is_off_topic_query(contenuto):
+        async def offtopic_gen():
+            msg = f"{_regime_scope_message(active_regime)} Riformula la domanda in questo ambito."
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': []}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(offtopic_gen(), media_type="text/event-stream")
+
+    # Hardcoded responses (same as main endpoint)
+    is_forfettario_regime = active_regime.regime_id == "forfettario"
+    allow_critical = _allow_hardcoded("critical")
+    allow_stable = _allow_hardcoded("stable")
+    allow_optional = _allow_hardcoded("optional")
+
+    if allow_optional and is_forfettario_regime and _is_forfettario_intro_query(contenuto):
+        async def intro_gen():
+            msg = (
+                "Il regime forfettario e' un regime fiscale agevolato per partite IVA individuali. "
+                "In pratica, il reddito imponibile non si calcola sottraendo tutte le spese reali una per una, "
+                "ma applicando ai ricavi un coefficiente di redditivita' legato all'attivita' svolta. "
+                "Su quel reddito si paga di norma un'imposta sostitutiva del 15%, che in alcuni casi scende al 5%."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': []}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(intro_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_quadro_lm_query(contenuto):
+        async def quadrolm_gen():
+            msg = (
+                "Il Quadro LM e' la sezione del Modello Redditi Persone Fisiche dedicata ai contribuenti "
+                "che applicano il regime forfettario. Serve a determinare il reddito imponibile e "
+                "l'imposta sostitutiva dovuta."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['09_Guida_Tecnica_Quadro_LM_Dichiarazione_Redditi.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(quadrolm_gen(), media_type="text/event-stream")
+
+    if allow_critical and is_forfettario_regime and _is_ateco_coeff_query(contenuto):
+        ateco_data = _extract_ateco_components(contenuto)
+        if ateco_data is not None:
+            prefix, subcode = ateco_data
+            coeff = _lookup_coefficiente_ateco(prefix, subcode=subcode)
+            if coeff is not None:
+                if subcode is not None and coeff.endswith("%"):
+                    msg = f"Il coefficiente di redditivita' per ATECO {prefix}.{subcode} e' {coeff}."
+                elif prefix == 46 or prefix == 47:
+                    msg = f"Per il codice ATECO {prefix}, {coeff}. Controlla sempre il sottocodice completo per il valore esatto."
+                else:
+                    msg = f"Il coefficiente di redditivita' per ATECO {prefix} e' {coeff}."
+                async def ateco_gen():
+                    yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['03_Tabella_Coefficienti_Redditivita_ATECO.pdf', '01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf']}, ensure_ascii=False)}\n\n"
+                return StreamingResponse(ateco_gen(), media_type="text/event-stream")
+
+        if _is_ateco_list_query(contenuto):
+            async def atecolist_gen():
+                msg = (
+                    "Nel regime forfettario i coefficienti di redditivita' sono associati a gruppi ATECO: "
+                    "40% (es. commercio e alloggio/ristorazione), "
+                    "54% (commercio ambulante alimenti/bevande), "
+                    "62% (intermediari del commercio), "
+                    "67% (altre attivita' economiche), "
+                    "78% (attivita' professionali, sanitarie, istruzione e finanziarie), "
+                    "86% (costruzioni e attivita' immobiliari). "
+                    "Se mi indichi un codice ATECO specifico, ti dico il coefficiente esatto."
+                )
+                yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['03_Tabella_Coefficienti_Redditivita_ATECO.pdf', '01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf']}, ensure_ascii=False)}\n\n"
+            return StreamingResponse(atecolist_gen(), media_type="text/event-stream")
+
+    if allow_critical and is_forfettario_regime and _is_random_ateco_query(contenuto):
+        async def randomateco_gen():
+            msg = (
+                "Non posso inventare un codice ATECO a caso. Nei documenti disponibili non c'e' "
+                "l'elenco completo dei codici ATECO italiani; c'e' solo la tabella dei gruppi ATECO "
+                "con i relativi coefficienti. Se mi dai un codice specifico, posso dirti il coefficiente."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['03_Tabella_Coefficienti_Redditivita_ATECO.pdf', '01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(randomateco_gen(), media_type="text/event-stream")
+
+    if allow_critical and is_forfettario_regime and _is_ateco_codes_query(contenuto):
+        async def atecocodes_gen():
+            msg = (
+                "Nei documenti disponibili non c'e' un elenco completo di tutti i codici ATECO italiani; "
+                "c'e' la tabella dei gruppi ATECO rilevanti per il regime forfettario con i relativi coefficienti. "
+                "Se vuoi, posso dirti il coefficiente partendo da un codice ATECO preciso."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['03_Tabella_Coefficienti_Redditivita_ATECO.pdf', '01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(atecocodes_gen(), media_type="text/event-stream")
+
+    # Additional hardcoded responses (limits, tax, INPS, employment, invoicing)
+    if allow_stable and is_forfettario_regime and _is_forfettario_query(contenuto) and _is_limit_query(contenuto) and _is_tax_query(contenuto):
+        async def limittax_gen():
+            msg = (
+                "Per restare nel regime forfettario, nel periodo precedente ricavi o compensi non devono superare 85.000 euro; "
+                "se durante l'anno superi 100.000 euro, l'uscita dal regime e' immediata. "
+                "Il regime cessa anche dall'anno successivo al venir meno dei requisiti richiesti per l'accesso."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(limittax_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_forfettario_query(contenuto) and _is_limit_query(contenuto):
+        async def limit85k_gen():
+            msg = (
+                "Per il regime forfettario, la soglia ordinaria e' 85.000 euro di ricavi o compensi. "
+                "L'uscita immediata scatta se nell'anno superi 100.000 euro."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(limit85k_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_general_forfettario_tax_query(contenuto):
+        async def tax15_gen():
+            msg = (
+                "Nel regime forfettario paghi un'imposta sostitutiva che in via ordinaria e' del 15%. "
+                "Per le nuove attivita', se rispetti i requisiti, l'aliquota scende al 5% per i primi 5 anni."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(tax15_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_forfettario_exit_100k_query(contenuto):
+        async def exit100k_gen():
+            msg = (
+                "Se superi 100.000 euro di ricavi o compensi nell'anno, l'uscita dal forfettario e' immediata "
+                "dal momento del superamento."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(exit100k_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_cash_basis_threshold_query(contenuto):
+        async def cashbasis_gen():
+            msg = (
+                "Per le soglie del regime forfettario conta quanto incassi, non quanto fatturi, perche' si applica "
+                "il criterio di cassa."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(cashbasis_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_aliquota_5_query(contenuto):
+        async def aliquota5_gen():
+            msg = (
+                "L'aliquota del 5% si applica alle nuove attivita' che rispettano i requisiti previsti "
+                "per il regime forfettario, e vale per i primi 5 anni."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(aliquota5_gen(), media_type="text/event-stream")
+
+    # INPS 35% reduction queries
+    if allow_stable and is_forfettario_regime and _is_inps_35_general_query(contenuto):
+        async def inps35general_gen():
+            msg = (
+                "La riduzione INPS del 35% e' riservata agli imprenditori individuali forfettari iscritti alla "
+                "gestione Artigiani o Commercianti. Non si applica a chi e' iscritto alla Gestione Separata o a una Cassa professionale."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['10_Circolare_INPS_14-2026_Artigiani_e_Commercianti.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(inps35general_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_inps_35_apply_query(contenuto):
+        async def inps35apply_gen():
+            msg = (
+                "La domanda per la riduzione INPS del 35% e' esclusivamente telematica. "
+                "Si presenta dal portale INPS, con accesso SPID, CIE o CNS, nel Cassetto Previdenziale per "
+                "Artigiani e Commercianti, seguendo il percorso: Adesione agevolazioni - Richiesta agevolazione."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['10_Circolare_INPS_14-2026_Artigiani_e_Commercianti.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(inps35apply_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_inps_35_deadline_query(contenuto):
+        async def inps35deadline_gen():
+            msg = (
+                "La domanda per la riduzione contributiva INPS del 35% si presenta solo online nel Cassetto "
+                "Previdenziale Artigiani e Commercianti (accesso con SPID/CIE/CNS). "
+                "Per chi e' gia' attivo, la scadenza e' il 28 febbraio dell'anno."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['10_Circolare_INPS_14-2026_Artigiani_e_Commercianti.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(inps35deadline_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_inps_35_new_activity_query(contenuto):
+        async def inps35new_gen():
+            msg = (
+                "Per una nuova attivita', la richiesta della riduzione INPS del 35% va fatta dopo l'iscrizione "
+                "alla gestione Artigiani o Commercianti e deve essere presentata entro un anno dall'inizio."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['10_Circolare_INPS_14-2026_Artigiani_e_Commercianti.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(inps35new_gen(), media_type="text/event-stream")
+
+    # Employment income queries
+    if allow_stable and is_forfettario_regime and _is_employment_income_threshold_query(contenuto):
+        async def empthreshold_gen():
+            msg = (
+                "In generale, con redditi da lavoro dipendente o assimilati superiori a 30.000 euro "
+                "non puoi applicare il regime forfettario. La soglia non rileva se il rapporto di lavoro e' cessato."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(empthreshold_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_ex_employer_prevalence_query(contenuto):
+        async def exemployer_gen():
+            msg = (
+                "Puoi aprire la partita IVA, ma c'e' un rischio forte di causa ostativa se fatturi "
+                "prevalentemente all'ex datore di lavoro o alla ex azienda con cui il rapporto e' in corso "
+                "o e' cessato nei due precedenti periodi d'imposta. Se oltre il 50% dei compensi arriva da "
+                "quel soggetto, perdi il forfettario dall'anno successivo."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf', '05_Circolare_9E-2019_Approfondimento_Cause_Ostative.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(exemployer_gen(), media_type="text/event-stream")
+
+    # Invoicing and VAT queries
+    if allow_stable and is_forfettario_regime and _is_bollo_query(contenuto):
+        async def bollo_gen():
+            msg = (
+                "Sì, se la fattura supera 77,47 euro si applica l'imposta di bollo da 2,00 euro, "
+                "anche nelle fatture verso l'estero. "
+                "In fattura va indicata la dicitura di assolvimento del bollo."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['08b_Manuale_AdE_Imposta_Bollo_Fatture_Elettroniche.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(bollo_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_vies_query(contenuto):
+        async def vies_gen():
+            msg = (
+                "Sì, per il forfettario l'iscrizione al VIES e' necessaria quando effettua operazioni "
+                "intracomunitarie di beni o servizi verso soggetti UE."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['12_Operazioni_Estere_VIES_Reverse_Charge_e_Dogane.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(vies_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_ads_reverse_charge_query(contenuto):
+        async def ads_gen():
+            msg = (
+                "Per acquisti di servizi esteri come Google Ads o Facebook Ads, in forfettario si applica "
+                "integrazione/autofattura TD17 con IVA al 22% e versamento entro il giorno 16 del mese successivo "
+                "con F24 codice 6099. L'IVA resta un costo non detraibile."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['12_Operazioni_Estere_VIES_Reverse_Charge_e_Dogane.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(ads_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_eu_b2b_services_query(contenuto):
+        async def eub2b_gen():
+            msg = (
+                "Per servizi B2B verso cliente UE, la fattura si emette senza IVA con dicitura "
+                "'Reverse Charge' o 'Inversione contabile' e richiede iscrizione VIES. "
+                "Per queste operazioni e' previsto l'adempimento Intrastat. "
+                "Se la fattura supera 77,47 euro, si applica anche il bollo da 2,00 euro."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['12_Operazioni_Estere_VIES_Reverse_Charge_e_Dogane.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(eub2b_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_extra_ue_services_query(contenuto):
+        async def extraue_gen():
+            msg = (
+                "Per servizi verso cliente extra-UE, la fattura e' senza IVA con dicitura: "
+                "'Operazione non soggetta ai sensi degli artt. da 7 a 7-septies del DPR 633/72'. "
+                "Se l'importo supera 77,47 euro, si applica il bollo da 2,00 euro."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['12_Operazioni_Estere_VIES_Reverse_Charge_e_Dogane.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(extraue_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_730_only_forfettario_query(contenuto):
+        async def modello730_gen():
+            msg = (
+                "Il reddito della partita IVA forfettaria non si dichiara nel 730 ma nel Modello Redditi PF, "
+                "quadro LM. Il 730 puoi usarlo solo per eventuali altri redditi soggetti a IRPEF, come lavoro "
+                "dipendente, pensione, terreni o fabbricati."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['16_IL MODELLO 730 E IL CONTRIBUENTE FORFETTARIO (2026).pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(modello730_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_cassa_integrativo_threshold_query(contenuto):
+        async def cassainteg_gen():
+            msg = (
+                "No. Il contributo integrativo addebitato in fattura dagli iscritti a una Cassa professionale "
+                "(per esempio 2%, 4% o 5%) non concorre al reddito forfettario e non conta nel limite degli "
+                "85.000 euro."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['15_CASSE PROFESSIONALI AUTONOME E REGIME FORFETTARIO (2026).pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(cassainteg_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_bollo_reimbursement_tax_query(contenuto):
+        async def bolloreim_gen():
+            msg = (
+                "No. Il rimborso dei 2 euro del bollo da parte del cliente non costituisce un ricavo "
+                "aggiuntivo da tassare separatamente e non si somma al limite degli 85.000 euro."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['08b_Manuale_AdE_Imposta_Bollo_Fatture_Elettroniche.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(bolloreim_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_residency_query(contenuto):
+        async def residency_gen():
+            msg = (
+                "In via generale il regime forfettario e' riservato ai residenti in Italia. Fanno eccezione "
+                "i residenti in uno Stato UE o SEE con adeguato scambio di informazioni, ma solo se producono "
+                "in Italia almeno il 75% del reddito complessivo."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(residency_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_special_vat_regime_query(contenuto):
+        async def specialvat_gen():
+            msg = (
+                "No, i regimi speciali IVA sono incompatibili con il regime forfettario. Se ti avvali di "
+                "regimi speciali come agricoltura, editoria, agenzie di viaggio o sali e tabacchi, non puoi "
+                "accedere o permanere nel forfettario."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(specialvat_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_srl_control_query(contenuto):
+        async def srlcontrol_gen():
+            msg = (
+                "In presenza di controllo, anche di fatto, una partecipazione in SRL puo' costituire causa "
+                "ostativa se l'attivita' individuale risulta riconducibile a quella della societa'. "
+                "Senza controllo, la partecipazione di minoranza non e' di per se' ostativa."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['04_Elenco_Cause_Ostative_e_Esclusioni_2026.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(srlcontrol_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_family_detraction_query(contenuto):
+        async def familydet_gen():
+            msg = (
+                "No. L'imposta sostitutiva del regime forfettario non consente di recuperare dal carico "
+                "fiscale della partita IVA le detrazioni per figli a carico o spese come l'asilo nido. "
+                "Quelle agevolazioni non riducono l'imposta sostitutiva del forfettario."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['16_IL MODELLO 730 E IL CONTRIBUENTE FORFETTARIO (2026).pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(familydet_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_exit_100k_example_query(contenuto):
+        async def exitexample_gen():
+            msg = (
+                "No, non resti forfettario fino a dicembre. Se superi 100.000 euro di compensi o ricavi "
+                "percepiti nell'anno, l'uscita dal regime e' immediata dal momento del superamento e "
+                "sull'operazione che fa superare la soglia devi applicare subito il regime IVA ordinario."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['02_Circolare_32E-2023_Novita_Soglie_e_Uscita_Immediat.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(exitexample_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_business_meal_cost_query(contenuto):
+        async def businessmeal_gen():
+            msg = (
+                "No. Nel regime forfettario non detrai l'IVA sugli acquisti e non deduci analiticamente "
+                "spese come una cena con cliente. Il vantaggio fiscale e' gia' forfettizzato tramite il "
+                "coefficiente di redditivita'."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['01_Legge_190-2014_Base_Normativa_e_Coefficienti.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(businessmeal_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_naspi_anticipation_query(contenuto):
+        async def naspianti_gen():
+            msg = (
+                "Sì, chi apre una partita IVA forfettaria puo' chiedere l'anticipazione della NASPI in un'unica "
+                "soluzione, ma la domanda va inviata all'INPS entro 30 giorni dall'apertura della partita IVA."
+            )
+            src = "14_NASPI, DISOCCUPAZIONE E INCENTIVI ALL'AUTOIMPRENDITORIALITÀ (2026).pdf"
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': [src]}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(naspianti_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_foreign_software_reverse_charge_query(contenuto):
+        async def foreignsoft_gen():
+            msg = (
+                "No, non sei a posto cosi'. Se acquisti un software o un servizio digitale da un fornitore "
+                "estero senza IVA, devi emettere autofattura/integrazione TD17 con IVA italiana al 22% e "
+                "versarla con F24 entro il giorno 16 del mese successivo. Nel forfettario quell'IVA resta "
+                "un costo e non e' detraibile."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['12_Operazioni_Estere_VIES_Reverse_Charge_e_Dogane.pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(foreignsoft_gen(), media_type="text/event-stream")
+
+    if allow_stable and is_forfettario_regime and _is_strumental_asset_sale_query(contenuto):
+        async def strumental_gen():
+            msg = (
+                "No. La cessione di un bene strumentale usato, come un vecchio PC aziendale, non si somma "
+                "ai ricavi o compensi che contano per la soglia degli 85.000 euro."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': ['13_CASI CRITICI E RISPOSTE AI QUESITI (PRASSI ADE).pdf']}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(strumental_gen(), media_type="text/event-stream")
+
+    if not regime_explicit and is_forfettario_regime and not _is_forfettario_domain_query(contenuto):
+        async def scopedomain_gen():
+            msg = f"{_regime_scope_message(active_regime)} Riformula la domanda in questo ambito."
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': []}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(scopedomain_gen(), media_type="text/event-stream")
+
+    if regime_explicit and not _is_tax_regime_query(contenuto):
+        async def scope_gen():
+            msg = f"{_regime_scope_message(active_regime)} Riformula la domanda in questo ambito."
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': []}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(scope_gen(), media_type="text/event-stream")
+
+    # RAG retrieval (same as main endpoint)
+    retrieved, retrieval_mode = _search_with_intent(raw_contenuto, regime_id=active_regime.regime_id)
+
+    if not retrieved:
+        async def noresult_gen():
+            msg = (
+                "Non ho trovato informazioni pertinenti nei documenti disponibili. "
+                "Prova a riformulare con termini piú specifici o a verificare la tua domanda."
+            )
+            yield f"data: {json.dumps({'text': msg, 'done': True, 'sources': []}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(noresult_gen(), media_type="text/event-stream")
+
+    # Check confidence
+    top_score = max(item.score for item in retrieved)
+    if top_score < 0.12:
+        _log_rag_event(
+            "rag_low_confidence",
+            {"query": raw_contenuto, "regime": active_regime.regime_id, "top_score": top_score},
+        )
+
+    # Build context
+    context_blocks = []
+    for item in retrieved:
+        context_blocks.append(
+            f"[Fonte: {item.source} | Chunk: {item.chunk_id} | Score: {item.score:.3f}]\n{item.text}"
+        )
+    context = "\n\n".join(context_blocks)
+
+    system_prompt = (
+        f"Sei un assistente fiscale per {active_regime.label.lower()} in Italia. "
+        "Rispondi solo con informazioni presenti nel CONTEXT. "
+        "Se il CONTEXT non contiene una parte della risposta, dillo in una sola frase breve. "
+        "Non inventare norme, soglie o scadenze. "
+        "Stile obbligatorio: italiano chiaro, tono professionale, nessun markdown, "
+        "nessun uso di **, # o elenchi con trattini. "
+        "Non iniziare con formule tipo 'In base al CONTEXT fornito'."
+    )
+
+    user_prompt = (
+        f"DOMANDA:\n{contenuto}\n\n"
+        f"CONTEXT:\n{context}\n\n"
+        "Rispondi in italiano in modo sintetico. "
+        "Usa massimo 4 frasi totali. "
+        "Dai prima la risposta diretta. "
+        "Non inserire mai le fonti nel testo della risposta."
+    )
+
+    llm_client = _get_llm_client()
+    if not llm_client:
+        async def nollm_gen():
+            yield f"data: {json.dumps({'error': client_init_error or 'LLM non disponibile'}, ensure_ascii=False)}\n\n"
+        return StreamingResponse(nollm_gen(), media_type="text/event-stream")
+
+    sources = list(dict.fromkeys(item.source for item in retrieved))[:4]
+    source_details = _build_source_details(retrieved)
+    confidence_label, confidence_score = _confidence_from_results(retrieved, retrieval_mode)
+
+    async def stream_generator():
+        try:
+            response_stream = llm_client.chat.completions.create(
+                model=llm_model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                stream=True,
+            )
+
+            full_text = ""
+            for chunk in response_stream:
+                delta = chunk.choices[0].delta.content or "" if chunk.choices else ""
+                if delta:
+                    full_text += delta
+                    yield f"data: {json.dumps({'chunk': delta}, ensure_ascii=False)}\n\n"
+                    await asyncio.sleep(0)  # Yield control
+
+            # Final message with metadata - convert SourceRef to dict for JSON serialization
+            final_payload = {
+                "done": True,
+                "text": _clean_model_answer(full_text),
+                "sources": sources,
+                "source_details": [
+                    {
+                        "source": d.source,
+                        "excerpt": d.excerpt,
+                        "chunk_id": d.chunk_id,
+                        "page_start": d.page_start,
+                        "page_end": d.page_end,
+                        "score": d.score,
+                    }
+                    for d in source_details
+                ],
+                "confidence_label": confidence_label,
+                "confidence_score": confidence_score,
+                "retrieval_mode": retrieval_mode,
+                "regime_id": active_regime.regime_id,
+                "chat_id": payload.chat_id,
+            }
+            yield f"data: {json.dumps(final_payload, ensure_ascii=False)}\n\n"
+
+        except RateLimitError:
+            yield f"data: {json.dumps({'error': 'Quota DeepSeek esaurita (errore 429)'}, ensure_ascii=False)}\n\n"
+        except APIError as error:
+            yield f"data: {json.dumps({'error': f'Errore API DeepSeek: {error}'}, ensure_ascii=False)}\n\n"
+        except Exception as error:
+            yield f"data: {json.dumps({'error': f'Errore interno: {error}'}, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(stream_generator(), media_type="text/event-stream")
 
 
 @app.get("/{asset_name}", include_in_schema=False, response_class=FileResponse)

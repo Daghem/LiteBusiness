@@ -968,11 +968,37 @@ html[data-theme="dark"] .disclaimer-text {
   }
 }
 
+/* Streaming message cursor effect */
+.streaming-text {
+  position: relative;
+}
+
+.streaming-text::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background: var(--cobalt);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: streamingCursor 1s ease-in-out infinite;
+}
+
+@keyframes streamingCursor {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+
+  .streaming-text::after {
+    animation: none;
+    opacity: 1;
   }
 }

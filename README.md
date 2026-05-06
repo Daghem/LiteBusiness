@@ -10,135 +10,164 @@ header: default
 short_description: Assistente AI e simulatore per il regime forfettario.
 ---
 
-# FlyTax
+# Spiegazione progetto
 
-## Progetto ITS
+---
 
-Applicazione web con assistente AI focalizzata sul regime forfettario italiano.
-Il retrieval documentale usa Qdrant (database vettoriale) con indicizzazione diretta dai PDF normativi del corpus forfettario.
+## 1. Cos'è FlyTax
 
-## Stack
+**FlyTax** è un assistente AI specializzato sul **regime forfettario italiano**. Non è un chatbot generico: risponde solo a domande fiscali e contributive legate a questo regime, usando come fonte una biblioteca di documenti ufficiali (leggi, circolari, guide tecniche, prassi dell'Agenzia delle Entrate e INPS).
 
-- Frontend statico: `index.html`, `chat.html`
-- Dashboard utente: `dashboard.html`
-- Backend: FastAPI (`api_deepseek.py`)
-- LLM: DeepSeek via API compatibile OpenAI
-- Vector DB: Qdrant
-- Embedding: SentenceTransformers
+Il cuore è un sistema **RAG** (Retrieval Augmented Generation): l'AI non risponde "a memoria", ma legge i documenti normativi caricati, trova i passaggi pertinenti, e poi compone la risposta.
 
-## Variabili ambiente
+---
 
-Nel file `.env`:
+## 2. Architettura e tecnologie
 
-```env
-API_KEY_DEEPSEEK=...
-QDRANT_URL=http://localhost:6333
-QDRANT_API_KEY=
-QDRANT_COLLECTION=flytax_normativa_2026
-EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
-LEXICAL_FALLBACK_ENABLED=1
-HARD_CODED_MODE=all
-LOG_RAG_EVENTS=0
-LOG_DIR=logs
-DATA_ROOT=data
-DOCUMENT_ROOTS=.
-UPLOADS_ROOT=.
-RAG_INDEX_PATH=rag_index/index.json
-ADMIN_ACCESS_KEY=...
-```
+Il progetto è un'applicazione web full-stack con questi strati:
 
-## Avvio rapido
+| Strato | Tecnologia | File principali |
+|---|---|---|
+| **Frontend** | HTML, CSS, Bootstrap 5, JavaScript vanilla | [index.html](cci:7://file:///home/ytaki/its/project_work/FlyTax/index.html:0:0-0:0), [chat.html](cci:7://file:///home/ytaki/its/project_work/FlyTax/chat.html:0:0-0:0), [dashboard.html](cci:7://file:///home/ytaki/its/project_work/FlyTax/dashboard.html:0:0-0:0), [admin_tools.html](cci:7://file:///home/ytaki/its/project_work/FlyTax/admin_tools.html:0:0-0:0) |
+| **Backend API** | FastAPI (Python) | [api_deepseek.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/api_deepseek.py:0:0-0:0) |
+| **AI / LLM** | DeepSeek (via API compatibile OpenAI) | [api_deepseek.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/api_deepseek.py:0:0-0:0) |
+| **Database vettoriale** | Qdrant | [rag_qdrant.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/rag_qdrant.py:0:0-0:0) |
+| **Embedding** | SentenceTransformers (`paraphrase-multilingual-MiniLM-L12-v2`) | [rag_qdrant.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/rag_qdrant.py:0:0-0:0) |
+| **Simulatore fiscale** | Python puro | [tax_simulator.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/tax_simulator.py:0:0-0:0) |
+| **Storage dati** | File JSON/JSONL su disco | [storage_services.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/storage_services.py:0:0-0:0) |
+| **Indicizzazione** | Script CLI | [build_rag_index.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/build_rag_index.py:0:0-0:0) |
 
-1. Avvia Qdrant:
-   `docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant`
-2. Installa dipendenze:
-   `pip install -r requirements.txt`
-3. Indicizza i PDF (e XML):
-   `python3 build_rag_index.py`
-4. Avvia API:
-   `uvicorn api_deepseek:app --reload`
-5. Apri `http://127.0.0.1:8000/` dal browser.
-6. Dashboard utente: `http://127.0.0.1:8000/dashboard.html`
-7. Area admin tecnica: `http://127.0.0.1:8000/admin_tools.html`
+---
 
-## Deploy su Hugging Face Spaces
+## 3. Come funziona la chat (flusso RAG)
 
-Il repository ora include i file minimi per un deploy come Docker Space:
+Quando scrivi una domanda in chat, il backend esegue questi passaggi:
 
-- `Dockerfile`
-- `.dockerignore`
-- `space_server.py`
-- front matter Spaces in questo `README.md`
+### A. Normalizzazione e controllo ambito
+- La domanda viene "ripulita" da errori di battitura comuni (`forchettario` → `forfettario`, `alliquota` → `aliquota`, ecc.).
+- Il sistema controlla se la domanda è **off-topic** (es. "che tempo fa?", "bitcoin") e la rifiuta.
+- Verifica se la domanda rientra nel dominio del forfettario.
 
-Procedura:
+### B. Risposte hardcoded (guscio di precisione)
+Prima di chiamare l'AI, il backend ha una **lunga serie di regole codificate** che riconoscono domande specifiche e rispondono immediatamente con testo controllato. Esempi:
+- Coefficienti ATECO
+- Soglie 85.000€ / 100.000€
+- Aliquota 5% e 15%
+- Riduzione INPS 35%
+- Fatturazione verso UE / extra-UE
+- Cause ostative (lavoro dipendente, ex datore, SRL)
+- NASPI e compatibilità
+- Bollo, VIES, Intrastat
 
-1. Crea uno Space su Hugging Face scegliendo `Docker` come SDK.
-2. Pusha questo repository nello Space.
-3. Nelle `Settings` dello Space configura come `Variables / Secrets` almeno:
-   `API_KEY_DEEPSEEK`, `QDRANT_URL`, `QDRANT_API_KEY` se serve, `ADMIN_ACCESS_KEY`.
-4. Avvia il build automatico dello Space.
+Questo serve a **non inventare numeri o norme**: se la domanda è una di queste, la risposta è precisa al 100% senza passare dall'AI.
 
-Note importanti per Hugging Face Spaces:
+### C. Ricerca nei documenti (RAG)
+Se non c'è una regola hardcoded, il sistema:
+1. **Embedda la domanda** (la trasforma in un vettore numerico con SentenceTransformers).
+2. **Cerca su Qdrant** i chunk di testo più simili tra i PDF/XML indicizzati.
+3. Usa anche un **fallback lessicale** (ricerca per parole chiave) se la ricerca semantica trova poco.
+4. **Espande la query**: aggiunge termini correlati per trovare più fonti (es. se chiedi di "tasse", cerca anche "imposta sostitutiva", "aliquota", "quadro LM").
 
-- Lo Space esporra' l'app su porta `7860`, configurata nel front matter con `app_port: 7860`.
-- Spaces permette traffico in uscita solo su `80`, `443` e `8080`, quindi `QDRANT_URL` deve puntare a un endpoint raggiungibile su una di queste porte. Un classico `http://host:6333` non e' adatto a Spaces.
-- Se usi Qdrant Cloud, preferisci un endpoint `https://...` sulla porta `443`.
-- Il filesystem dello Space non e' persistente per default: chat, feedback, log e upload ripartono vuoti a ogni rebuild/restart.
-- La root `GET /` continua a servire `index.html`, mentre `POST /` resta l'endpoint chat.
+### D. Generazione della risposta con DeepSeek
+- I chunk trovati vengono incollati in un **prompt strutturato** con istruzioni rigide: *"Rispondi solo con informazioni presenti nel CONTEXT. Non inventare norme. Stile: italiano chiaro, tono professionale, nessun markdown, massimo 4 frasi."*
+- DeepSeek legge i documenti e compone la risposta.
+- La risposta viene pulita (es. toglie frasi tipo "In base al contesto fornito").
 
-## Deploy su Render
+### E. Fonti e confidenza
+La risposta arriva all'utente con:
+- **Fonti**: nomi dei PDF usati, con estratto del testo e numero di pagina (quando disponibile).
+- **Confidenza**: `alta`, `media` o `bassa`, in base allo score dei risultati trovati.
 
-Il repository include `render.yaml`, quindi puo' essere importato come Blueprint.
+---
 
-Configurazione minima:
+## 4. Il simulatore fiscale
 
-1. Crea un servizio Qdrant raggiungibile da Render.
-2. Su Render importa il repo con `render.yaml`.
-3. Imposta almeno queste variabili:
-   `API_KEY_DEEPSEEK`, `QDRANT_URL`, `QDRANT_API_KEY` (se serve), `ADMIN_ACCESS_KEY`.
-4. Avvia il servizio web.
+In [chat.html](cci:7://file:///home/ytaki/its/project_work/FlyTax/chat.html:0:0-0:0) e [dashboard.html](cci:7://file:///home/ytaki/its/project_work/FlyTax/dashboard.html:0:0-0:0) c'è un modulo per calcolare in modo **orientativo**:
+- **Imponibile**: ricavi × coefficiente di redditività (lookup da codice ATECO).
+- **Contributi**: imponibile × aliquota previdenziale (Gestione Separata, Artigiani/Commercianti, o nessuna).
+- **Imposta sostitutiva**: 15% o 5% sull'imponibile meno i contributi.
+- **Netto stimato**.
 
-Note pratiche per Render:
+I coefficienti ATECO sono codificati in [tax_simulator.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/tax_simulator.py:0:0-0:0) e in [api_deepseek.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/api_deepseek.py:0:0-0:0) (duplicati per uso in chat e in simulatore).
 
-- L'app espone sia API sia frontend dallo stesso processo FastAPI.
-- La root `GET /` serve `index.html`, mentre `POST /` resta l'endpoint chat.
-- Se vuoi usare la stessa origin per il frontend deployato, non serve modificare i file HTML: usano automaticamente `window.location.origin`.
-- Per avere persistenza reale su chat, feedback, log e documenti caricati, conviene montare un disco Render e puntare gli env `DATA_ROOT`, `UPLOADS_ROOT`, `LOG_DIR` e, se necessario, `DOCUMENT_ROOTS` verso quel mount path.
+---
 
-## Funzionalita' aggiunte
+## 5. Gestione documentale e indicizzazione
 
-- Chat con cronologia persistita lato server e lista chat recenti
-- Fonti arricchite con estratti, score e pagina quando disponibile
-- Indicatore di confidenza della risposta (`alta`, `media`, `bassa`)
-- Export delle risposte e feedback `utile / non utile`
-- Simulatore fiscale orientativo per il regime forfettario
-- Upload PDF/XML da dashboard e reindicizzazione da interfaccia
-- Metriche base su chat, feedback e query senza risultato
-- Test automatici su simulatore e servizi di storage
+I documenti normativi stanno in [Normativo_Forfettari_Agg_2026/](cci:9://file:///home/ytaki/its/project_work/FlyTax/Normativo_Forfettari_Agg_2026:0:0-0:0) (PDF e XML).
 
-## Endpoint principali
+### Indicizzazione ([build_rag_index.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/build_rag_index.py:0:0-0:0) + [rag_qdrant.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/rag_qdrant.py:0:0-0:0))
+1. Estrae il testo da ogni pagina PDF (con PyMuPDF / `fitz`).
+2. Divide il testo in **chunk** di ~1200 caratteri con sovrapposizione di 200.
+3. Genera gli **embedding** (vettori) per ogni chunk.
+4. Carica tutto su **Qdrant** con metadata: regime, nome file, chunk_id, testo, pagina iniziale/finale.
 
-- `POST /` chat AI
-- `GET /regimes` restituisce il solo regime supportato (`forfettario`)
-- `POST /simulate` simulatore forfettario
-- `GET /chat-history` lista chat salvate
-- `POST /chat-history` salva un turno chat
-- `GET /chat-history/{chat_id}` recupera una chat
-- `DELETE /chat-history/{chat_id}` elimina una chat
-- `POST /feedback` salva feedback utente
-- `GET /admin/overview` statistiche dashboard
-- `POST /admin/upload` carica un PDF/XML
-- `POST /admin/reindex` ricostruisce l'indice Qdrant
+In runtime, la ricerca è istantanea: Qdrant confronta il vettore della domanda con i vettori dei chunk.
 
-## Note
+---
 
-- L'indice non usa piu' `testi_estratti_2026` per la ricerca runtime.
-- I chunk testuali vengono salvati come payload su Qdrant e recuperati on-demand.
-- Il corpus indicizzato e' `Normativo_Forfettari_Agg_2026` (supporta `.pdf` e `.xml`, anche in sottocartelle).
-- `DOCUMENT_ROOTS` accetta piu' percorsi separati da virgola, utile per combinare documenti inclusi nel repo e documenti caricati su un disco persistente.
-- Tutti i chunk vengono gestiti come documentazione del regime forfettario.
-- Le regole hardcoded e il flusso RAG/LLM sono entrambi limitati al regime forfettario.
-- E' attivo un fallback lessicale opzionale per evitare falsi "non menzionato" in caso di retrieval debole.
-- `HARD_CODED_MODE`: `all`, `balanced`, `critical` per limitare le risposte hardcoded.
-- Per domande definitorie (es. "cos'è il codice ATECO") e' consigliato aggiungere una fonte ufficiale (ISTAT/AdE) che includa la definizione.
-- Per vedere le pagine nelle fonti, e' necessario reindicizzare i documenti con la versione aggiornata di `build_rag_index.py`.
+## 6. Frontend: le 3 pagine
+
+- **[index.html](cci:7://file:///home/ytaki/its/project_work/FlyTax/index.html:0:0-0:0)**: landing page di presentazione con call-to-action.
+- **[chat.html](cci:7://file:///home/ytaki/its/project_work/FlyTax/chat.html:0:0-0:0)**: workspace vero e proprio. Ha:
+  - Pannello laterale con cronologia chat salvate.
+  - Area messaggi con possibilità di dare feedback (👍/👎).
+  - Simulatore forfettario collassabile.
+  - Toggle tema chiaro/scuro.
+- **[dashboard.html](cci:7://file:///home/ytaki/its/project_work/FlyTax/dashboard.html:0:0-0:0)**: pagina di benvenuto con accesso rapido a chat, simulatore e admin.
+- **[admin_tools.html](cci:7://file:///home/ytaki/its/project_work/FlyTax/admin_tools.html:0:0-0:0)**: area tecnica per upload PDF/XML, re-indicizzazione e statistiche.
+
+Tutte le pagine usano Bootstrap 5, font moderni (Manrope, Space Grotesk) e un tema scuro/claro persistente in `localStorage`.
+
+---
+
+## 7. Backend API: endpoint principali ([api_deepseek.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/api_deepseek.py:0:0-0:0))
+
+| Endpoint | Metodo | Cosa fa |
+|---|---|---|
+| `POST /` | Chat sincrona | Domanda → risposta JSON con testo, fonti, confidenza. |
+| `POST /chat-stream` | Chat streaming | Stessa logica ma risponde in SSE (Server-Sent Events) per effetto "macchina da scrivere". |
+| `POST /simulate` | Simulatore | Calcola tasse e contributi. |
+| `GET /regimes` | Regimi supportati | Restituisce solo `forfettario`. |
+| `POST /chat-history` | Salva turno | Memorizza la conversazione su disco. |
+| `GET /chat-history` | Lista chat | Elenco cronologia. |
+| `GET /chat-history/{id}` | Recupera chat | Riapre una chat salvata. |
+| `DELETE /chat-history/{id}` | Elimina chat | |
+| `POST /feedback` | Salva feedback | Up/down sulla risposta. |
+| `GET /admin/overview` | Statistiche | Numero chat, messaggi, feedback, domande top. |
+| `POST /admin/upload` | Carica PDF/XML | Richiede chiave admin. |
+| `POST /admin/reindex` | Ricostruisce indice | Rilegge tutti i PDF e ricarica Qdrant. |
+| `GET /healthz` | Health check | Stato del servizio e del RAG. |
+
+---
+
+## 8. Storage e persistenza
+
+Tutto è basato su **file JSON/JSONL** (nessun database relazionale):
+- `data/chat_history/*.json` — ogni chat è un file JSON con i messaggi.
+- `data/feedback/feedback.jsonl` — una riga per ogni voto.
+- `data/events/app_events.jsonl` — log di eventi (RAG senza risultati, confidenza bassa, reindex).
+
+Le statistiche admin vengono calcolate al volo leggendo questi file.
+---
+
+## 10. Deploy
+
+Il progetto è pronto per essere deployato su:
+- **Hugging Face Spaces** (Docker Space, porta 7860).
+- **Render** (con [render.yaml](cci:7://file:///home/ytaki/its/project_work/FlyTax/render.yaml:0:0-0:0) come Blueprint).
+- **Locale** con `uvicorn api_deepseek:app --reload`.
+
+Il [Dockerfile](cci:7://file:///home/ytaki/its/project_work/FlyTax/Dockerfile:0:0-0:0) è incluso, così come [space_server.py](cci:7://file:///home/ytaki/its/project_work/FlyTax/space_server.py:0:0-0:0) per l'avvio su HF Spaces.
+
+---
+
+## In sintesi
+
+FlyTax è un **sistema RAG specializzato e blindato** per il regime forfettario. La sua forza è la combinazione di:
+1. **Risposte hardcoded** per le domande frequenti (massima precisione).
+2. **Ricerca semantica + lessicale** su documenti ufficiali (Qdrant).
+3. **LLM controllato** (DeepSeek) che risponde solo leggendo le fonti trovate, con prompt che vietano di inventare.
+4. **Simulatore fiscale** integrato per i calcoli orientativi.
+
+È pensato per studi professionali, consulenti o privati che vogliono risposte affidabili sul forfettario senza rischio di "allucinazioni" dell'AI.

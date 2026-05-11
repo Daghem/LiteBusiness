@@ -205,85 +205,55 @@
       let db = null;
 
       async function initDatabase() {
-        try {
-          const { sqlite3Worker1Promisified } = await import('https://cdn.jsdelivr.net/npm/@sqlite.org/sqlite-wasm@3.44.2/index.mjs');
-          const proxy = await sqlite3Worker1Promisified();
-          const dbName = 'file:///flytax_db.sqlite3?vfs=opfs';
-          await proxy('open', { filename: dbName });
-          db = proxy;
-          await db('exec', {
-            sql: `
-              CREATE TABLE IF NOT EXISTS chats (
-                id TEXT PRIMARY KEY,
-                title TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-              );
-              CREATE TABLE IF NOT EXISTS messages (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                chat_id TEXT,
-                sender TEXT,
-                content TEXT,
-                sources TEXT,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(chat_id) REFERENCES chats(id)
-              );
-            `
-          });
-          console.log("[SQLite] OPFS inizializzato");
-        } catch (err) {
-          console.error("[SQLite] Errore inizializzazione:", err);
-        }
+        // Using localStorage persistence (no external CDN, no COOP/COEP headers required)
+        db = true;
+        console.log("[Storage] localStorage inizializzato");
       }
 
       async function saveMessageToSQLite(chatId, sender, text, sources = []) {
         if (!db) {
-          console.warn("[SQLite] DB non inizializzato, messaggio non salvato");
+          console.warn("[Storage] DB non inizializzato, messaggio non salvato");
           return;
         }
         try {
-          await db('exec', {
-            sql: 'INSERT OR IGNORE INTO chats (id, title) VALUES (?, ?)',
-            bind: [chatId, text.substring(0, 30) + "..."]
-          });
-          await db('exec', {
-            sql: 'INSERT INTO messages (chat_id, sender, content, sources) VALUES (?, ?, ?, ?)',
-            bind: [chatId, sender, text, JSON.stringify(sources)]
-          });
-          console.log("[SQLite] Messaggio salvato:", sender, text.substring(0, 40));
+          const chats = JSON.parse(localStorage.getItem('flytax-chats') || '[]');
+          if (!chats.find(c => c.id === chatId)) {
+            chats.push({ id: chatId, title: text.substring(0, 30) + "...", created_at: new Date().toISOString() });
+            localStorage.setItem('flytax-chats', JSON.stringify(chats));
+          }
+          const messages = JSON.parse(localStorage.getItem(`flytax-messages-${chatId}`) || '[]');
+          messages.push({ sender, content: text, sources: JSON.stringify(sources), timestamp: new Date().toISOString() });
+          localStorage.setItem(`flytax-messages-${chatId}`, JSON.stringify(messages));
+          console.log("[Storage] Messaggio salvato:", sender, text.substring(0, 40));
         } catch (err) {
-          console.error("[SQLite] Errore salvataggio messaggio:", err);
+          console.error("[Storage] Errore salvataggio messaggio:", err);
         }
       }
 
       async function loadChatHistoryFromDB() {
         if (!db) {
-          console.warn("[SQLite] DB non inizializzato, cronologia non caricata");
+          console.warn("[Storage] DB non inizializzato, cronologia non caricata");
           return;
         }
         try {
-          const result = await db('exec', {
-            sql: 'SELECT sender, content, sources FROM messages WHERE chat_id = ? ORDER BY timestamp ASC',
-            bind: [currentChatId],
-            returnValue: 'resultRows',
-            rowMode: 'array'
-          });
-          if (result && result.length) {
-            chatHistory = result.map(row => ({
+          const messages = JSON.parse(localStorage.getItem(`flytax-messages-${currentChatId}`) || '[]');
+          if (messages && messages.length) {
+            chatHistory = messages.map(msg => ({
               id: createMessageId(),
-              sender: row[0],
-              text: row[1],
-              sources: JSON.parse(row[2] || '[]'),
+              sender: msg.sender,
+              text: msg.content,
+              sources: JSON.parse(msg.sources || '[]'),
               sourceDetails: [],
               confidenceLabel: null,
               confidenceScore: null,
               retrievalMode: null,
             }));
-            console.log("[SQLite] Cronologia caricata, messaggi:", chatHistory.length);
+            console.log("[Storage] Cronologia caricata, messaggi:", chatHistory.length);
           } else {
-            console.log("[SQLite] Nessun messaggio nel DB per chat", currentChatId);
+            console.log("[Storage] Nessun messaggio nel DB per chat", currentChatId);
           }
         } catch (err) {
-          console.error("[SQLite] Errore caricamento cronologia:", err);
+          console.error("[Storage] Errore caricamento cronologia:", err);
         }
       }
 
@@ -707,7 +677,7 @@
                       : "";
                 const scoreLabel =
                   typeof item.score === "number" ? `<span>Score ${item.score.toFixed(3)}</span>` : "";
-                const docUrl = `${getApiBaseUrl()}/documents/${encodeURIComponent(item.source)}`;
+                const docUrl = `${getApiBaseUrl()}/Normativo_Forfettari_Agg_2026/${encodeURIComponent(item.source)}`;
                 return `
                   <a href="${docUrl}" target="_blank" rel="noopener noreferrer" class="source-card-link">
                     <article class="source-card source-card-clickable">
@@ -965,16 +935,15 @@
       async function loadHistoryListFromDB() {
         if (!db) return [];
         try {
-          const result = await db('exec', {
-            sql: `SELECT c.id, c.title, COUNT(m.id) as msg_count FROM chats c LEFT JOIN messages m ON c.id = m.chat_id GROUP BY c.id ORDER BY c.created_at DESC`,
-            returnValue: 'resultRows',
-            rowMode: 'array'
+          const chats = JSON.parse(localStorage.getItem('flytax-chats') || '[]');
+          return chats.map(chat => {
+            const messages = JSON.parse(localStorage.getItem(`flytax-messages-${chat.id}`) || '[]');
+            return {
+              chat_id: chat.id,
+              title: chat.title || 'Chat senza titolo',
+              message_count: messages.length
+            };
           });
-          return (result || []).map(row => ({
-            chat_id: row[0],
-            title: row[1] || 'Chat senza titolo',
-            message_count: row[2] || 0
-          }));
         } catch (err) {
           console.error("Errore caricamento lista chat DB:", err);
           return [];
@@ -984,18 +953,13 @@
       async function loadChatFromDB(chatId) {
         if (!db) return false;
         try {
-          const result = await db('exec', {
-            sql: 'SELECT sender, content, sources FROM messages WHERE chat_id = ? ORDER BY timestamp ASC',
-            bind: [chatId],
-            returnValue: 'resultRows',
-            rowMode: 'array'
-          });
-          if (!result || !result.length) return false;
-          chatHistory = result.map(row => ({
+          const messages = JSON.parse(localStorage.getItem(`flytax-messages-${chatId}`) || '[]');
+          if (!messages || !messages.length) return false;
+          chatHistory = messages.map(msg => ({
             id: createMessageId(),
-            sender: row[0],
-            text: row[1],
-            sources: JSON.parse(row[2] || '[]'),
+            sender: msg.sender,
+            text: msg.content,
+            sources: JSON.parse(msg.sources || '[]'),
             sourceDetails: [],
             confidenceLabel: null,
             confidenceScore: null,
@@ -1014,14 +978,10 @@
       async function deleteChatFromDB(chatId) {
         if (!db) return;
         try {
-          await db('exec', {
-            sql: 'DELETE FROM messages WHERE chat_id = ?',
-            bind: [chatId]
-          });
-          await db('exec', {
-            sql: 'DELETE FROM chats WHERE id = ?',
-            bind: [chatId]
-          });
+          localStorage.removeItem(`flytax-messages-${chatId}`);
+          const chats = JSON.parse(localStorage.getItem('flytax-chats') || '[]');
+          const filtered = chats.filter(c => c.id !== chatId);
+          localStorage.setItem('flytax-chats', JSON.stringify(filtered));
         } catch (err) {
           console.error("Errore eliminazione chat da DB:", err);
         }

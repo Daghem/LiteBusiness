@@ -1413,7 +1413,7 @@ async def chat_stream(payload: ChatRequest):
 
     return StreamingResponse(stream_generator(), media_type="text/event-stream")
 
-@app.get("/documents/{filename}", include_in_schema=False, response_class=FileResponse)
+@app.get("/Normativo_Forfettari_Agg_2026/{filename}", include_in_schema=False, response_class=FileResponse)
 async def serve_document(filename: str):
     """Serve un documento PDF/XML dal corpus normativo per consultazione o download."""
     safe_name = Path(filename).name

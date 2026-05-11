@@ -203,12 +203,88 @@
       let chatHistory = [];
       let serverHistory = [];
       let currentChatId = loadOrCreateChatId();
+      let db = null;
+
+      async function initDatabase() {
+        try {
+          const { sqlite3Worker1Promisified } = await import('https://cdn.jsdelivr.net/npm/@sqlite.org/sqlite-wasm@3.44.2/index.mjs');
+          const proxy = await sqlite3Worker1Promisified();
+          const dbName = 'file:///flytax_db.sqlite3?vfs=opfs';
+          await proxy('open', { filename: dbName });
+          db = proxy;
+          await db('exec', {
+            sql: `
+              CREATE TABLE IF NOT EXISTS chats (
+                id TEXT PRIMARY KEY,
+                title TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+              );
+              CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                chat_id TEXT,
+                sender TEXT,
+                content TEXT,
+                sources TEXT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(chat_id) REFERENCES chats(id)
+              );
+            `
+          });
+          console.log("SQLite OPFS inizializzato con successo");
+        } catch (err) {
+          console.error("Errore inizializzazione SQLite:", err);
+        }
+      }
+
+      async function saveMessageToSQLite(chatId, sender, text, sources = []) {
+        if (!db) return;
+        try {
+          await db('exec', {
+            sql: 'INSERT OR IGNORE INTO chats (id, title) VALUES (?, ?)',
+            bind: [chatId, text.substring(0, 30) + "..."]
+          });
+          await db('exec', {
+            sql: 'INSERT INTO messages (chat_id, sender, content, sources) VALUES (?, ?, ?, ?)',
+            bind: [chatId, sender, text, JSON.stringify(sources)]
+          });
+        } catch (err) {
+          console.error("Errore salvataggio messaggio:", err);
+        }
+      }
+
+      async function loadChatHistoryFromDB() {
+        if (!db) return;
+        try {
+          const result = await db('exec', {
+            sql: 'SELECT sender, content, sources FROM messages WHERE chat_id = ? ORDER BY timestamp ASC',
+            bind: [currentChatId],
+            returnValue: 'resultRows',
+            rowMode: 'array'
+          });
+          if (result && result.length) {
+            chatHistory = result.map(row => ({
+              id: createMessageId(),
+              sender: row[0],
+              text: row[1],
+              sources: JSON.parse(row[2] || '[]'),
+              sourceDetails: [],
+              confidenceLabel: null,
+              confidenceScore: null,
+              retrievalMode: null,
+            }));
+          }
+        } catch (err) {
+          console.error("Errore caricamento cronologia DB:", err);
+        }
+      }
 
       initialize();
 
       async function initialize() {
         syncThemeToggle();
-        restoreLocalChat();
+        await initDatabase();
+        await loadChatHistoryFromDB();
+        if (!chatHistory.length) restoreLocalChat();
         renderChat();
         await loadServerHistory();
       }
@@ -247,6 +323,7 @@
         sendButton.disabled = true;
 
         addMessage({ sender: "user", text: userText, sources: [], sourceDetails: [] });
+        await saveMessageToSQLite(currentChatId, "user", userText);
         inputField.value = "";
 
         const loadingDiv = createLoadingIndicator();
@@ -332,6 +409,7 @@
                   streamingMessage.retrievalMode = data.retrieval_mode || null;
                   finalizeStreamingMessage(streamingMsgId, streamingMessage);
                   await persistTurn(userText, streamingMessage);
+                  await saveMessageToSQLite(currentChatId, "ai", streamingMessage.text, streamingMessage.sources);
                   await loadServerHistory();
                   streamingComplete = true;
                   break; // Exit inner loop - streaming complete
@@ -426,14 +504,28 @@
       });
 
       async function loadServerHistory() {
+        let history = [];
         try {
           const response = await fetch(`${getApiBaseUrl()}/chat-history`);
-          if (!response.ok) throw new Error("Cronologia non disponibile");
-          serverHistory = await response.json();
-          renderHistoryList();
+          if (response.ok) {
+            history = await response.json();
+          }
         } catch (error) {
-          historyList.innerHTML = "<p class='empty-history'>Cronologia server non disponibile.</p>";
+          console.error("Errore caricamento cronologia server:", error);
         }
+        try {
+          const localHistory = await loadHistoryListFromDB();
+          const seen = new Set(history.map(h => h.chat_id));
+          for (const item of localHistory) {
+            if (!seen.has(item.chat_id)) {
+              history.push(item);
+            }
+          }
+        } catch (err) {
+          console.error("Errore caricamento cronologia DB:", err);
+        }
+        serverHistory = history;
+        renderHistoryList();
       }
 
       async function persistTurn(userText, assistantMessage) {
@@ -477,7 +569,11 @@
           saveChatHistory();
           renderChat();
         } catch (error) {
-          console.error("Apertura chat fallita:", error);
+          console.error("Apertura chat server fallita, provo DB locale:", error);
+          const loaded = await loadChatFromDB(chatId);
+          if (!loaded) {
+            console.error("Apertura chat fallita");
+          }
         }
       }
 
@@ -487,17 +583,18 @@
             method: "DELETE",
           });
           if (!response.ok) throw new Error("Eliminazione fallita");
-          if (chatId === currentChatId) {
-            currentChatId = createMessageId();
-            localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
-            chatHistory = [];
-            saveChatHistory();
-            renderChat();
-          }
-          await loadServerHistory();
         } catch (error) {
-          console.error("Eliminazione chat fallita:", error);
+          console.error("Eliminazione chat server fallita, elimino da DB locale:", error);
         }
+        await deleteChatFromDB(chatId);
+        if (chatId === currentChatId) {
+          currentChatId = createMessageId();
+          localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
+          chatHistory = [];
+          saveChatHistory();
+          renderChat();
+        }
+        await loadServerHistory();
       }
 
       function renderHistoryList() {
@@ -941,6 +1038,72 @@
           currency: "EUR",
           maximumFractionDigits: 2,
         }).format(value);
+      }
+
+      async function loadHistoryListFromDB() {
+        if (!db) return [];
+        try {
+          const result = await db('exec', {
+            sql: `SELECT c.id, c.title, COUNT(m.id) as msg_count FROM chats c LEFT JOIN messages m ON c.id = m.chat_id GROUP BY c.id ORDER BY c.created_at DESC`,
+            returnValue: 'resultRows',
+            rowMode: 'array'
+          });
+          return (result || []).map(row => ({
+            chat_id: row[0],
+            title: row[1] || 'Chat senza titolo',
+            message_count: row[2] || 0
+          }));
+        } catch (err) {
+          console.error("Errore caricamento lista chat DB:", err);
+          return [];
+        }
+      }
+
+      async function loadChatFromDB(chatId) {
+        if (!db) return false;
+        try {
+          const result = await db('exec', {
+            sql: 'SELECT sender, content, sources FROM messages WHERE chat_id = ? ORDER BY timestamp ASC',
+            bind: [chatId],
+            returnValue: 'resultRows',
+            rowMode: 'array'
+          });
+          if (!result || !result.length) return false;
+          chatHistory = result.map(row => ({
+            id: createMessageId(),
+            sender: row[0],
+            text: row[1],
+            sources: JSON.parse(row[2] || '[]'),
+            sourceDetails: [],
+            confidenceLabel: null,
+            confidenceScore: null,
+            retrievalMode: null,
+          }));
+          currentChatId = chatId;
+          localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
+          saveChatHistory();
+          renderChat();
+          return true;
+        } catch (err) {
+          console.error("Errore caricamento chat da DB:", err);
+          return false;
+        }
+      }
+
+      async function deleteChatFromDB(chatId) {
+        if (!db) return;
+        try {
+          await db('exec', {
+            sql: 'DELETE FROM messages WHERE chat_id = ?',
+            bind: [chatId]
+          });
+          await db('exec', {
+            sql: 'DELETE FROM chats WHERE id = ?',
+            bind: [chatId]
+          });
+        } catch (err) {
+          console.error("Errore eliminazione chat da DB:", err);
+        }
       }
     </script>
   </body>

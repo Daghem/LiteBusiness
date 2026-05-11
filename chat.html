@@ -229,14 +229,17 @@
               );
             `
           });
-          console.log("SQLite OPFS inizializzato con successo");
+          console.log("[SQLite] OPFS inizializzato");
         } catch (err) {
-          console.error("Errore inizializzazione SQLite:", err);
+          console.error("[SQLite] Errore inizializzazione:", err);
         }
       }
 
       async function saveMessageToSQLite(chatId, sender, text, sources = []) {
-        if (!db) return;
+        if (!db) {
+          console.warn("[SQLite] DB non inizializzato, messaggio non salvato");
+          return;
+        }
         try {
           await db('exec', {
             sql: 'INSERT OR IGNORE INTO chats (id, title) VALUES (?, ?)',
@@ -246,13 +249,17 @@
             sql: 'INSERT INTO messages (chat_id, sender, content, sources) VALUES (?, ?, ?, ?)',
             bind: [chatId, sender, text, JSON.stringify(sources)]
           });
+          console.log("[SQLite] Messaggio salvato:", sender, text.substring(0, 40));
         } catch (err) {
-          console.error("Errore salvataggio messaggio:", err);
+          console.error("[SQLite] Errore salvataggio messaggio:", err);
         }
       }
 
       async function loadChatHistoryFromDB() {
-        if (!db) return;
+        if (!db) {
+          console.warn("[SQLite] DB non inizializzato, cronologia non caricata");
+          return;
+        }
         try {
           const result = await db('exec', {
             sql: 'SELECT sender, content, sources FROM messages WHERE chat_id = ? ORDER BY timestamp ASC',
@@ -271,9 +278,12 @@
               confidenceScore: null,
               retrievalMode: null,
             }));
+            console.log("[SQLite] Cronologia caricata, messaggi:", chatHistory.length);
+          } else {
+            console.log("[SQLite] Nessun messaggio nel DB per chat", currentChatId);
           }
         } catch (err) {
-          console.error("Errore caricamento cronologia DB:", err);
+          console.error("[SQLite] Errore caricamento cronologia:", err);
         }
       }
 
@@ -386,7 +396,6 @@
                   streamingMessage.sources = [];
                   streamingMessage.sourceDetails = [];
                   finalizeStreamingMessage(streamingMsgId, streamingMessage);
-                  await persistTurn(userText, streamingMessage);
                   streamingComplete = true;
                   break; // Exit inner loop
                 }
@@ -398,7 +407,7 @@
                 }
 
                 if (data.done) {
-                  // Final message with all metadata
+                  console.log("[Stream] Ricevuto done, salvataggio messaggio AI...");
                   streamingMessage.text = data.text || streamingMessage.text;
                   streamingMessage.sources = normalizeSources(data.sources);
                   streamingMessage.sourceDetails = normalizeSourceDetails(data.source_details || []);

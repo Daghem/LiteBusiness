@@ -576,9 +576,14 @@ def _classify_query_relevance(query: str, regime_label: str) -> str:
                         "ATECO_LOOKUP — se l'utente chiede il coefficiente di redditività, la redditività, "
                         "o la percentuale associata a un codice ATECO specifico (es. 'coefficiente ATECO 69', "
                         "'redditività del codice 47.82', 'quanto è la redditività ATECO 62').\n"
-                        "OFF_TOPIC — se la domanda NON riguarda fisco, tasse, contributi, IVA, INPS, "
-                        "fatturazione, regimi fiscali, partita IVA (es. sport, meteo, cucina).\n"
-                        "PERTINENTE — per qualsiasi altra domanda su temi fiscali o contributivi."
+                        "OFF_TOPIC — se la domanda è completamente estranea al mondo fiscale, contabile "
+                        "e lavorativo (es. sport, meteo, cucina, intrattenimento, saluti come 'come stai').\n"
+                        "PERTINENTE — per QUALSIASI domanda che riguardi, anche indirettamente, "
+                        "fisco, tasse, contributi, IVA, INPS, fatturazione, regimi fiscali, partita IVA, "
+                        "codici ATECO, coefficienti di redditività, reddito, imposta sostitutiva, "
+                        "detrazioni, deduzioni, soglie, ricavi, compensi, aliquote, "
+                        "contabilità, dichiarazioni, scadenze fiscali, o qualsiasi altro concetto "
+                        "economico-fiscale. Nel dubbio, classifica come PERTINENTE."
                     ),
                 },
                 {"role": "user", "content": query},

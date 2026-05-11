@@ -1413,6 +1413,29 @@ async def chat_stream(payload: ChatRequest):
 
     return StreamingResponse(stream_generator(), media_type="text/event-stream")
 
+@app.get("/documents/{filename}", include_in_schema=False, response_class=FileResponse)
+async def serve_document(filename: str):
+    """Serve un documento PDF/XML dal corpus normativo per consultazione o download."""
+    safe_name = Path(filename).name
+    if safe_name != filename or not filename:
+        raise HTTPException(status_code=400, detail="Nome file non valido.")
+    for root in DOCUMENT_ROOTS:
+        candidate = root / FORFETTARIO_CORPUS_DIRNAME / safe_name
+        if candidate.is_file():
+            return FileResponse(
+                candidate,
+                media_type="application/pdf" if safe_name.lower().endswith(".pdf") else "application/octet-stream",
+                filename=safe_name,
+            )
+    uploads_candidate = UPLOADS_ROOT / FORFETTARIO_CORPUS_DIRNAME / safe_name
+    if uploads_candidate.is_file():
+        return FileResponse(
+            uploads_candidate,
+            media_type="application/pdf" if safe_name.lower().endswith(".pdf") else "application/octet-stream",
+            filename=safe_name,
+        )
+    raise HTTPException(status_code=404, detail="Documento non trovato.")
+
 @app.get("/{asset_name}", include_in_schema=False, response_class=FileResponse)
 async def serve_frontend_asset(asset_name: str):
     if asset_name not in FRONTEND_PAGES | FRONTEND_ASSETS:
@@ -1421,3 +1444,4 @@ async def serve_frontend_asset(asset_name: str):
     if not target_path.exists():
         raise HTTPException(status_code=404, detail="Risorsa non trovata.")
     return FileResponse(target_path)
+

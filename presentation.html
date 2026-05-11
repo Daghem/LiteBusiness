@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlyTax — Presentazione</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    :root {
+      --bg: #0B1021;
+      --surface: #11182B;
+      --primary: #00B894;
+      --accent: #3498DB;
+      --text: #E8ECF1;
+      --muted: #8F9BB3;
+      --border: rgba(255,255,255,0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .slides-container {
+      height: 100vh;
+      width: 100vw;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    .slide {
+      height: 100vh;
+      width: 100vw;
+      scroll-snap-align: start;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide-content {
+      max-width: 1100px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Decorative elements */
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: -20%; right: -10%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,184,148,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    h1 { font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 700; line-height: 1.1; margin-bottom: 1.5rem; }
+    h2 { font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 600; margin-bottom: 1.2rem; color: var(--primary); }
+    h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--accent); }
+    p, li { font-size: 1.15rem; line-height: 1.7; color: var(--muted); max-width: 700px; }
+    ul { list-style: none; padding-left: 0; }
+    li { position: relative; padding-left: 1.5rem; margin-bottom: 0.6rem; }
+    li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0.6rem;
+      width: 6px; height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(0,184,148,0.12);
+      color: var(--primary);
+      padding: 0.4rem 1rem;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(0,184,148,0.2);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,184,148,0.3);
+    }
+    .card-icon {
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+    .card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .card p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2rem;
+      align-items: stretch;
+    }
+    .flow-step {
+      flex: 1 1 180px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      position: relative;
+    }
+    .flow-step .step-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .flow-step h4 {
+      font-size: 1rem;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+    .flow-step p { font-size: 0.85rem; }
+    .arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.2rem;
+      padding: 0 0.2rem;
+    }
+
+    .big-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .hero-sub {
+      font-size: 1.3rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin-bottom: 2rem;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--primary);
+      color: var(--bg);
+      padding: 0.9rem 1.8rem;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: opacity 0.2s;
+    }
+    .cta-btn:hover { opacity: 0.9; }
+
+    .nav-dots {
+      position: fixed;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      z-index: 100;
+    }
+    .nav-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .nav-dot.active { background: var(--primary); }
+
+    .nav-arrows {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+      z-index: 100;
+    }
+    .nav-arrow {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: border-color 0.2s;
+    }
+    .nav-arrow:hover { border-color: var(--primary); }
+
+    .slide-counter {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      z-index: 100;
+    }
+
+    @media (max-width: 768px) {
+      .slide { padding: 1.2rem; }
+      .flow { flex-direction: column; }
+      .arrow { transform: rotate(90deg); }
+      .nav-dots { right: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nav-dots" id="navDots"></div>
+  <div class="slide-counter"><span id="currentSlide">1</span> / 10</div>
+  <div class="nav-arrows">
+    <button class="nav-arrow" onclick="prevSlide()" aria-label="Slide precedente"><i class="bi bi-chevron-up"></i></button>
+    <button class="nav-arrow" onclick="nextSlide()" aria-label="Slide successiva"><i class="bi bi-chevron-down"></i></button>
+  </div>
+
+  <div class="slides-container" id="slidesContainer">
+
+    <!-- SLIDE 1: TITOLO -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="badge"><i class="bi bi-robot"></i> AI Fiscale Specializzata</div>
+        <h1>FlyTax</h1>
+        <p class="hero-sub">Assistente AI e simulatore per il regime forfettario italiano. Risposte verificate su normativa, tributi e previdenza.</p>
+        <a href="https://github.com" class="cta-btn" style="display:none" id="ctaStarter"><i class="bi bi-play-fill"></i> Apri Progetto</a>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: IL PROBLEMA -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="badge"><i class="bi bi-bullseye"></i> Obiettivo</div>
+        <h2>Perché FlyTax?</h2>
+        <p>I professionisti e i piccoli imprenditori nel regime forfettario affrontano domande fiscali frequenti e precise. I chatbot generici tendono a inventare norme, soglie e scadenze.</p>
+        <ul style="margin-top:1.5rem">
+          <li>Risposte verificate solo su documenti ufficiali</li>
+          <li>Nessuna allucinazione del modello generativo</li>
+          <li>Simulatore fiscale integrato per calcoli orientativi</li>
+          <li>Cronologia chat, feedback e metriche admin</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: ARCHITETTURA -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="badge"><i class="bi bi-layers"></i> Stack Tecnologico</div>
+        <h2>Architettura</h2>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-icon"><i class="bi bi-window"></i></div>
+            <h4>Frontend</h4>
+            <p>HTML, CSS, Bootstrap 5 e JavaScript vanilla. Tema chiaro/scuro, chat, simulatore e dashboard.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon"><i class="bi bi-hdd-network"></i></div>
+            <h4>Backend</h4>
+            <p>FastAPI (Python) con endpoint REST e streaming SSE per l'effetto macchina da scrivere.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon"><i class="bi bi-brain"></i></div>
+            <h4>AI / LLM</h4>
+            <p>DeepSeek via API compatibile OpenAI. Il modello risponde <strong>solo</strong> leggendo i documenti recuperati.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon"><i class="bi bi-database"></i></div>
+            <h4>Vector DB</h4>
+            <p>Qdrant per la ricerca semantica. SentenceTransformers per generare gli embedding della query e dei chunk.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: FLUSSO RAG -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="badge"><i class="bi bi-search"></i> Retrieval Augmented Generation</div>
+        <h2>Come funziona la chat</h2>
+        <div class="flow">
+          <div class="flow-step">
+            <div class="step-num">Step 1</div>
+            <h4>Normalizzazione</h4>
+            <p>Corregge errori di battitura e standardizza termini fiscali.</p>
+          </div>
+          <div class="arrow"><i class="bi bi-arrow-right"></i></div>
+          <div class="flow-step">
+            <div class="step-num">Step 2</div>
+            <h4>Hardcoded</h4>
+            <p>Se la domanda è nota, risponde immediatamente con testo controllato.</p>
+          </div>
+          <div class="arrow"><i class="bi bi-arrow-right"></i></div>
+          <div class="flow-step">
+            <div class="step-num">Step 3</div>
+            <h4>Ricerca</h4>
+            <p>Semantic search su Qdrant + fallback lessicale per trovare i chunk pertinenti.</p>
+          </div>
+          <div class="arrow"><i class="bi bi-arrow-right"></i></div>
+          <div class="flow-step">
+            <div class="step-num">Step 4</div>
+            <h4>Generazione</h4>
+            <p>DeepSeek compone la risposta leggendo i documenti, con prompt blindato.</p>
+          </div>
+        </div>
+        <p style="margin-top:1.5rem; font-size:1rem;"><i class="bi bi-shield-check" style="color:var(--primary)"></i> Il LLM <strong>non può inventare</strong>: il prompt impone di usare solo il CONTEXT fornito e vietato markdown.</p>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: HARDCODED -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="badge"><i class="bi bi-lock-fill"></i> Guscio di Precisione</div>
+        <h2>Risposte Hardcoded</h2>
+        <p>Prima di chiamare l'AI, il backend riconosce decine di domande specifiche e risponde con testo controllato al 100%. Esempi:</p>
+        <div class="grid-2" style="margin-top:1.5rem">
+          <div class="card">
+            <h4><i class="bi bi-calculator" style="color:var(--accent);margin-right:0.4rem;"></i> Coefficienti ATECO</h4>
+            <p>Lookup diretto del coefficiente di redditività dal codice ATECO inserito.</p>
+          </div>
+          <div class="card">
+            <h4><i class="bi bi-cash-stack" style="color:var(--accent);margin-right:0.4rem;"></i> Soglie 85.000€ / 100.000€</h4>
+            <p>Regole precise sulle soglie di accesso e uscita immediata dal regime.</p>
+          </div>
+          <div class="card">
+            <h4><i class="bi bi-percent" style="color:var(--accent);margin-right:0.4rem;"></i> Aliquota 5% e 15%</h4>
+            <p>Spiegazione sintetica dell'imposta sostitutiva e delle casistiche ridotte.</p>
+          </div>
+          <div class="card">
+            <h4><i class="bi bi-globe" style="color:var(--accent);margin-right:0.4rem;"></i> Fatturazione estera</h4>
+            <p>VIES, reverse charge, Intrastat, bollo e diciture per UE e extra-UE.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: SIMULATORE -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="badge"><i class="bi bi-bar-chart-line"></i> Calcolo Orientativo</div>
+        <h2>Simulatore Fiscale</h2>
+        <p>Un modulo integrato in chat e dashboard che stima il carico fiscale e previdenziale in base ai dati inseriti.</p>
+        <div class="grid-2" style="margin-top:2rem">
+          <div class="card">
+            <div class="big-number">1</div>
+            <h4 style="margin-top:0.8rem">Ricavi & ATECO</h4>
+            <p>L'utente inserisce i ricavi e il codice ATECO. Il sistema trova automaticamente il coefficiente di redditività.</p>
+          </div>
+          <div class="card">
+            <div class="big-number">2</div>
+            <h4 style="margin-top:0.8rem">Contributi</h4>
+            <p>Calcola i contributi previdenziali in base alla gestione scelta (Separata, Artigiani/Commercianti).</p>
+          </div>
+          <div class="card">
+            <div class="big-number">3</div>
+            <h4 style="margin-top:0.8rem">Imposta sostitutiva</h4>
+            <p>Applica l'aliquota del 15% o 5% sull'imponibile, netto dei contributi.</p>
+          </div>
+          <div class="card">
+            <div class="big-number">4</div>
+            <h4 style="margin-top:0.8rem">Netto stimato</h4>
+            <p>Risultato finale con dettaglio di tutti i passaggi per trasparenza.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: FRONTEND -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="badge"><i class="bi bi-window-sidebar"></i> Interfaccia Utente</div>
+        <h2>Le 4 pagine principali</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h4><i class="bi bi-house-door" style="color:var(--primary);margin-right:0.4rem;"></i> index.html</h4>
+            <p>Landing page con branding, descrizione del servizio e call-to-action per accedere alla chat o al simulatore.</p>
+          </div>
+          <div class="card">
+            <h4><i class="bi bi-chat-dots" style="color:var(--primary);margin-right:0.4rem;"></i> chat.html</h4>
+            <p>Workspace completo: chat AI con cronologia laterale, simulatore collassabile, feedback 👍/👎 e toggle tema.</p>
+          </div>
+          <div class="card">
+            <h4><i class="bi bi-speedometer2" style="color:var(--primary);margin-right:0.4rem;"></i> dashboard.html</h4>
+            <p>Pagina di benvenuto con accesso rapido a chat, simulatore e area amministrativa.</p>
+          </div>
+          <div class="card">
+            <h4><i class="bi bi-gear" style="color:var(--primary);margin-right:0.4rem;"></i> admin_tools.html</h4>
+            <p>Area tecnica per caricare nuovi PDF/XML, avviare la re-indicizzazione e visualizzare statistiche.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: STORAGE -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="badge"><i class="bi bi-hdd"></i> Persistenza</div>
+        <h2>Storage & Dati</h2>
+        <p>FlyTax non usa database relazionali: tutto è basato su file JSON e JSONL per semplicità e portabilità.</p>
+        <div class="flow" style="margin-top:2rem">
+          <div class="flow-step">
+            <h4><i class="bi bi-chat-left-text" style="color:var(--primary)"></i> Chat History</h4>
+            <p>Ogni conversazione è un file JSON in <code>data/chat_history/</code>. Salvataggio automatico a ogni turno.</p>
+          </div>
+          <div class="arrow"><i class="bi bi-arrow-right"></i></div>
+          <div class="flow-step">
+            <h4><i class="bi bi-hand-thumbs-up" style="color:var(--primary)"></i> Feedback</h4>
+            <p>Voti utile/non utile appenditi in <code>data/feedback/feedback.jsonl</code> per analisi qualità.</p>
+          </div>
+          <div class="arrow"><i class="bi bi-arrow-right"></i></div>
+          <div class="flow-step">
+            <h4><i class="bi bi-activity" style="color:var(--primary)"></i> Eventi</h4>
+            <p>Log di eventi RAG (query senza risultati, confidenza bassa, reindex) in <code>data/events/</code>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: DEPLOY -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="badge"><i class="bi bi-cloud-upload"></i> Rilascio</div>
+        <h2>Deploy</h2>
+        <p>Il progetto è pronto per essere rilasciato su più piattaforme senza modifiche al codice.</p>
+        <div class="grid-2" style="margin-top:2rem">
+          <div class="card">
+            <h4><i class="bi bi-box-seam" style="color:var(--primary);margin-right:0.4rem;"></i> Hugging Face Spaces</h4>
+            <p>Docker Space con porta 7860. Include <code>Dockerfile</code> e <code>space_server.py</code> per l'avvio automatico.</p>
+          </div>
+          <div class="card">
+            <h4><i class="bi bi-server" style="color:var(--primary);margin-right:0.4rem;"></i> Render</h4>
+            <p>Importabile come Blueprint tramite <code>render.yaml</code>. Supporta mount disco per persistenza dati.</p>
+          </div>
+          <div class="card">
+            <h4><i class="bi bi-laptop" style="color:var(--primary);margin-right:0.4rem;"></i> Locale</h4>
+            <p>Avvio con <code>uvicorn api_deepseek:app --reload</code>. Qdrant in Docker locale per lo sviluppo.</p>
+          </div>
+          <div class="card">
+            <h4><i class="bi bi-shield-check" style="color:var(--primary);margin-right:0.4rem;"></i> Health Check</h4>
+            <p>Endpoint <code>/healthz</code> per monitorare lo stato del servizio e della disponibilità RAG.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: SINTESI -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="badge"><i class="bi bi-stars"></i> In Sintesi</div>
+        <h2>Perché funziona</h2>
+        <p>FlyTax combina più layer di difesa per garantire risposte affidabili nel regime forfettario:</p>
+        <div class="grid-2" style="margin-top:2rem">
+          <div class="card">
+            <div class="big-number">01</div>
+            <h4 style="margin-top:0.8rem">Hardcoded</h4>
+            <p>Risposte predefinite per le domande frequenti: precisione matematica, zero allucinazioni.</p>
+          </div>
+          <div class="card">
+            <div class="big-number">02</div>
+            <h4 style="margin-top:0.8rem">RAG Semantico</h4>
+            <p>Ricerca vettoriale su Qdrant nei documenti normativi ufficiali PDF e XML.</p>
+          </div>
+          <div class="card">
+            <div class="big-number">03</div>
+            <h4 style="margin-top:0.8rem">LLM Controllato</h4>
+            <p>DeepSeek risponde solo leggendo i chunk recuperati, con prompt che vietano di inventare norme.</p>
+          </div>
+          <div class="card">
+            <div class="big-number">04</div>
+            <h4 style="margin-top:0.8rem">Simulatore</h4>
+            <p>Calcoli orientativi integrati per stimare imponibile, contributi, imposta e netto.</p>
+          </div>
+        </div>
+        <p style="margin-top:2rem; font-size:1.1rem; color:var(--text);"><i class="bi bi-check-circle-fill" style="color:var(--primary);margin-right:0.4rem;"></i> Pensato per consulenti, studi professionali e privati che cercano risposte affidabili sul forfettario.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const container = document.getElementById('slidesContainer');
+    const slides = document.querySelectorAll('.slide');
+    const dotsContainer = document.getElementById('navDots');
+    const currentSpan = document.getElementById('currentSlide');
+    let current = 0;
+
+    slides.forEach((_, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'nav-dot' + (i === 0 ? ' active' : '');
+      btn.onclick = () => goTo(i);
+      dotsContainer.appendChild(btn);
+    });
+
+    function updateDots() {
+      document.querySelectorAll('.nav-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+      currentSpan.textContent = current + 1;
+    }
+
+    function goTo(index) {
+      if (index < 0 || index >= slides.length) return;
+      current = index;
+      slides[index].scrollIntoView({ behavior: 'smooth' });
+      updateDots();
+    }
+
+    function nextSlide() { goTo(current + 1); }
+    function prevSlide() { goTo(current - 1); }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          current = Array.from(slides).indexOf(entry.target);
+          updateDots();
+        }
+      });
+    }, { threshold: 0.5 });
+
+    slides.forEach(s => observer.observe(s));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault(); nextSlide();
+      }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault(); prevSlide();
+      }
+    });
+
+    // Supporto swipe per mobile
+    let touchStartY = 0;
+    container.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY);
+    container.addEventListener('touchend', e => {
+      const diff = touchStartY - e.changedTouches[0].clientY;
+      if (Math.abs(diff) > 50) {
+        diff > 0 ? nextSlide() : prevSlide();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -687,15 +687,21 @@
                       : "";
                 const scoreLabel =
                   typeof item.score === "number" ? `<span>Score ${item.score.toFixed(3)}</span>` : "";
+                const docUrl = `${getApiBaseUrl()}/documents/${encodeURIComponent(item.source)}`;
                 return `
-                  <article class="source-card">
-                    <div class="source-card-head">
-                      <strong>${escapeHtml(item.source)}</strong>
-                      ${pageLabel ? `<span>${pageLabel}</span>` : ""}
-                    </div>
-                    ${item.excerpt ? `<p>${escapeHtml(item.excerpt)}</p>` : ""}
-                    <div class="source-card-meta">${scoreLabel}</div>
-                  </article>
+                  <a href="${docUrl}" target="_blank" rel="noopener noreferrer" class="source-card-link">
+                    <article class="source-card source-card-clickable">
+                      <div class="source-card-head">
+                        <strong><i class="fas fa-file-pdf source-card-icon"></i>${escapeHtml(item.source)}</strong>
+                        ${pageLabel ? `<span>${pageLabel}</span>` : ""}
+                      </div>
+                      ${item.excerpt ? `<p>${escapeHtml(item.excerpt)}</p>` : ""}
+                      <div class="source-card-meta">
+                        ${scoreLabel}
+                        <span class="source-card-action"><i class="fas fa-external-link-alt"></i> Apri documento</span>
+                      </div>
+                    </article>
+                  </a>
                 `;
               })
               .join("")}

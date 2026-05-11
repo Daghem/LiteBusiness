@@ -193,7 +193,6 @@
       const simulatorBody = document.getElementById("simulatorBody");
       const simulatorForm = document.getElementById("simulatorForm");
       const simulatorResult = document.getElementById("simulatorResult");
-      const CHAT_STORAGE_KEY = "flytax-chat-history-v2";
       const CURRENT_CHAT_ID_KEY = "flytax-current-chat-id";
       const DEFAULT_API_BASE = window.location.origin;
       const INTRO_MESSAGE =
@@ -284,9 +283,8 @@
         syncThemeToggle();
         await initDatabase();
         await loadChatHistoryFromDB();
-        if (!chatHistory.length) restoreLocalChat();
         renderChat();
-        await loadServerHistory();
+        await loadLocalHistory();
       }
 
       themeToggle.addEventListener("click", function () {
@@ -408,9 +406,8 @@
                   streamingMessage.confidenceScore = typeof data.confidence_score === "number" ? data.confidence_score : null;
                   streamingMessage.retrievalMode = data.retrieval_mode || null;
                   finalizeStreamingMessage(streamingMsgId, streamingMessage);
-                  await persistTurn(userText, streamingMessage);
                   await saveMessageToSQLite(currentChatId, "ai", streamingMessage.text, streamingMessage.sources);
-                  await loadServerHistory();
+                  await loadLocalHistory();
                   streamingComplete = true;
                   break; // Exit inner loop - streaming complete
                 }
@@ -445,14 +442,13 @@
         currentChatId = createMessageId();
         localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
         chatHistory = [];
-        saveChatHistory();
         renderChat();
         inputField.value = "";
         inputField.focus();
       });
 
       refreshHistoryButton.addEventListener("click", function () {
-        loadServerHistory();
+        loadLocalHistory();
       });
 
       toggleSimulatorButton.addEventListener("click", function () {
@@ -503,98 +499,34 @@
         }
       });
 
-      async function loadServerHistory() {
-        let history = [];
-        try {
-          const response = await fetch(`${getApiBaseUrl()}/chat-history`);
-          if (response.ok) {
-            history = await response.json();
-          }
-        } catch (error) {
-          console.error("Errore caricamento cronologia server:", error);
-        }
+      async function loadLocalHistory() {
         try {
           const localHistory = await loadHistoryListFromDB();
-          const seen = new Set(history.map(h => h.chat_id));
-          for (const item of localHistory) {
-            if (!seen.has(item.chat_id)) {
-              history.push(item);
-            }
-          }
+          serverHistory = localHistory;
+          renderHistoryList();
         } catch (err) {
-          console.error("Errore caricamento cronologia DB:", err);
-        }
-        serverHistory = history;
-        renderHistoryList();
-      }
-
-      async function persistTurn(userText, assistantMessage) {
-        try {
-          await fetch(`${getApiBaseUrl()}/chat-history`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              chat_id: currentChatId,
-              regime_id: "forfettario",
-              user_message: userText,
-              assistant_message: assistantMessage.text,
-              assistant_sources: assistantMessage.sources,
-              confidence_label: assistantMessage.confidenceLabel,
-              confidence_score: assistantMessage.confidenceScore,
-              retrieval_mode: assistantMessage.retrievalMode,
-            }),
-          });
-        } catch (error) {
-          console.error("Persistenza chat fallita:", error);
+          console.error("Errore caricamento cronologia locale:", err);
+          serverHistory = [];
+          renderHistoryList();
         }
       }
 
       async function openChat(chatId) {
-        try {
-          const response = await fetch(`${getApiBaseUrl()}/chat-history/${chatId}`);
-          if (!response.ok) throw new Error("Chat non disponibile");
-          const transcript = await response.json();
-          currentChatId = transcript.chat_id;
-          localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
-          chatHistory = transcript.messages.map((message) => ({
-            id: createMessageId(),
-            sender: message.role === "assistant" ? "ai" : "user",
-            text: message.text,
-            sources: normalizeSources(message.sources),
-            sourceDetails: [],
-            confidenceLabel: message.confidence_label || null,
-            confidenceScore: typeof message.confidence_score === "number" ? message.confidence_score : null,
-            retrievalMode: message.retrieval_mode || null,
-          }));
-          saveChatHistory();
-          renderChat();
-        } catch (error) {
-          console.error("Apertura chat server fallita, provo DB locale:", error);
-          const loaded = await loadChatFromDB(chatId);
-          if (!loaded) {
-            console.error("Apertura chat fallita");
-          }
+        const loaded = await loadChatFromDB(chatId);
+        if (!loaded) {
+          console.error("Apertura chat fallita");
         }
       }
 
       async function deleteChat(chatId) {
-        try {
-          const response = await fetch(`${getApiBaseUrl()}/chat-history/${chatId}`, {
-            method: "DELETE",
-          });
-          if (!response.ok) throw new Error("Eliminazione fallita");
-        } catch (error) {
-          console.error("Eliminazione chat server fallita, elimino da DB locale:", error);
-        }
         await deleteChatFromDB(chatId);
         if (chatId === currentChatId) {
           currentChatId = createMessageId();
           localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
           chatHistory = [];
-          saveChatHistory();
           renderChat();
         }
-        await loadServerHistory();
+        await loadLocalHistory();
       }
 
       function renderHistoryList() {
@@ -654,23 +586,6 @@
           : [];
       }
 
-      function restoreLocalChat() {
-        try {
-          const raw = localStorage.getItem(CHAT_STORAGE_KEY);
-          if (!raw) return;
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            chatHistory = parsed;
-          }
-        } catch (error) {
-          console.error("Cronologia locale non leggibile:", error);
-        }
-      }
-
-      function saveChatHistory() {
-        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chatHistory.slice(-100)));
-      }
-
       function addMessage(message, options = {}) {
         chatHistory.push({
           id: createMessageId(),
@@ -682,7 +597,6 @@
           confidenceScore: message.confidenceScore || null,
           retrievalMode: message.retrievalMode || null,
         });
-        saveChatHistory();
         renderMessage(chatHistory[chatHistory.length - 1], options);
       }
 
@@ -901,7 +815,6 @@
           confidenceScore: message.confidenceScore || null,
           retrievalMode: message.retrievalMode || null,
         });
-        saveChatHistory();
 
         streamingMessages.delete(msgId);
       }
@@ -1081,7 +994,6 @@
           }));
           currentChatId = chatId;
           localStorage.setItem(CURRENT_CHAT_ID_KEY, currentChatId);
-          saveChatHistory();
           renderChat();
           return true;
         } catch (err) {

@@ -1055,7 +1055,7 @@ async def read_root(payload: ChatRequest):
         )
 
     # LLM-based query classification
-    relevance = _classify_query_relevance(raw_contenuto, active_regime.label)
+    relevance = _classify_query_relevance(contenuto, active_regime.label)
     if relevance == "off_topic":
         return ChatResponse(
             message=(
